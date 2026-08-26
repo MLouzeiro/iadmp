@@ -340,3 +340,23 @@ model Oportunidade {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 }
+
+model ConfiguracoesIgreja {
+  id               String   @id @default(cuid())
+  nomeIgreja       String   @default("Igreja Assembleia de Deus Ministerio da Promessa")
+  logoUrl          String?
+  logoDarkUrl      String?
+  faviconUrl       String?
+  corPrincipal      String   @default("#C8960C")
+  corSecundaria    String   @default("#C41E1E")
+  corDestaque      String   @default("#D4A017")
+  corFundo         String   @default("#0A1628")
+  corFundoClaro    String   @default("#F5E6C8")
+  corSuperficie    String   @default("#0D1F35")
+  corTexto         String   @default("#F0ECE2")
+  corTextoSecundario String @default("#C8C2B6")
+  corBorda         String   @default("rgba(201, 168, 76, 0.12)")
+  tema             String   @default("dark")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

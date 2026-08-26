@@ -85,6 +85,9 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
   background: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(var(--color-primary-rgb, 200, 150, 12), 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(var(--color-primary-rgb, 200, 150, 12), 0.02) 0%, transparent 50%);
   transition: background-color 0.4s ease, color 0.4s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -125,6 +128,11 @@ img {
 
 section {
   padding: 5rem 0;
+  position: relative;
+}
+
+section:nth-child(even) {
+  background: var(--bg-secondary);
 }
 
 /* Buttons */

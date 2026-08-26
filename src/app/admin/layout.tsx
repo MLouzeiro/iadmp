@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images, Lightbulb, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images, Lightbulb, Settings, LogOut, Palette, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
 const sidebarLinks = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -14,15 +15,22 @@ const sidebarLinks = [
   { name: 'Avisos', path: '/admin/avisos', icon: Bell },
   { name: 'Galeria', path: '/admin/galeria', icon: Images },
   { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
-  { name: 'Configuracoes', path: '/admin/configuracoes', icon: Settings },
+];
+
+const configSubLinks = [
+  { name: 'Geral', path: '/admin/configuracoes', icon: Settings },
+  { name: 'Aparencia', path: '/admin/configuracoes/aparencia', icon: Palette },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [configOpen, setConfigOpen] = useState(pathname.startsWith('/admin/configuracoes'));
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
+
+  const isConfigActive = pathname.startsWith('/admin/configuracoes');
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', paddingTop: 'var(--header-height)' }}>
@@ -62,6 +70,62 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             );
           })}
+
+          {/* Configuracoes com sub-menu */}
+          <button
+            onClick={() => setConfigOpen(!configOpen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem 1rem',
+              borderRadius: 'var(--radius-sm)',
+              color: isConfigActive ? 'var(--color-secondary)' : 'var(--text-primary)',
+              background: isConfigActive ? 'var(--bg-card)' : 'transparent',
+              fontWeight: isConfigActive ? 600 : 400,
+              transition: 'var(--transition)',
+              cursor: 'pointer',
+              width: '100%',
+              textAlign: 'left',
+              fontSize: 'inherit',
+              fontFamily: 'inherit',
+            }}
+          >
+            <Settings size={20} />
+            Configuracoes
+            <ChevronDown size={16} style={{ marginLeft: 'auto', transform: configOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'var(--transition)' }} />
+          </button>
+
+          {configOpen && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '1rem' }}>
+              {configSubLinks.map(({ name, path, icon: Icon }) => {
+                const isActive = pathname === path;
+                return (
+                  <Link
+                    key={path}
+                    href={path}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '0.6rem 1rem',
+                      borderRadius: 'var(--radius-sm)',
+                      color: isActive ? 'var(--color-primary)' : 'var(--text-muted)',
+                      background: isActive ? 'var(--gradient-gold-soft)' : 'transparent',
+                      textDecoration: 'none',
+                      fontWeight: isActive ? 600 : 400,
+                      transition: 'var(--transition)',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    <Icon size={16} />
+                    {name}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
           <Link
             href="/"
             style={{
