@@ -3,61 +3,80 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { navigation } from '@/data/site-data';
 
-const links = [
-  { name: 'Inicio', path: '/' },
-  { name: 'Sobre', path: '/sobre' },
-  { name: 'Eventos', path: '/eventos' },
-  { name: 'Lideranca', path: '/lideranca' },
-  { name: 'Galeria', path: '/galeria' },
-  { name: 'Contato', path: '/contato' },
-];
-
-const Navbar = () => {
-  const [isNavShowing, setIsNavShowing] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState('dark');
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const saved = localStorage.getItem('iadmp-theme') || 'dark';
+    setTheme(saved);
+    document.documentElement.setAttribute('data-theme', saved);
   }, []);
 
-  useEffect(() => { setIsNavShowing(false); }, [pathname]);
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('iadmp-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+  };
 
   return (
-    <nav className={scrolled ? 'scrolled' : ''}>
-      <div className="container nav__container">
-        <Link href="/" className="logo">
-          <img src="/images/logo.png" alt="IADMP Logo" width={48} height={48} />
-        </Link>
-        <ul className={`nav__links ${isNavShowing ? 'show__nav' : 'hide__nav'}`}>
-          {links.map(({ name, path }) => (
-            <li key={path}>
-              <Link href={path} className={pathname === path ? 'active-nav' : ''}>
-                {name}
+    <>
+      <nav className="navbar">
+        <div className="container">
+          <Link href="/" className="navbar-logo">
+            <img src="/images/logo.png" alt="IADMP" />
+            IADMP
+          </Link>
+
+          <div className="navbar-links">
+            {navigation.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={pathname === item.path ? 'active' : ''}
+              >
+                {item.name}
               </Link>
-            </li>
-          ))}
-          <li>
-            <Link href="/admin" className={pathname.startsWith('/admin') ? 'active-nav' : ''}>
-              Gestao
-            </Link>
-          </li>
-        </ul>
-        <div className="nav__actions">
+            ))}
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Alternar tema">
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+          </div>
+
           <button
-            className="nav__toggle-btn"
-            onClick={() => setIsNavShowing((prev) => !prev)}
+            className="navbar-toggle"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Menu"
           >
-            {isNavShowing ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </div>
-    </nav>
-  );
-};
+      </nav>
 
-export default Navbar;
+      <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`}>
+        {navigation.map((item) => (
+          <Link
+            key={item.path}
+            href={item.path}
+            onClick={() => setMobileOpen(false)}
+            className={pathname === item.path ? 'active' : ''}
+          >
+            {item.name}
+          </Link>
+        ))}
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          style={{ alignSelf: 'flex-start', marginTop: '1rem' }}
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+      </div>
+    </>
+  );
+}
