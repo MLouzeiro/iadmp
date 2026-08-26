@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MEMBER)
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  avaliacoes   Avaliacao[]
+  membro       Membro?
+}
+
+enum Role {
+  ADMIN
+  PASTOR
+  SECRETARIA
+  FINANCEIRO
+  LIDER_MINISTERIO
+  EDITOR_SITE
+  MEMBER
+}
+
+model Membro {
+  id             String        @id @default(cuid())
+  nome           String
+  email          String?
+  telefone       String?
+  whatsapp       String?
+  dataNascimento DateTime?
+  endereco       String?
+  foto           String?
+  dataEntrada    DateTime      @default(now())
+  status         StatusMembro  @default(ATIVO)
+  observacoes    String?
+  congregacao    String?
+  userId         String?        @unique
+  user           User?           @relation(fields: [userId], references: [id])
+  ministerioId   String?
+  ministerio     Ministerio?   @relation(fields: [ministerioId], references: [id])
+  departamentoId String?
+  departamento   Departamento? @relation(fields: [departamentoId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lideranca      Lideranca[]
+}
+
+enum StatusMembro {
+  ATIVO
+  INATIVO
+  TRANSFERIDO
+  FALECIDO
+}
+
+model Ministerio {
+  id          String    @id @default(cuid())
+  nome        String
+  descricao   String?
+  responsavel String?
+  ativo       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  membros     Membro[]
+  lideranca   Lideranca[]
+}
+
+model Departamento {
+  id          String    @id @default(cuid())
+  nome        String
+  descricao   String?
+  responsavel String?
+  ativo       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  membros     Membro[]
+}
+
+model Lideranca {
+  id            String    @id @default(cuid())
+  nome          String
+  cargo         String
+  foto          String?
+  biografia     String?
+  ordemExibicao Int       @default(0)
+  publico       Boolean   @default(true)
+  ativo         Boolean   @default(true)
+  dataInicio    DateTime?
+  dataFim       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  membroId      String?
+  membro        Membro?   @relation(fields: [membroId], references: [id])
+  ministerioId  String?
+  ministerio    Ministerio? @relation(fields: [ministerioId], references: [id])
+}
+
+model Evento {
+  id                String         @id @default(cuid())
+  nome              String
+  categoriaId       String?
+  dataInicio        DateTime
+  dataEvento        DateTime
+  dataFim           DateTime?
+  tema              String?
+  preletores        String[]
+  diasDuracao       Int?
+  status            StatusEvento   @default(PLANEJADO)
+  observacoes       String?
+  local             String?
+  responsavelGeral  String?
+  publicarNoSite    Boolean        @default(false)
+  orcamentoPrevisto Decimal?       @db.Decimal(10, 2)
+  totalDespesas     Decimal        @default(0) @db.Decimal(10, 2)
+  totalReceitas     Decimal        @default(0) @db.Decimal(10, 2)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  categoria         CategoriaEvento? @relation(fields: [categoriaId], references: [id])
+  campanha          Campanha?
+  avaliacao         Avaliacao?
+  participantes     EventoParticipante[]
+  financeiro        EventoFinanceiro[]
+  liturgias         Liturgia[]
+  galeriaItems      GaleriaItem[]
+  agenda            Agenda[]
+  tarefas           TarefaEvento[]
+}
+
+model CategoriaEvento {
+  id        String    @id @default(cuid())
+  nome      String
+  descricao String?
+  cor       String?
+  ativo     Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  eventos   Evento[]
+}
+
+model EventoParticipante {
+  id             String    @id @default(cuid())
+  nome           String
+  email          String?
+  telefone       String?
+  funcaoParticipante String @default("PARTICIPANTE")
+  observacoes    String?
+  createdAt      DateTime  @default(now())
+  eventoId       String
+  evento         Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+}
+
+model TarefaEvento {
+  id          String    @id @default(cuid())
+  titulo      String
+  descricao   String?
+  responsavel String?
+  prazo       DateTime?
+  concluida   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  eventoId    String
+  evento      Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+}
+
+enum StatusEvento {
+  PLANEJADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+model Campanha {
+  id              String    @id @default(cuid())
+  eventoId        String    @unique
+  meta            Decimal   @db.Decimal(10, 2)
+  valorArrecadado Decimal   @default(0) @db.Decimal(10, 2)
+  dataInicio      DateTime
+  dataFim         DateTime
+  descricao       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  evento          Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+}
+
+model CategoriaFinanceira {
+  id            String    @id @default(cuid())
+  nome          String
+  genero        String
+  descricao     String?
+  ativo         Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  movimentacoes EventoFinanceiro[]
+}
+
+model EventoFinanceiro {
+  id                    String    @id @default(cuid())
+  descricao             String
+  valor                 Decimal   @db.Decimal(10, 2)
+  quando                DateTime  @default(now())
+  generoMovimentacao    String
+  fornecedor            String?
+  comprovante           String?
+  responsavel           String?
+  observacoes           String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  eventoId              String
+  evento                Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  categoriaFinanceiraId String?
+  categoriaFinanceira   CategoriaFinanceira? @relation(fields: [categoriaFinanceiraId], references: [id])
+}
+
+model Avaliacao {
+  id                    String    @id @default(cuid())
+  eventoId              String    @unique
+  notaEquipe            Int
+  observacoesEquipe     String?
+  presencaEstimada      Int?
+  planejamentoDiasAntes Int?
+  metaAtingidaPercent   Decimal?  @db.Decimal(5, 2)
+  sugestoesAutomaticas  String[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  evento                Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  userId                String?
+  user                  User?     @relation(fields: [userId], references: [id])
+}
+
+model Liturgia {
+  id          String    @id @default(cuid())
+  quando      DateTime
+  horario     String?
+  dirigente   String?
+  pregador    String?
+  tema        String?
+  observacoes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  eventoId    String?
+  evento      Evento?   @relation(fields: [eventoId], references: [id])
+  itens       LiturgiaItem[]
+}
+
+model LiturgiaItem {
+  id              String    @id @default(cuid())
+  ordem           Int
+  titulo          String
+  responsavel     String?
+  horarioPrevisto String?
+  duracao         String?
+  observacao      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  liturgiaId      String
+  liturgia        Liturgia  @relation(fields: [liturgiaId], references: [id], onDelete: Cascade)
+}
+
+model Agenda {
+  id          String    @id @default(cuid())
+  titulo      String
+  descricao   String?
+  comeco      DateTime
+  termino     DateTime?
+  horario     String?
+  local       String?
+  recorrente  Boolean   @default(false)
+  recorrencia String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  eventoId    String?
+  evento      Evento?   @relation(fields: [eventoId], references: [id])
+}
+
+model Aviso {
+  id             String    @id @default(cuid())
+  titulo         String
+  descricao      String
+  imagem         String?
+  categoria      String?
+  comecaEm       DateTime  @default(now())
+  terminaEm      DateTime?
+  urgencia       String    @default("NORMAL")
+  situacaoAviso  String    @default("ATIVO")
+  publicoAlvo    String?
+  publicarSite   Boolean   @default(false)
+  mostrarPainel  Boolean   @default(true)
+  destaque       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model GaleriaAlbum {
+  id        String    @id @default(cuid())
+  nome      String
+  descricao String?
+  capa      String?
+  momentAlbum DateTime?
+  publico   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  itens     GaleriaItem[]
+}
+
+model GaleriaItem {
+  id          String    @id @default(cuid())
+  titulo      String?
+  descricao   String?
+  url         String
+  classArquivo String   @default("FOTO")
+  ordem       Int       @default(0)
+  momentoItem DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  albumId     String?
+  album       GaleriaAlbum? @relation(fields: [albumId], references: [id])
+  eventoId    String?
+  evento      Evento?   @relation(fields: [eventoId], references: [id])
+}
+
+model Oportunidade {
+  id                String    @id @default(cuid())
+  titulo            String
+  descricao         String
+  generoOportunidade String
+  responsavel       String?
+  prazo             DateTime?
+  vagas             Int?
+  abrirOportunidade String    @default("ATIVA")
+  observacoes       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
