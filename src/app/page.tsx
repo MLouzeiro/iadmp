@@ -13,9 +13,9 @@ export default function Home() {
         <div className="hero-content fade-in">
           <h1>
             Igreja Assembleia de Deus<br />
-            <span>Ministerio da Promessa</span>
+            <span>Missão da Promessa</span>
           </h1>
-          <p>Uma comunidade de fe, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.</p>
+          <p>Uma igreja de fé, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.</p>
           <div className="hero-buttons">
             <Link href="/sobre" className="btn btn-primary btn-lg">
               Conheca Nossa Historia <ArrowRight size={16} />
@@ -50,7 +50,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <span className="label">Programacao Semanal</span>
-            <h2>Nossos Cultos e Reunioes</h2>
+            <h2>Nossos Cultos</h2>
             <p>Confira nossa agenda semanal e participe conosco.</p>
             <div className="divider" />
           </div>

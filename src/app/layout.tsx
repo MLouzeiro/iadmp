@@ -9,8 +9,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'IADMP - Igreja Assembleia de Deus Ministerio da Promessa',
-  description: 'Site oficial da Igreja Assembleia de Deus Ministerio da Promessa - IADMP. Uma comunidade de fe, amor e esperanca.',
+  title: 'IADMP - Igreja Assembleia de Deus Missão da Promessa',
+  description: 'Site oficial da Igreja Assembleia de Deus Missão da Promessa - IADMP. Uma comunidade de fe, amor e esperanca.',
   keywords: ['igreja', 'assembleia de deus', 'ministerio da promessa', 'IADMP', 'culto', 'worship', 'fe', 'comunhao'],
   openGraph: {
     title: 'IADMP - Igreja Assembleia de Deus Ministerio da Promessa',
