@@ -2,7 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
+export async function GET() {
+  return handleSeed();
+}
+
 export async function POST() {
+  return handleSeed();
+}
+
+async function handleSeed() {
   try {
     const adminPasswordHash = await bcrypt.hash('admin123', 10);
 
@@ -20,6 +28,6 @@ export async function POST() {
     return NextResponse.json({ success: true, user: { id: admin.id, email: admin.email, role: admin.role } });
   } catch (error) {
     console.error('Seed error:', error);
-    return NextResponse.json({ error: 'Erro ao criar admin' }, { status: 500 });
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
