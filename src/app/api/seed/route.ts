@@ -26,8 +26,8 @@ async function handleSeed() {
     });
 
     return NextResponse.json({ success: true, user: { id: admin.id, email: admin.email, role: admin.role } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Seed error:', error);
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    return NextResponse.json({ error: error.message || String(error), stack: error.stack }, { status: 500 });
   }
 }
