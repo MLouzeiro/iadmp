@@ -3,6 +3,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Save, RotateCcw, Palette, Eye } from 'lucide-react';
 import { palettes, defaultColors, type ThemeColors } from '@/lib/theme-palettes';
+import Button from '@/components/ui/Button';
+import FormCard from '@/components/ui/FormCard';
+import Input from '@/components/ui/Input';
+import styles from '@/components/ui/form.module.css';
 
 interface Config {
   id?: string;
@@ -196,52 +200,35 @@ export default function AparenciaPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      <div className={styles.pageHeader}>
         <div>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Aparencia do Site</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Personalize as cores e identidade visual do site.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button onClick={restoreDefaults} className="btn btn-outline" style={{ fontSize: '0.8rem' }}>
-            <RotateCcw size={14} /> Restaurar padrao
-          </button>
-          <button onClick={handleSave} className="btn" style={{ fontSize: '0.8rem' }} disabled={saving}>
-            <Save size={14} /> {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar alteracoes'}
-          </button>
+          <Button variant="secondary" icon={<RotateCcw size={14} />} onClick={restoreDefaults} size="sm">
+            Restaurar padrao
+          </Button>
+          <Button icon={<Save size={14} />} onClick={handleSave} size="sm" disabled={saving}>
+            {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar alteracoes'}
+          </Button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
+      <div className={styles.formGrid} style={{ gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
         {/* Left: Settings */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Identidade */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+          <div className={styles.formCard}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Identidade</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minWidth: '120px' }}>Nome da Igreja</label>
-                <input
-                  type="text"
-                  value={config.nomeIgreja}
-                  onChange={(e) => setConfig({ ...config, nomeIgreja: e.target.value })}
-                  style={{ flex: 1, padding: '0.5rem 0.75rem', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minWidth: '120px' }}>Logo URL</label>
-                <input
-                  type="text"
-                  value={config.logoUrl || ''}
-                  onChange={(e) => setConfig({ ...config, logoUrl: e.target.value || null })}
-                  placeholder="/images/logo.png"
-                  style={{ flex: 1, padding: '0.5rem 0.75rem', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontFamily: 'inherit', fontSize: '0.85rem' }}
-                />
-              </div>
+              <Input label="Nome da Igreja" value={config.nomeIgreja} onChange={(e) => setConfig({ ...config, nomeIgreja: e.target.value })} />
+              <Input label="Logo URL" value={config.logoUrl || ''} placeholder="/images/logo.png" onChange={(e) => setConfig({ ...config, logoUrl: e.target.value || null })} />
             </div>
           </div>
 
           {/* Cores */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+          <div className={styles.formCard}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Cores</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {colorFields.map(({ key, label }) => (
@@ -256,7 +243,7 @@ export default function AparenciaPage() {
           </div>
 
           {/* Tema */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+          <div className={styles.formCard}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Tema</h3>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               {['dark', 'light', 'auto'].map((t) => (
@@ -282,7 +269,7 @@ export default function AparenciaPage() {
           </div>
 
           {/* Paletas */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+          <div className={styles.formCard}>
             <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--color-primary)' }}>
               <Palette size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.5rem' }} />
               Paletas Pre-definidas

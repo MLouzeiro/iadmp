@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import FormCard from '@/components/ui/FormCard';
+import FormGrid from '@/components/ui/FormGrid';
+import SearchBar from '@/components/ui/SearchBar';
+import styles from '@/components/ui/form.module.css';
 
 interface Membro {
   id: string;
@@ -61,73 +67,52 @@ export default function MembrosPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className={styles.pageHeader}>
         <SectionHead icon={<span>👥</span>} title="Gestao de Membros" />
-        <button className="btn sm" onClick={() => setShowForm(true)}><Plus size={16} /> Novo Membro</button>
+        <Button icon={<Plus size={16} />} onClick={() => setShowForm(true)} size="sm">
+          Novo Membro
+        </Button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input
-            type="text"
-            placeholder="Buscar membro..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: '100%', padding: '0.8rem 1rem 0.8rem 2.5rem', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-          />
-        </div>
+      <div className={styles.toolbar}>
+        <SearchBar value={search} onChange={setSearch} placeholder="Buscar membro..." />
       </div>
 
       {showForm && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '2rem', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ color: 'var(--color-secondary)' }}>Novo Membro</h3>
-            <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}><X size={24} /></button>
-          </div>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="form__group">
-              <label>Nome Completo</label>
-              <input type="text" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+        <FormCard title="Novo Membro" onClose={() => setShowForm(false)}>
+          <FormGrid onSubmit={handleSubmit}>
+            <Input label="Nome Completo" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+            <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <Input label="Telefone" type="tel" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
+            <Input label="Congregacao" value={form.congregacao} onChange={(e) => setForm({ ...form, congregacao: e.target.value })} />
+            <div className={styles.formActionsFull}>
+              <Button type="submit">Salvar Membro</Button>
             </div>
-            <div className="form__group">
-              <label>Email</label>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            </div>
-            <div className="form__group">
-              <label>Telefone</label>
-              <input type="tel" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
-            </div>
-            <div className="form__group">
-              <label>Congregacao</label>
-              <input type="text" value={form.congregacao} onChange={(e) => setForm({ ...form, congregacao: e.target.value })} />
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <button type="submit" className="btn">Salvar Membro</button>
-            </div>
-          </form>
-        </div>
+          </FormGrid>
+        </FormCard>
       )}
 
       <div style={{ marginTop: '1rem' }}>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)' }}>Carregando...</p>
+          <p className={styles.loadingState}>Carregando...</p>
         ) : membros.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)' }}>Nenhum membro encontrado.</p>
+          <p className={styles.emptyState}>Nenhum membro encontrado.</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {membros.map((membro) => (
-              <div key={membro.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
+              <div key={membro.id} className={styles.listItem}>
+                <div className={styles.listItemInfo}>
                   <h4>{membro.nome}</h4>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  <p>
                     {membro.email || 'Sem email'} | {membro.congregacao || 'Sem congregacao'}
                     {membro.ministerio && ` | ${membro.ministerio.nome}`}
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <span style={{ padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', background: statusColors[membro.status], color: '#fff', fontSize: '0.75rem', fontWeight: 600 }}>{membro.status}</span>
-                  <button onClick={() => handleDelete(membro.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                <div className={styles.listItemActions}>
+                  <span className={styles.badge} style={{ background: statusColors[membro.status], color: '#fff' }}>
+                    {membro.status}
+                  </span>
+                  <Button variant="ghost" icon={<Trash2 size={16} />} onClick={() => handleDelete(membro.id)} />
                 </div>
               </div>
             ))}

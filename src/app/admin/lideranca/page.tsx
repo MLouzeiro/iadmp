@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, X, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
+import Input from '@/components/ui/Input';
+import Checkbox from '@/components/ui/Checkbox';
+import Button from '@/components/ui/Button';
+import FormCard from '@/components/ui/FormCard';
+import FormGrid from '@/components/ui/FormGrid';
+import styles from '@/components/ui/form.module.css';
 
 interface Lider {
   id: string;
@@ -51,64 +57,48 @@ export default function LiderancaPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className={styles.pageHeader}>
         <SectionHead icon={<span>👤</span>} title="Gestao de Lideranca" />
-        <button className="btn sm" onClick={() => setShowForm(true)}><Plus size={16} /> Novo Lider</button>
+        <Button icon={<Plus size={16} />} onClick={() => setShowForm(true)} size="sm">
+          Novo Lider
+        </Button>
       </div>
 
       {showForm && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '2rem', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ color: 'var(--color-secondary)' }}>Novo Lider</h3>
-            <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}><X size={24} /></button>
-          </div>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="form__group">
-              <label>Nome</label>
-              <input type="text" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+        <FormCard title="Novo Lider" onClose={() => setShowForm(false)}>
+          <FormGrid onSubmit={handleSubmit}>
+            <Input label="Nome" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+            <Input label="Cargo" required value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} />
+            <Input label="Ordem de Exibicao" type="number" value={form.ordemExibicao} onChange={(e) => setForm({ ...form, ordemExibicao: parseInt(e.target.value) || 0 })} />
+            <Checkbox label="Publico no site" checked={form.publico} onChange={(checked) => setForm({ ...form, publico: checked })} />
+            <div className={styles.formActionsFull}>
+              <Button type="submit">Salvar Lider</Button>
             </div>
-            <div className="form__group">
-              <label>Cargo</label>
-              <input type="text" required value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} />
-            </div>
-            <div className="form__group">
-              <label>Ordem de Exibicao</label>
-              <input type="number" value={form.ordemExibicao} onChange={(e) => setForm({ ...form, ordemExibicao: parseInt(e.target.value) || 0 })} />
-            </div>
-            <div className="form__group" style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1.5rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input type="checkbox" checked={form.publico} onChange={(e) => setForm({ ...form, publico: e.target.checked })} />
-                Publico no site
-              </label>
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <button type="submit" className="btn">Salvar Lider</button>
-            </div>
-          </form>
-        </div>
+          </FormGrid>
+        </FormCard>
       )}
 
       <div style={{ marginTop: '1rem' }}>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)' }}>Carregando...</p>
+          <p className={styles.loadingState}>Carregando...</p>
         ) : lideres.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)' }}>Nenhum lider encontrado.</p>
+          <p className={styles.emptyState}>Nenhum lider encontrado.</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {lideres.map((lider) => (
-              <div key={lider.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
+              <div key={lider.id} className={styles.listItem}>
+                <div className={styles.listItemInfo}>
                   <h4>{lider.nome}</h4>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  <p>
                     {lider.cargo} | Ordem: {lider.ordemExibicao}
                     {lider.ministerio && ` | ${lider.ministerio.nome}`}
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <span style={{ padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', background: lider.publico ? '#4caf50' : '#9e9e9e', color: '#fff', fontSize: '0.75rem', fontWeight: 600 }}>
+                <div className={styles.listItemActions}>
+                  <span className={styles.badge} style={{ background: lider.publico ? '#4caf50' : '#9e9e9e', color: '#fff' }}>
                     {lider.publico ? 'Publico' : 'Privado'}
                   </span>
-                  <button onClick={() => handleDelete(lider.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                  <Button variant="ghost" icon={<Trash2 size={16} />} onClick={() => handleDelete(lider.id)} />
                 </div>
               </div>
             ))}
