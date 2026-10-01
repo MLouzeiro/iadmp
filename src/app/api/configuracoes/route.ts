@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { defaultColors } from '@/lib/theme-palettes';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function GET() {
   try {
@@ -22,6 +23,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    await requireAuth();
     const body = await request.json();
     let config = await prisma.configuracoesIgreja.findFirst();
 
@@ -52,7 +54,9 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(config);
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     console.error('Error updating church config:', error);
     return NextResponse.json(
       { error: 'Erro ao salvar configuracoes' },

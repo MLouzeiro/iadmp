@@ -1,6 +1,6 @@
 export const churchData = {
   name: 'IADMP',
-  fullName: 'Igreja Assembleia de Deus Ministerio da Promessa',
+  fullName: 'Igreja Assembleia de Deus Missão da Promessa',
   description: 'Uma comunidade de fe, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.',
   address: 'Maranhao, Brasil',
   phone: '+55 98 98803-5646',
@@ -11,17 +11,21 @@ export const churchData = {
 
 export const navigation = [
   { name: 'Inicio', path: '/' },
-  { name: 'Sobre', path: '/sobre' },
-  { name: 'Eventos', path: '/eventos' },
-  { name: 'Galeria', path: '/galeria' },
-  { name: 'Lideranca', path: '/lideranca' },
+  { name: 'A Igreja', path: '/sobre' },
+  { name: 'Programacoes', path: '/eventos' },
+  { name: 'Pregacoes', path: '/pregacoes' },
   { name: 'Contato', path: '/contato' },
+];
+
+export const socialLinks = [
+  { name: 'YouTube', url: 'https://www.youtube.com/@iadmpma', icon: 'youtube' },
+  { name: 'Instagram', url: 'https://www.instagram.com/iadmpma', icon: 'instagram' },
 ];
 
 export const programs = [
   {
     id: 1,
-    day: 'Segunda, Quarta e Sabado',
+    day: 'Quarta e Domingo',
     title: 'Consagracoes',
     time: '06:00',
     description: 'Tempo de oracao e consagracao diante do Senhor.',
@@ -30,6 +34,13 @@ export const programs = [
     id: 2,
     day: 'Terca-Feira',
     title: 'Culto de Doutrina',
+    time: '19:30',
+    description: 'Estudo aprofundado da Palavra de Deus.',
+  },
+    {
+    id: 2,
+    day: 'Quarta-Feira',
+    title: 'Culto no Res. Tiradentes',
     time: '19:30',
     description: 'Estudo aprofundado da Palavra de Deus.',
   },
@@ -80,17 +91,17 @@ export const leaders = [
   { id: 1, name: 'Pr. Cleiginaldo Barros', role: 'Pastor Presidente', image: '/images/iadmp/Lideranca/Cleiginaldo.jpg' },
   { id: 2, name: 'Pr. Walmorio', role: 'Pastor da Vila Sarney', image: '/images/iadmp/Lideranca/Walmorio.jpeg' },
   { id: 3, name: 'Pr. Melquesedeque', role: 'Pastor', image: '/images/iadmp/Lideranca/Melquisedeque.jpeg' },
-  { id: 4, name: 'Dc. Marcio Louzeiro', role: '1 Dirigente', image: '/images/iadmp/Lideranca/Marcio.jpg' },
+  { id: 4, name: 'Pb. Marcio Louzeiro', role: '1 Dirigente', image: '/images/iadmp/Lideranca/Marcio.jpg' },
   { id: 5, name: 'Missionario Cristiano', role: '2 Dirigente', image: '/images/iadmp/Lideranca/Cristiano.jpeg' },
   { id: 6, name: 'Ayton Sena', role: 'Lider de Jovens', image: '/images/iadmp/Lideranca/Ayton-Sena.jpg' },
   { id: 7, name: 'Ana Caroline', role: 'Lider de Jovens', image: '/images/iadmp/Lideranca/Carol.jpeg' },
   { id: 8, name: 'Missionaria Suenne Baros', role: '1 Dirigente do Circulo de Oracao', image: '/images/iadmp/Lideranca/Suene.jpg' },
   { id: 9, name: 'Dc. Thiane Louzeiro', role: 'Regente das Heroinas da Fe', image: '/images/iadmp/Lideranca/Thiane.jpeg' },
   { id: 10, name: 'Dc. Dayane', role: 'Regente das Heroinas da Fe', image: '' },
-  { id: 11, name: 'Dc. Janaina Freitas', role: 'Lider do Dep. de Criancas', image: '/images/iadmp/Lideranca/Janaina.jpeg' },
-  { id: 12, name: 'Julia', role: 'Lider do Dep. de Criancas', image: '' },
+ // { id: 11, name: 'Dc. Janaina Freitas', role: 'Lider do Dep. de Criancas', image: '/images/iadmp/Lideranca/Janaina.jpeg' },
+ // { id: 12, name: 'Julia', role: 'Lider do Dep. de Criancas', image: '' },
   { id: 13, name: 'Jannes', role: 'Tesoureiro', image: '' },
-  { id: 14, name: 'Erica Lopes', role: 'Tesoureira', image: '/images/iadmp/Lideranca/Erika.jpeg' },
+ // { id: 14, name: 'Erica Lopes', role: 'Tesoureira', image: '/images/iadmp/Lideranca/Erika.jpeg' },
 ];
 
 export const congregations = [
@@ -102,14 +113,20 @@ export const congregations = [
   },
   {
     id: 2,
-    name: 'Vila Sarney',
-    description: 'Pastor: Walmorio',
-    image: '/images/iadmp/Sarney/imagem7.jpeg',
+    name: 'Res. Tiradentes',
+    description: '-',
+    //image: '/images/iadmp/Sarney/imagem7.jpeg',
   },
   {
     id: 3,
     name: 'Novo Renascer',
     description: 'Novo Renascer (Albino Soero)',
+    image: '/images/iadmp/NovoRenascer/imagem2.jpeg',
+  },
+    {
+    id: 3,
+    name: 'Vila Sarney',
+    description: 'Vila Sarney',
     image: '/images/iadmp/NovoRenascer/imagem2.jpeg',
   },
 ];

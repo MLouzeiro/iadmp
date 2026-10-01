@@ -1,0 +1,639 @@
+/* ===================================================
+   LITURGIA MODULE CSS
+   =================================================== */
+
+/* === LISTS === */
+.liturgiaList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.liturgiaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.liturgiaCard:hover {
+  border-color: var(--color-secondary);
+  background: var(--gradient-gold-soft);
+}
+
+.liturgiaCardData {
+  text-align: center;
+  min-width: 70px;
+}
+
+.liturgiaCardDia {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  line-height: 1;
+}
+
+.liturgiaCardMes {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.liturgiaCardInfo {
+  flex: 1;
+}
+
+.liturgiaCardTema {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.liturgiaCardDetalhes {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.liturgiaCardDetalhes span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.liturgiaCardActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* === STATUS BADGE === */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.statusRASCUNHO { background: rgba(158, 158, 158, 0.15); color: #9e9e9e; }
+.statusEM_PREPARACAO { background: rgba(33, 150, 243, 0.15); color: #2196f3; }
+.statusPRONTA { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+.statusEM_ANDAMENTO { background: rgba(255, 152, 0, 0.15); color: #ff9800; }
+.statusREALIZADA { background: rgba(76, 175, 80, 0.25); color: #388e3c; }
+.statusCANCELADA { background: rgba(244, 67, 54, 0.15); color: #f44336; }
+
+.statusMomentoPENDENTE { background: rgba(158, 158, 158, 0.15); color: #9e9e9e; }
+.statusMomentoEM_ANDAMENTO { background: rgba(255, 152, 0, 0.15); color: #ff9800; }
+.statusMomentoCONCLUIDO { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+.statusMomentoCANCELADO { background: rgba(244, 67, 54, 0.15); color: #f44336; }
+
+/* === TIMELINE (Momentos) === */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.momentoItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  position: relative;
+  align-items: flex-start;
+}
+
+.momentoDot {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  z-index: 1;
+  transition: var(--transition);
+}
+
+.momentoDot.ativo {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+  box-shadow: 0 0 0 4px rgba(200, 150, 12, 0.15);
+}
+
+.momentoDot.concluido {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+}
+
+.momentoConteudo {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+}
+
+.momentoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.momentoTipo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+}
+
+.momentoTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.momentoMeta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.momentoDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* === MOMENTO FORM === */
+.momentoForm {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: var(--transition);
+}
+
+.momentoForm:hover {
+  border-color: rgba(201, 150, 12, 0.3);
+}
+
+.momentoFormHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.momentoFormDrag {
+  cursor: grab;
+  color: var(--text-muted);
+  padding: 0.25rem;
+}
+
+.momentoFormDrag:active {
+  cursor: grabbing;
+}
+
+.momentoFormOrder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gradient-gold-soft);
+  border: 1px solid var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  flex-shrink: 0;
+}
+
+.momentoFormTitle {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.momentoFormRemove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.momentoFormRemove:hover {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.momentoFormFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.momentoFormFields .fullWidth {
+  grid-column: 1 / -1;
+}
+
+/* === WORSHIP MODE (Modo Culto) === */
+.worshipMode {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
+}
+
+.worshipHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.worshipHeaderTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  color: var(--color-secondary);
+}
+
+.worshipHeaderMeta {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.worshipBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.worshipMomentoTipo {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.worshipMomentoTitulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.worshipMomentoDetalhe {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.75rem;
+}
+
+.worshipMomentoDesc {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 700px;
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+
+.worshipMusicaLetra {
+  font-size: 1.4rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  white-space: pre-wrap;
+  margin-top: 1.5rem;
+}
+
+.worshipBiblia {
+  font-size: 1.3rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 700px;
+  font-style: italic;
+  margin-top: 1.5rem;
+}
+
+.worshipFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.worshipProgress {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin: 0 1.5rem;
+  overflow: hidden;
+}
+
+.worshipProgressBar {
+  height: 100%;
+  background: var(--color-secondary);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.worshipNavBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.worshipNavBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.worshipNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.worshipNavBtn.sair {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.worshipNavBtn.sair:hover {
+  background: rgba(244, 67, 54, 0.4);
+}
+
+/* === PRINT MODE === */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .printContainer {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .printHeader {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .printHeader h1 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem;
+  }
+
+  .printMomento {
+    border-bottom: 1px solid #ddd;
+    padding: 0.75rem 0;
+    page-break-inside: avoid;
+  }
+
+  .printMomentoTitle {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .printMomentoMeta {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .printMomentoDesc {
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.printContainer {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.printHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.printHeader h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.printHeader p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.printMomento {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.printMomentoTitle {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.printMomentoMeta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.printMomentoDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* === FILTERS === */
+.filtersBar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filterLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* === EMPTY STATE === */
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.emptyStateIcon {
+  margin-bottom: 1rem;
+  opacity: 0.4;
+}
+
+.emptyStateTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.emptyStateDesc {
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* === STATS CARDS === */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* === TABS === */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tab.active {
+  color: var(--color-secondary);
+  border-bottom-color: var(--color-secondary);
+  font-weight: 600;
+}

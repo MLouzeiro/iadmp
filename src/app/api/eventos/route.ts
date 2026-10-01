@@ -1,21 +1,26 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { eventoSchema } from '@/lib/validations';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function GET() {
   try {
+    await requireAuth();
     const eventos = await prisma.evento.findMany({
       include: { categoria: true, campanha: true, avaliacao: true },
       orderBy: { dataEvento: 'desc' },
     });
     return NextResponse.json(eventos);
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     return NextResponse.json({ error: 'Erro ao buscar eventos' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    await requireAuth();
     const body = await request.json();
     const validated = eventoSchema.parse(body);
 
@@ -40,7 +45,12 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(evento, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error instanceof Error && error.name === 'ZodError') {
+      return NextResponse.json({ error: 'Dados invalidos', details: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: 'Erro ao criar evento' }, { status: 500 });
   }
 }

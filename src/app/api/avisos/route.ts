@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function GET() {
   try {
+    await requireAuth();
     const now = new Date();
     const avisos = await prisma.aviso.findMany({
       where: {
@@ -16,13 +18,16 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(avisos);
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     return NextResponse.json({ error: 'Erro ao buscar avisos' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    await requireAuth();
     const body = await request.json();
     const aviso = await prisma.aviso.create({
       data: {
@@ -41,7 +46,9 @@ export async function POST(request: Request) {
       },
     });
     return NextResponse.json(aviso, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     return NextResponse.json({ error: 'Erro ao criar aviso' }, { status: 500 });
   }
 }

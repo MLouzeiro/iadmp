@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireSuperAdmin } from '@/lib/auth-helpers';
 import bcrypt from 'bcryptjs';
 
 export async function GET() {
@@ -12,6 +13,12 @@ export async function POST() {
 
 async function handleSeed() {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Nao encontrado' }, { status: 404 });
+    }
+
+    await requireSuperAdmin();
+
     const adminPasswordHash = await bcrypt.hash('admin123', 10);
 
     const admin = await prisma.user.upsert({
@@ -27,7 +34,9 @@ async function handleSeed() {
 
     return NextResponse.json({ success: true, user: { id: admin.id, email: admin.email, role: admin.role } });
   } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     console.error('Seed error:', error);
-    return NextResponse.json({ error: error.message || String(error), stack: error.stack }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao executar seed' }, { status: 500 });
   }
 }

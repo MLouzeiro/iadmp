@@ -9,26 +9,120 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(MEMBER)
-  ativo        Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  avaliacoes   Avaliacao[]
-  membro       Membro?
+  id              String              @id @default(cuid())
+  name            String
+  email           String              @unique
+  passwordHash    String
+  telefone        String?
+  role            Role                @default(MEMBER)
+  perfilId        String?
+  perfil          Perfil?             @relation(fields: [perfilId], references: [id])
+  ativo           Boolean             @default(true)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  avaliacoes      Avaliacao[]
+  membro          Membro?
+  organizacoes    UsuarioOrganizacao[]
+  permissoes      UsuarioPermissao[]
+  auditLogs       AuditLog[]
+  pregacoes       Pregacao[]
 }
 
 enum Role {
+  SUPER_ADMIN
+  ADMIN_IGREJA
+  LIDER
+  COORDENADOR
+  MUSICO
+  MEMBER
   ADMIN
   PASTOR
   SECRETARIA
   FINANCEIRO
   LIDER_MINISTERIO
   EDITOR_SITE
-  MEMBER
+}
+
+model Organizacao {
+  id              String                @id @default(cuid())
+  nome            String
+  descricao       String?
+  ativo           Boolean               @default(true)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  usuarios        UsuarioOrganizacao[]
+  liturgias       Liturgia[]
+  musicas         LiturgiaMusica[]
+  modelos         LiturgiaModelo[]
+  canaisOficiais  CanalOficial[]
+  pregacoes       Pregacao[]
+  versiculos      VersiculoDiario[]
+}
+
+model UsuarioOrganizacao {
+  id              String        @id @default(cuid())
+  userId          String
+  organizacaoId   String
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizacao     Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizacaoId])
+}
+
+model Perfil {
+  id              String              @id @default(cuid())
+  nome            String              @unique
+  descricao       String?
+  isSystem        Boolean             @default(false)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  usuarios        User[]
+  permissoes      PerfilPermissao[]
+}
+
+model Permissao {
+  id              String              @id @default(cuid())
+  modulo          String
+  acao            String
+  descricao       String?
+  createdAt       DateTime            @default(now())
+  perfilPermissoes PerfilPermissao[]
+  usuarioPermissoes UsuarioPermissao[]
+
+  @@unique([modulo, acao])
+}
+
+model PerfilPermissao {
+  id              String    @id @default(cuid())
+  perfilId        String
+  permissaoId     String
+  perfil          Perfil    @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  permissao       Permissao @relation(fields: [permissaoId], references: [id], onDelete: Cascade)
+
+  @@unique([perfilId, permissaoId])
+}
+
+model UsuarioPermissao {
+  id              String    @id @default(cuid())
+  userId          String
+  permissaoId     String
+  concedida       Boolean   @default(true)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permissao       Permissao @relation(fields: [permissaoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissaoId])
+}
+
+model AuditLog {
+  id              String    @id @default(cuid())
+  userId          String
+  acao            String
+  entidade        String
+  entidadeId      String?
+  detalhes        Json?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Membro {
@@ -237,32 +331,126 @@ model Avaliacao {
 }
 
 model Liturgia {
-  id          String    @id @default(cuid())
-  quando      DateTime
-  horario     String?
-  dirigente   String?
-  pregador    String?
-  tema        String?
-  observacoes String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  eventoId    String?
-  evento      Evento?   @relation(fields: [eventoId], references: [id])
-  itens       LiturgiaItem[]
+  id                  String              @id @default(cuid())
+  organizacaoId       String
+  congregacao         String?
+  data                DateTime
+  horarioInicio       String
+  horarioFimPrevisto  String?
+  tipoCulto           String              @default("Celebracao")
+  tema                String?
+  dirigente           String?
+  dirigenteUserId     String?
+  pregador            String?
+  pregadorUserId      String?
+  responsavel         String?
+  responsavelUserId   String?
+  observacoes         String?
+  status              StatusLiturgia      @default(RASCUNHO)
+  modeloId            String?
+  createdById         String?
+  updatedById         String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  eventoId            String?
+  evento              Evento?             @relation(fields: [eventoId], references: [id])
+  itens               LiturgiaItem[]
+  pregacao            Pregacao?
+  organizacao         Organizacao         @relation(fields: [organizacaoId], references: [id])
+}
+
+enum StatusLiturgia {
+  RASCUNHO
+  EM_PREPARACAO
+  PRONTA
+  EM_ANDAMENTO
+  REALIZADA
+  CANCELADA
 }
 
 model LiturgiaItem {
+  id                  String              @id @default(cuid())
+  ordem               Int
+  tipo                String
+  titulo              String
+  horarioPrevisto     String?
+  duracaoPrevista     Int?
+  responsavel         String?
+  responsavelUserId   String?
+  descricao           String?
+  observacoes         String?
+  musicaId            String?
+  referenciaBiblica   String?
+  livroBiblico        String?
+  capituloBiblico     String?
+  versiculoInicio     String?
+  versiculoFim        String?
+  textoBiblico        String?
+  temaPregacao        String?
+  prioridade          String              @default("NORMAL")
+  status              StatusMomento       @default(PENDENTE)
+  iniciadoEm          DateTime?
+  finalizadoEm        DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  liturgiaId          String
+  liturgia            Liturgia            @relation(fields: [liturgiaId], references: [id], onDelete: Cascade)
+  musica              LiturgiaMusica?     @relation(fields: [musicaId], references: [id])
+}
+
+enum StatusMomento {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+model LiturgiaMusica {
   id              String    @id @default(cuid())
-  ordem           Int
+  organizacaoId   String
   titulo          String
-  responsavel     String?
-  horarioPrevisto String?
-  duracao         String?
-  observacao      String?
+  compositor      String?
+  artista         String?
+  tom             String?
+  categoria       String    @default("Adoracao")
+  letra           String?
+  link            String?
+  observacoes     String?
+  ativo           Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  liturgiaId      String
-  liturgia        Liturgia  @relation(fields: [liturgiaId], references: [id], onDelete: Cascade)
+  organizacao     Organizacao @relation(fields: [organizacaoId], references: [id])
+  momentos        LiturgiaItem[]
+}
+
+model LiturgiaModelo {
+  id              String                @id @default(cuid())
+  organizacaoId   String
+  nome            String
+  descricao       String?
+  tipoCulto       String?
+  ativo           Boolean               @default(true)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  createdById     String?
+  organizacao     Organizacao           @relation(fields: [organizacaoId], references: [id])
+  momentos        LiturgiaModeloMomento[]
+}
+
+model LiturgiaModeloMomento {
+  id                  String    @id @default(cuid())
+  ordem               Int
+  tipo                String
+  titulo              String
+  duracaoPrevista     Int?
+  descricao           String?
+  observacoes         String?
+  musicaId            String?
+  referenciaBiblica   String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  modeloId            String
+  modelo              LiturgiaModelo @relation(fields: [modeloId], references: [id], onDelete: Cascade)
 }
 
 model Agenda {
@@ -359,4 +547,95 @@ model ConfiguracoesIgreja {
   tema             String   @default("dark")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model CanalOficial {
+  id              String    @id @default(cuid())
+  organizacaoId   String
+  tipo            String
+  nome            String
+  url             String
+  descricao       String?
+  ativo           Boolean   @default(true)
+  ordem           Int       @default(0)
+  createdById     String?
+  updatedById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  organizacao     Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId])
+  @@index([organizacaoId, tipo])
+}
+
+enum StatusPregacao {
+  RASCUNHO
+  PUBLICADA
+  ARQUIVADA
+}
+
+model Pregacao {
+  id                  String        @id @default(cuid())
+  organizacaoId       String
+  liturgiaId          String?     @unique
+  titulo              String
+  slug                String        @unique
+  descricao           String?
+  tema                String?
+  tipo                String        @default("Pregacao")
+  pregadorId          String?
+  pregadorNome        String?
+  data                DateTime
+  referenciaLivro     String?
+  referenciaCapitulo  Int?
+  referenciaVersIni   Int?
+  referenciaVersFim   Int?
+  videoUrl            String?
+  capaUrl             String?
+  observacoes         String?
+  status              StatusPregacao @default(RASCUNHO)
+  destaque            Boolean       @default(false)
+  createdById         String?
+  updatedById         String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  organizacao         Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  liturgia            Liturgia?     @relation(fields: [liturgiaId], references: [id], onDelete: SetNull)
+  pregador            User?         @relation(fields: [pregadorId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([organizacaoId, status])
+  @@index([organizacaoId, data])
+  @@index([pregadorId])
+  @@index([liturgiaId])
+}
+
+model VersiculoDiario {
+  id              String    @id @default(cuid())
+  organizacaoId   String
+  referencia      String
+  versiculo       String
+  reflexao        String
+  ativo           Boolean   @default(true)
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  organizacao     Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  historico       VersiculoHistorico[]
+
+  @@index([organizacaoId])
+  @@index([organizacaoId, ativo])
+}
+
+model VersiculoHistorico {
+  id              String    @id @default(cuid())
+  versiculoId     String
+  slot            Int
+  exibidoEm       DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  versiculo       VersiculoDiario @relation(fields: [versiculoId], references: [id], onDelete: Cascade)
+
+  @@index([versiculoId])
+  @@index([slot])
+  @@unique([versiculoId, slot])
 }

@@ -35,3 +35,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# RAG local (memória do projeto — nunca versionar)
+.claude/rag.db
+.claude/rag.db-*
+
+# opencode local
+.opencode/node_modules/
+.opencode/package-lock.json

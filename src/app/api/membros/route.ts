@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { membroSchema } from '@/lib/validations';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function GET(request: Request) {
   try {
+    await requireAuth();
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -31,13 +33,16 @@ export async function GET(request: Request) {
     ]);
 
     return NextResponse.json({ membros, total, page, limit });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     return NextResponse.json({ error: 'Erro ao buscar membros' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    await requireAuth();
     const body = await request.json();
     const validated = membroSchema.parse(body);
 
@@ -58,7 +63,9 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(membro, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ error: 'Dados invalidos', details: error.message }, { status: 400 });
     }

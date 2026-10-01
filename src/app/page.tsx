@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { Heart, ArrowRight } from 'lucide-react';
-import { programs, values, leaders, congregations, getDailyVerse } from '@/data/site-data';
+import { Heart, ArrowRight, MapPin, Phone, Mail } from 'lucide-react';
+import { programs, values, leaders, congregations, churchData } from '@/data/site-data';
+import PublicSections from '@/components/public/PublicSections';
 
 export default function Home() {
-  const verse = getDailyVerse();
-
   return (
     <>
       {/* Hero */}
@@ -12,38 +11,23 @@ export default function Home() {
         <div className="hero-bg" style={{ backgroundImage: 'url(/images/iadmp/Slide/image1.jpg)' }} />
         <div className="hero-content fade-in">
           <h1>
-            Igreja Assembleia de Deus<br />
-            <span>Missão da Promessa</span>
+            Uma igreja para viver,<br />
+            <span>servir e transformar</span>
           </h1>
-          <p>Uma igreja de fé, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.</p>
+          <p>Comunidade de fe, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.</p>
           <div className="hero-buttons">
             <Link href="/sobre" className="btn btn-primary btn-lg">
               Conheca Nossa Historia <ArrowRight size={16} />
             </Link>
             <Link href="/eventos" className="btn btn-outline btn-lg">
-              Proximos Eventos
+              Proximas Programacoes
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Versiculo do Dia */}
-      <section className="verse-section">
-        <div className="container">
-          <div className="section-heading">
-            <span className="label">Versiculo do Dia</span>
-            <div className="divider" />
-          </div>
-          <div className="verse-card fade-in">
-            <p className="reference">{verse.reference}</p>
-            <p className="text">&ldquo;{verse.text}&rdquo;</p>
-            <div className="reflection">
-              <span className="reflection-label">Reflexao</span>
-              {verse.reflection}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Versiculo + Programacoes + Pregacoes + Canais (do banco) */}
+      <PublicSections />
 
       {/* Programacao Semanal */}
       <section>
@@ -72,7 +56,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <span className="label">Nossas Congregacoes</span>
-            <h2>Igreja em Comunhao</h2>
+            <h2>Encontre uma Congregacao</h2>
             <p>Conheca nossas congregacoes e participe de uma perto de voce.</p>
             <div className="divider" />
           </div>
@@ -143,6 +127,22 @@ export default function Home() {
           <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
             <Link href="/lideranca" className="btn btn-outline">
               Ver Toda Lideranca <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="cta-section">
+        <div className="container">
+          <h2>Venha fazer parte da nossa comunidade</h2>
+          <p>Somos uma familia de fe que te acolhe com amor. Venha nos conhecer!</p>
+          <div className="cta-buttons">
+            <Link href="/sobre" className="btn btn-dark btn-lg">
+              Conheca Nossa Igreja
+            </Link>
+            <Link href="/contato" className="btn btn-white btn-lg">
+              Fale Conosco
             </Link>
           </div>
         </div>
