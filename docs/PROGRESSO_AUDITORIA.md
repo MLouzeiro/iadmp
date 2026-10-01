@@ -167,13 +167,18 @@ em liturgia/músicas/modelos/canais/pragações/versículos · suíte de testes 
 
 ---
 
-## 6. O que foi commitado nesta sessão
+## 6. O que foi commitado nesta sessão ✅ CONCLUÍDO
 
-- **Commit:** ver `git log -1` (trabalho acumulado: módulos de comunicação, liturgia,
-  usuários, perfis/permissoes/organizações, rotas públicas, `auth-helpers.ts`,
-  suíte de testes Jest, ESLint, tooling `.claude/`/`.opencode/`/`AGENTS.md`).
+- **Commit `9757b71`** — `feat: add usuarios/comunicacao/liturgia modules, tests and audit docs`
+  (156 arquivos: módulos de comunicação, liturgia, usuários, perfis/permissoes/organizações,
+  rotas públicas, `auth-helpers.ts`, suíte Jest, ESLint, tooling `.claude/`/`.opencode/`/
+  `AGENTS.md`, e este documento).
 - **Validação antes do commit:** `tsc` 0 erros · `jest` 65/65 · `next build` ok.
-- **Push para `origin/master`.** Deploy NÃO é automático (sem integração Git na Vercel).
+  Nenhum arquivo sensível stagingado (`.env`, `node_modules`, `rag.db`, `.next`, `.vercel` fora).
+- **Push realizado:** `e16eb70..9757b71 master -> master` → `origin/master` sincronizado
+  (0 commits de diferença, working tree limpa).
+- Deploy NÃO é automático (a Vercel não tem integração Git neste projeto) → **produção
+  continua no código antigo até a Fase 0 da seção 7.**
 
 ---
 
