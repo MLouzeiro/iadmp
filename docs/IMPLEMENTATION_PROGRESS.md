@@ -50,7 +50,20 @@ node prisma/migrate-tenant.js   # adiciona colunas, cria org padrao, popula Cong
 npm run db:push                 # reconcilia tabelas novas (Inscricao/Pagamento/Aprovacao) + FKs
 npm run db:seed
 ```
-> **ATENÇÃO:** a Fase 0 ainda **não foi aplicada no banco de produção**. Rodar os comandos acima antes do próximo deploy.
+> **APLICADA EM PRODUÇÃO em 03/10/2026** (projeto Neon `igreja-prod` / branch `production`,
+> endpoint `ep-dark-math-ahrjmyg9`, o mesmo do `.env`). Sequência executada com sucesso:
+> `migrate-tenant.js` → `db:push` → `db:seed`.
+>
+> **Descoberta importante da migração:** o banco de produção estava **atrás do código já deployado** —
+> as tabelas `CanalOficial`, `Pregacao`, `VersiculoDiario` e `VersiculoHistorico` **não existiam**.
+> O `db:push` as criou junto com `Inscricao`, `Pagamento`, `Aprovacao` e `Congregacao`.
+> Colunas legadas `Membro.congregacao` e `Liturgia.congregacao` (string) foram removidas pelo push;
+> nenhuma tinha valor, então nada se perdeu.
+>
+> Estado verificado pós-migração: 57 permissões (inclui `usuarios:ver_auditoria`), 1 org,
+> 3 usuários, 8 eventos, 3 liturgias — tudo atribuído à organização. Smoke test com os includes
+> novos (`congregacao`, `organizacao`, `inscricao`, `pagamento`, `aprovacao`,
+> `configuracoesIgreja` por org) retornou OK.
 
 **Verificação da sessão 2**: `npx jest` → **115 testes, 10 suítes, todos passando**; `npx tsc --noEmit` → limpo; `npm run build` → sucesso.
 
