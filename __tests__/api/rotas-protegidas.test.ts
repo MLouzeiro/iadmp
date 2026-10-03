@@ -43,6 +43,13 @@ jest.mock('@/lib/prisma', () => ({
       count: jest.fn().mockResolvedValue(0),
       upsert: jest.fn().mockResolvedValue({ id: 'u1' }),
     },
+    usuarioOrganizacao: {
+      findMany: jest.fn().mockResolvedValue([{ organizacaoId: 'org1' }]),
+      findUnique: jest.fn().mockResolvedValue({ userId: 'u1', organizacaoId: 'org1' }),
+    },
+    auditLog: {
+      create: jest.fn().mockResolvedValue({}),
+    },
   },
 }));
 
@@ -50,6 +57,7 @@ jest.mock('@/lib/auth-helpers', () => ({
   requireAuth: jest.fn(),
   requireSuperAdmin: jest.fn(),
   hasPermission: jest.fn().mockResolvedValue(true),
+  canManageOrganization: jest.fn().mockResolvedValue(true),
   getUserPermissions: jest.fn().mockResolvedValue([]),
   getUserOrganizations: jest.fn().mockResolvedValue([]),
 }));

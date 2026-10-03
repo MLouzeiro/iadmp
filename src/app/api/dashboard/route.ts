@@ -1,38 +1,38 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-helpers';
+import { resolveOrgScope, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
+import { indicadoresDashboardLegado } from '@/lib/indicadores';
 
-export async function GET() {
+/**
+ * Mantido por compatibilidade com o painel atual.
+ * Os números vêm do core `src/lib/indicadores.ts` — não recalcular aqui.
+ */
+export async function GET(request?: NextRequest) {
   try {
-    await requireAuth();
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const user = await requireAuth();
+    const { searchParams } = new URL(request?.url || 'http://localhost/');
+    const organizacaoId = searchParams.get('organizacaoId');
 
-    const totalMembros = await prisma.membro.count({ where: { status: 'ATIVO' } });
-    const totalLideres = await prisma.lideranca.count({ where: { ativo: true } });
+    const scope = await resolveOrgScope(user, organizacaoId);
 
-    const eventosRealizados = await prisma.evento.count({
-      where: { status: 'CONCLUIDO', dataEvento: { gte: startOfYear, lte: now } },
-    });
+    const filtros = {
+      organizacaoIds: scope.requestedOrgId
+        ? [scope.requestedOrgId]
+        : scope.mode === 'ALL'
+          ? []
+          : scope.orgIds,
+      congregacaoId: null,
+      eventoId: null,
+      categoria: null,
+      status: null,
+    };
 
-    const eventosFuturos = await prisma.evento.count({
-      where: { status: 'PLANEJADO', dataEvento: { gte: now } },
-    });
-
-    const avisosAtivos = await prisma.aviso.count({
-      where: { situacaoAviso: 'ATIVO', terminaEm: { gte: now } },
-    });
-
-    return NextResponse.json({
-      totalMembros,
-      totalLideres,
-      eventosRealizados,
-      eventosFuturos,
-      avisosAtivos,
-    });
+    const dados = await indicadoresDashboardLegado(filtros);
+    return NextResponse.json(dados);
   } catch (error: any) {
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar dados do dashboard' }, { status: 500 });
   }
 }

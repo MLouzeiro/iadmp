@@ -26,6 +26,10 @@ model User {
   permissoes      UsuarioPermissao[]
   auditLogs       AuditLog[]
   pregacoes       Pregacao[]
+  inscricoes      Inscricao[]
+  pagamentos      Pagamento[]
+  aprovacoesSolicitadas Aprovacao[]   @relation("Solicitante")
+  aprovacoesDecididas   Aprovacao[]   @relation("Aprovador")
 }
 
 enum Role {
@@ -51,23 +55,74 @@ model Organizacao {
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   usuarios        UsuarioOrganizacao[]
+  congregacoes    Congregacao[]
+  configuracoes   ConfiguracoesIgreja[]
   liturgias       Liturgia[]
   musicas         LiturgiaMusica[]
   modelos         LiturgiaModelo[]
   canaisOficiais  CanalOficial[]
   pregacoes       Pregacao[]
   versiculos      VersiculoDiario[]
+  membros         Membro[]
+  liderancas      Lideranca[]
+  ministerios     Ministerio[]
+  departamentos   Departamento[]
+  eventos         Evento[]
+  campanhas       Campanha[]
+  financeiro      EventoFinanceiro[]
+  avisos          Aviso[]
+  galeriaAlbuns   GaleriaAlbum[]
+  galeriaItens    GaleriaItem[]
+  oportunidades   Oportunidade[]
+  agendas         Agenda[]
+  inscricoes      Inscricao[]
+  pagamentos      Pagamento[]
+  aprovacoes      Aprovacao[]
+  auditLogs       AuditLog[]
 }
 
 model UsuarioOrganizacao {
   id              String        @id @default(cuid())
   userId          String
   organizacaoId   String
+  perfilId        String?
+  ativo           Boolean       @default(true)
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   organizacao     Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  perfil          Perfil?       @relation(fields: [perfilId], references: [id])
 
   @@unique([userId, organizacaoId])
+  @@index([organizacaoId])
+  @@index([perfilId])
+}
+
+model Congregacao {
+  id              String        @id @default(cuid())
+  organizacaoId   String
+  nome            String
+  descricao       String?
+  ativo           Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organizacao     Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  membros         Membro[]
+  liturgias       Liturgia[]
+  liderancas      Lideranca[]
+  eventos         Evento[]
+  campanhas       Campanha[]
+  financeiro      EventoFinanceiro[]
+  avisos          Aviso[]
+  galeriaAlbuns   GaleriaAlbum[]
+  galeriaItens    GaleriaItem[]
+  oportunidades   Oportunidade[]
+  agendas         Agenda[]
+  inscricoes      Inscricao[]
+  pagamentos      Pagamento[]
+
+  @@unique([organizacaoId, nome])
+  @@index([organizacaoId])
 }
 
 model Perfil {
@@ -78,6 +133,7 @@ model Perfil {
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   usuarios        User[]
+  vinculos        UsuarioOrganizacao[]
   permissoes      PerfilPermissao[]
 }
 
@@ -115,18 +171,33 @@ model UsuarioPermissao {
 }
 
 model AuditLog {
-  id              String    @id @default(cuid())
+  id              String          @id @default(cuid())
   userId          String
+  organizacaoId   String?
   acao            String
   entidade        String
   entidadeId      String?
+  antes           Json?
+  depois          Json?
   detalhes        Json?
-  createdAt       DateTime  @default(now())
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip              String?
+  userAgent       String?
+  resultado       String          @default("SUCESSO")
+  createdAt       DateTime        @default(now())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizacao     Organizacao?    @relation(fields: [organizacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([userId])
+  @@index([entidade, entidadeId])
+  @@index([acao])
+  @@index([createdAt])
 }
 
 model Membro {
   id             String        @id @default(cuid())
+  organizacaoId  String
+  congregacaoId  String?
   nome           String
   email          String?
   telefone       String?
@@ -137,7 +208,6 @@ model Membro {
   dataEntrada    DateTime      @default(now())
   status         StatusMembro  @default(ATIVO)
   observacoes    String?
-  congregacao    String?
   userId         String?        @unique
   user           User?           @relation(fields: [userId], references: [id])
   ministerioId   String?
@@ -146,7 +216,14 @@ model Membro {
   departamento   Departamento? @relation(fields: [departamentoId], references: [id])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  organizacao    Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao    Congregacao?  @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
   lideranca      Lideranca[]
+  inscricoes     Inscricao[]
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([organizacaoId, status])
 }
 
 enum StatusMembro {
@@ -157,30 +234,41 @@ enum StatusMembro {
 }
 
 model Ministerio {
-  id          String    @id @default(cuid())
-  nome        String
-  descricao   String?
-  responsavel String?
-  ativo       Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  membros     Membro[]
-  lideranca   Lideranca[]
+  id             String        @id @default(cuid())
+  organizacaoId  String
+  congregacaoId  String?
+  nome           String
+  descricao      String?
+  responsavel    String?
+  ativo          Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizacao    Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  membros        Membro[]
+  lideranca      Lideranca[]
+
+  @@index([organizacaoId])
 }
 
 model Departamento {
-  id          String    @id @default(cuid())
-  nome        String
-  descricao   String?
-  responsavel String?
-  ativo       Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  membros     Membro[]
+  id             String        @id @default(cuid())
+  organizacaoId  String
+  nome           String
+  descricao      String?
+  responsavel    String?
+  ativo          Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizacao    Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  membros        Membro[]
+
+  @@index([organizacaoId])
 }
 
 model Lideranca {
   id            String    @id @default(cuid())
+  organizacaoId String
+  congregacaoId String?
   nome          String
   cargo         String
   foto          String?
@@ -196,10 +284,17 @@ model Lideranca {
   membro        Membro?   @relation(fields: [membroId], references: [id])
   ministerioId  String?
   ministerio    Ministerio? @relation(fields: [ministerioId], references: [id])
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao   Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
 }
 
 model Evento {
   id                String         @id @default(cuid())
+  organizacaoId     String
+  congregacaoId     String?
   nome              String
   categoriaId       String?
   dataInicio        DateTime
@@ -218,6 +313,8 @@ model Evento {
   totalReceitas     Decimal        @default(0) @db.Decimal(10, 2)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  organizacao       Organizacao    @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao       Congregacao?   @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
   categoria         CategoriaEvento? @relation(fields: [categoriaId], references: [id])
   campanha          Campanha?
   avaliacao         Avaliacao?
@@ -227,6 +324,12 @@ model Evento {
   galeriaItems      GaleriaItem[]
   agenda            Agenda[]
   tarefas           TarefaEvento[]
+  inscricoes        Inscricao[]
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([organizacaoId, status])
+  @@index([organizacaoId, dataEvento])
 }
 
 model CategoriaEvento {
@@ -274,6 +377,8 @@ enum StatusEvento {
 
 model Campanha {
   id              String    @id @default(cuid())
+  organizacaoId   String
+  congregacaoId   String?
   eventoId        String    @unique
   meta            Decimal   @db.Decimal(10, 2)
   valorArrecadado Decimal   @default(0) @db.Decimal(10, 2)
@@ -283,6 +388,10 @@ model Campanha {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   evento          Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  organizacao     Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao     Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
 }
 
 model CategoriaFinanceira {
@@ -296,22 +405,43 @@ model CategoriaFinanceira {
   movimentacoes EventoFinanceiro[]
 }
 
+enum CategoriaLancamento {
+  DIZIMO
+  OFERTA
+  DOACAO
+  INSCRICAO
+  DESPESA
+  OUTRO
+}
+
 model EventoFinanceiro {
   id                    String    @id @default(cuid())
+  organizacaoId         String
+  congregacaoId         String?
   descricao             String
   valor                 Decimal   @db.Decimal(10, 2)
   quando                DateTime  @default(now())
   generoMovimentacao    String
+  categoria             CategoriaLancamento @default(OUTRO)
   fornecedor            String?
   comprovante           String?
   responsavel           String?
   observacoes           String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
-  eventoId              String
-  evento                Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  eventoId              String?
+  evento                Evento?   @relation(fields: [eventoId], references: [id], onDelete: SetNull)
   categoriaFinanceiraId String?
   categoriaFinanceira   CategoriaFinanceira? @relation(fields: [categoriaFinanceiraId], references: [id])
+  organizacao           Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao           Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  pagamentos            Pagamento[]
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([eventoId])
+  @@index([organizacaoId, categoria])
+  @@index([organizacaoId, quando])
 }
 
 model Avaliacao {
@@ -333,7 +463,7 @@ model Avaliacao {
 model Liturgia {
   id                  String              @id @default(cuid())
   organizacaoId       String
-  congregacao         String?
+  congregacaoId       String?
   data                DateTime
   horarioInicio       String
   horarioFimPrevisto  String?
@@ -357,6 +487,11 @@ model Liturgia {
   itens               LiturgiaItem[]
   pregacao            Pregacao?
   organizacao         Organizacao         @relation(fields: [organizacaoId], references: [id])
+  congregacao         Congregacao?        @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([organizacaoId, data])
 }
 
 enum StatusLiturgia {
@@ -454,23 +589,32 @@ model LiturgiaModeloMomento {
 }
 
 model Agenda {
-  id          String    @id @default(cuid())
-  titulo      String
-  descricao   String?
-  comeco      DateTime
-  termino     DateTime?
-  horario     String?
-  local       String?
-  recorrente  Boolean   @default(false)
-  recorrencia String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  eventoId    String?
-  evento      Evento?   @relation(fields: [eventoId], references: [id])
+  id            String    @id @default(cuid())
+  organizacaoId String
+  congregacaoId String?
+  titulo        String
+  descricao     String?
+  comeco        DateTime
+  termino       DateTime?
+  horario       String?
+  local         String?
+  recorrente    Boolean   @default(false)
+  recorrencia   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  eventoId      String?
+  evento        Evento?   @relation(fields: [eventoId], references: [id])
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao   Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
 }
 
 model Aviso {
   id             String    @id @default(cuid())
+  organizacaoId  String
+  congregacaoId  String?
   titulo         String
   descricao      String
   imagem         String?
@@ -485,52 +629,79 @@ model Aviso {
   destaque       Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  organizacao    Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao    Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([organizacaoId, situacaoAviso])
 }
 
 model GaleriaAlbum {
-  id        String    @id @default(cuid())
-  nome      String
-  descricao String?
-  capa      String?
-  momentAlbum DateTime?
-  publico   Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  itens     GaleriaItem[]
+  id            String    @id @default(cuid())
+  organizacaoId String
+  congregacaoId String?
+  nome          String
+  descricao     String?
+  capa          String?
+  momentAlbum   DateTime?
+  publico       Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao   Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  itens         GaleriaItem[]
+
+  @@index([organizacaoId])
 }
 
 model GaleriaItem {
-  id          String    @id @default(cuid())
-  titulo      String?
-  descricao   String?
-  url         String
-  classArquivo String   @default("FOTO")
-  ordem       Int       @default(0)
-  momentoItem DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  albumId     String?
-  album       GaleriaAlbum? @relation(fields: [albumId], references: [id])
-  eventoId    String?
-  evento      Evento?   @relation(fields: [eventoId], references: [id])
+  id            String    @id @default(cuid())
+  organizacaoId String
+  congregacaoId String?
+  titulo        String?
+  descricao     String?
+  url           String
+  classArquivo  String    @default("FOTO")
+  ordem         Int       @default(0)
+  momentoItem   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  albumId       String?
+  album         GaleriaAlbum? @relation(fields: [albumId], references: [id])
+  eventoId      String?
+  evento        Evento?   @relation(fields: [eventoId], references: [id])
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao   Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([albumId])
+  @@index([eventoId])
 }
 
 model Oportunidade {
-  id                String    @id @default(cuid())
-  titulo            String
-  descricao         String
+  id                 String    @id @default(cuid())
+  organizacaoId      String
+  congregacaoId      String?
+  titulo             String
+  descricao          String
   generoOportunidade String
-  responsavel       String?
-  prazo             DateTime?
-  vagas             Int?
-  abrirOportunidade String    @default("ATIVA")
-  observacoes       String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  responsavel        String?
+  prazo              DateTime?
+  vagas              Int?
+  abrirOportunidade  String    @default("ATIVA")
+  observacoes        String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  organizacao        Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao        Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
 }
 
 model ConfiguracoesIgreja {
   id               String   @id @default(cuid())
+  organizacaoId    String   @unique
   nomeIgreja       String   @default("Igreja Assembleia de Deus Ministerio da Promessa")
   logoUrl          String?
   logoDarkUrl      String?
@@ -547,6 +718,9 @@ model ConfiguracoesIgreja {
   tema             String   @default("dark")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  organizacao      Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId])
 }
 
 model CanalOficial {
@@ -638,4 +812,126 @@ model VersiculoHistorico {
   @@index([versiculoId])
   @@index([slot])
   @@unique([versiculoId, slot])
+}
+
+enum StatusInscricao {
+  PENDENTE
+  CONFIRMADA
+  CANCELADA
+  REALIZADA
+}
+
+model Inscricao {
+  id              String           @id @default(cuid())
+  organizacaoId   String
+  congregacaoId   String?
+  eventoId        String
+  membroId        String?
+  nome            String
+  email           String?
+  telefone        String?
+  status          StatusInscricao  @default(PENDENTE)
+  valorPrevisto   Decimal?         @db.Decimal(10, 2)
+  valorPago       Decimal          @default(0) @db.Decimal(10, 2)
+  checkIn         Boolean          @default(false)
+  dataCheckIn     DateTime?
+  observacoes     String?
+  createdById     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  organizacao     Organizacao      @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao     Congregacao?     @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  membro          Membro?          @relation(fields: [membroId], references: [id], onDelete: SetNull)
+  criador         User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  pagamentos      Pagamento[]
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([eventoId])
+  @@index([membroId])
+  @@index([organizacaoId, status])
+}
+
+enum StatusPagamento {
+  PENDENTE
+  PARCIAL
+  PAGO
+  ESTORNADO
+  ERRO
+}
+
+enum FormaPagamento {
+  DINHEIRO
+  PIX
+  CARTAO
+  TRANSFERENCIA
+  BOLETO
+  OUTRO
+}
+
+model Pagamento {
+  id                  String           @id @default(cuid())
+  organizacaoId       String
+  congregacaoId       String?
+  inscricaoId         String?
+  eventoFinanceiroId  String?
+  descricao           String
+  valor               Decimal          @db.Decimal(10, 2)
+  forma               FormaPagamento   @default(DINHEIRO)
+  status              StatusPagamento  @default(PENDENTE)
+  txidPix             String?
+  comprovante         String?
+  estornadoDeId       String?
+  dataPagamento       DateTime?
+  observacoes         String?
+  createdById         String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  organizacao         Organizacao      @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao         Congregacao?     @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  inscricao           Inscricao?       @relation(fields: [inscricaoId], references: [id], onDelete: SetNull)
+  eventoFinanceiro    EventoFinanceiro? @relation(fields: [eventoFinanceiroId], references: [id], onDelete: SetNull)
+  criador             User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  estornadoDe         Pagamento?       @relation("Estorno", fields: [estornadoDeId], references: [id], onDelete: SetNull)
+  estornos            Pagamento[]      @relation("Estorno")
+
+  @@index([organizacaoId])
+  @@index([congregacaoId])
+  @@index([inscricaoId])
+  @@index([eventoFinanceiroId])
+  @@index([organizacaoId, status])
+  @@index([txidPix])
+}
+
+enum StatusAprovacao {
+  PENDENTE
+  APROVADA
+  REJEITADA
+  CANCELADA
+}
+
+model Aprovacao {
+  id              String           @id @default(cuid())
+  organizacaoId   String
+  entidade        String
+  entidadeId      String
+  tipo            String
+  solicitanteId   String
+  aprovadorId     String?
+  status          StatusAprovacao  @default(PENDENTE)
+  justificativa   String?
+  observacoes     String?
+  decididoEm      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  organizacao     Organizacao      @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  solicitante     User             @relation("Solicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
+  aprovador       User?            @relation("Aprovador", fields: [aprovadorId], references: [id], onDelete: SetNull)
+
+  @@index([organizacaoId])
+  @@index([entidade, entidadeId])
+  @@index([solicitanteId])
+  @@index([aprovadorId])
+  @@index([organizacaoId, status])
 }

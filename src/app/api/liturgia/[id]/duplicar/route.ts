@@ -25,7 +25,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const liturgia = await prisma.liturgia.create({
       data: {
         organizacaoId: existing.organizacaoId,
-        congregacao: existing.congregacao,
+        congregacaoId: existing.congregacaoId,
         data: new Date(novaData),
         horarioInicio: existing.horarioInicio,
         horarioFimPrevisto: existing.horarioFimPrevisto,

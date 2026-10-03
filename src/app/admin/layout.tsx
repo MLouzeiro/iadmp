@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images, Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate, Radio, Mic } from 'lucide-react';
+import { LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images, Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate, Radio, Mic, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 
 const sidebarLinks = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  { name: 'Centro de Gestao', path: '/admin/gestao', icon: BarChart3 },
   { name: 'Membros', path: '/admin/membros', icon: Users },
   { name: 'Lideranca', path: '/admin/lideranca', icon: UserCheck },
   { name: 'Eventos', path: '/admin/eventos', icon: Calendar },

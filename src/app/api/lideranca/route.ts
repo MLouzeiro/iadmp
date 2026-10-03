@@ -1,31 +1,71 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { liderancaSchema } from '@/lib/validations';
-import { requireAuth } from '@/lib/auth-helpers';
+import { requireAuth, hasPermission } from '@/lib/auth-helpers';
+import { writeAudit } from '@/lib/audit';
+import {
+  resolveOrgScope,
+  resolveTargetOrgId,
+  resolveCongregacaoId,
+  ORG_FORBIDDEN,
+  ORG_REQUIRED,
+  orgForbiddenResponse,
+} from '@/lib/tenant';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    const { searchParams } = new URL(request.url);
+    const organizacaoId = searchParams.get('organizacaoId');
+    const congregacaoId = searchParams.get('congregacaoId');
+
+    const scope = await resolveOrgScope(user, organizacaoId);
+
+    const where: Record<string, unknown> = {};
+    if (scope.requestedOrgId) {
+      where.organizacaoId = scope.requestedOrgId;
+    } else if (scope.mode !== 'ALL') {
+      where.organizacaoId = { in: scope.orgIds };
+    }
+    if (congregacaoId) where.congregacaoId = congregacaoId;
+
     const lideres = await prisma.lideranca.findMany({
-      include: { ministerio: true },
+      where,
+      include: {
+        ministerio: true,
+        congregacao: { select: { id: true, nome: true } },
+        organizacao: { select: { id: true, nome: true } },
+      },
       orderBy: { ordemExibicao: 'asc' },
     });
     return NextResponse.json(lideres);
   } catch (error: any) {
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar lideranca' }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    const podeCriar = await hasPermission(user.id, 'lideranca', 'criar');
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para criar lideranca' }, { status: 403 });
+
     const body = await request.json();
     const validated = liderancaSchema.parse(body);
+    const organizacaoId = await resolveTargetOrgId(user, body.organizacaoId);
+
+    const congregacaoId = await resolveCongregacaoId(organizacaoId, {
+      congregacaoId: body.congregacaoId,
+      congregacao: body.congregacao,
+    });
 
     const lider = await prisma.lideranca.create({
       data: {
+        organizacaoId,
+        congregacaoId,
         nome: validated.nome,
         cargo: validated.cargo,
         biografia: validated.biografia || null,
@@ -37,14 +77,29 @@ export async function POST(request: Request) {
         membroId: validated.membroId || null,
         ministerioId: validated.ministerioId || null,
       },
+      include: { congregacao: { select: { id: true, nome: true } } },
+    });
+
+    await writeAudit({
+      userId: user.id,
+      organizacaoId,
+      acao: 'CREATE',
+      entidade: 'Lideranca',
+      entidadeId: lider.id,
+      depois: lider,
+      req: request,
     });
 
     return NextResponse.json(lider, { status: 201 });
   } catch (error: any) {
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
+    if (error?.message === ORG_REQUIRED) {
+      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+    }
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Dados invalidos', details: error.message }, { status: 400 });
+      return NextResponse.json({ error: 'Dados invalidos' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Erro ao criar lider' }, { status: 500 });
   }

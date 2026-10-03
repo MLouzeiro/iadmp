@@ -1,18 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { defaultColors } from '@/lib/theme-palettes';
-import { requireAuth } from '@/lib/auth-helpers';
+import { requireAuth, hasPermission } from '@/lib/auth-helpers';
+import { writeAudit } from '@/lib/audit';
+import {
+  assertOrgAccess,
+  resolveOrgScope,
+  ORG_FORBIDDEN,
+  orgForbiddenResponse,
+} from '@/lib/tenant';
 
-export async function GET() {
+/**
+ * GET e publico (o tema do site depende dele).
+ * Aceita `?organizacaoId=`; sem ele, responde a configuracao mais antiga (compat single-tenant).
+ */
+export async function GET(request?: NextRequest) {
   try {
-    let config = await prisma.configuracoesIgreja.findFirst();
-    if (!config) {
+    const { searchParams } = new URL(request?.url || 'http://localhost/');
+    const organizacaoId = searchParams.get('organizacaoId');
+
+    let config = organizacaoId
+      ? await prisma.configuracoesIgreja.findUnique({ where: { organizacaoId } })
+      : await prisma.configuracoesIgreja.findFirst({ orderBy: { createdAt: 'asc' } });
+
+    if (!config && organizacaoId) {
       config = await prisma.configuracoesIgreja.create({
         data: {
+          organizacaoId,
           nomeIgreja: 'Igreja Assembleia de Deus Ministerio da Promessa',
           ...defaultColors,
         },
       });
+    }
+
+    if (!config) {
+      return NextResponse.json(defaultColors);
     }
     return NextResponse.json(config);
   } catch (error) {
@@ -23,9 +45,24 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    const podeEditar = await hasPermission(user.id, 'configuracoes', 'editar');
+    if (!podeEditar) {
+      return NextResponse.json({ error: 'Sem permissao para editar configuracoes' }, { status: 403 });
+    }
+
     const body = await request.json();
-    let config = await prisma.configuracoesIgreja.findFirst();
+    const scope = await resolveOrgScope(user, body.organizacaoId);
+
+    const organizacaoId = scope.requestedOrgId || (scope.mode === 'SINGLE' ? scope.orgIds[0] : null);
+    if (!organizacaoId) {
+      return NextResponse.json(
+        { error: 'organizacaoId e obrigatorio para editar configuracoes' },
+        { status: 400 }
+      );
+    }
+
+    await assertOrgAccess(user.id, organizacaoId, request);
 
     const data = {
       nomeIgreja: body.nomeIgreja,
@@ -44,19 +81,27 @@ export async function PUT(request: NextRequest) {
       tema: body.tema,
     };
 
-    if (config) {
-      config = await prisma.configuracoesIgreja.update({
-        where: { id: config.id },
-        data,
-      });
-    } else {
-      config = await prisma.configuracoesIgreja.create({ data });
-    }
+    const config = await prisma.configuracoesIgreja.upsert({
+      where: { organizacaoId },
+      create: { organizacaoId, ...data },
+      update: data,
+    });
+
+    await writeAudit({
+      userId: user.id,
+      organizacaoId,
+      acao: 'CONFIG_CHANGE',
+      entidade: 'ConfiguracoesIgreja',
+      entidadeId: config.id,
+      depois: data,
+      req: request,
+    });
 
     return NextResponse.json(config);
   } catch (error: any) {
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('Error updating church config:', error);
     return NextResponse.json(
       { error: 'Erro ao salvar configuracoes' },

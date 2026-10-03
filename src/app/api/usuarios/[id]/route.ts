@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canAssignRole, canManageOrganization } from '@/lib/auth-helpers';
+import { assertTargetUserScope, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 const editarUsuarioSchema = z.object({
   name: z.string().min(1).optional(),
@@ -49,18 +50,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
     }
 
-    if (requester.role !== 'SUPER_ADMIN') {
-      const userOrgIds = usuario.organizacoes.map(uo => uo.organizacao.id);
-      const requesterOrgs = await prisma.usuarioOrganizacao.findMany({
-        where: { userId: requester.id },
-        select: { organizacaoId: true },
-      });
-      const requesterOrgIds = requesterOrgs.map(uo => uo.organizacaoId);
-      const hasAccess = userOrgIds.some(id => requesterOrgIds.includes(id));
-      if (!hasAccess) {
-        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-      }
-    }
+    await assertTargetUserScope(requester, id, request);
 
     const safe = {
       ...usuario,
@@ -79,6 +69,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
     return NextResponse.json({ error: 'Erro ao buscar usuario' }, { status: 500 });
   }
@@ -99,8 +90,21 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
     }
 
+    await assertTargetUserScope(requester, id, request);
+
     const body = await request.json();
     const validated = editarUsuarioSchema.parse(body);
+
+    if (requester.id === id) {
+      const privilegiados = ['role', 'perfilId', 'permissoes', 'organizacoes', 'ativo'] as const;
+      const tentouEscalar = privilegiados.some(c => (validated as Record<string, unknown>)[c] !== undefined);
+      if (tentouEscalar) {
+        return NextResponse.json(
+          { error: 'Nao e permitido alterar propria permissao, perfil ou organizacao' },
+          { status: 403 }
+        );
+      }
+    }
 
     if (validated.role && requester.role !== 'SUPER_ADMIN') {
       const allowed = await canAssignRole(requester.id, validated.role);
@@ -187,6 +191,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
     return NextResponse.json({ error: 'Erro ao editar usuario' }, { status: 500 });
   }

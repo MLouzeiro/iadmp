@@ -16,7 +16,7 @@ interface Membro {
   email: string | null;
   telefone: string | null;
   status: string;
-  congregacao: string | null;
+  congregacao: { id: string; nome: string } | null;
   ministerio: { nome: string } | null;
 }
 
@@ -104,7 +104,7 @@ export default function MembrosPage() {
                 <div className={styles.listItemInfo}>
                   <h4>{membro.nome}</h4>
                   <p>
-                    {membro.email || 'Sem email'} | {membro.congregacao || 'Sem congregacao'}
+                    {membro.email || 'Sem email'} | {membro.congregacao?.nome || 'Sem congregacao'}
                     {membro.ministerio && ` | ${membro.ministerio.nome}`}
                   </p>
                 </div>

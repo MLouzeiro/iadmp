@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
+import { resolveCongregacaoId, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +44,11 @@ export async function GET(request: NextRequest) {
     const [liturgias, total] = await Promise.all([
       prisma.liturgia.findMany({
         where,
-        include: { itens: { orderBy: { ordem: 'asc' } }, organizacao: { select: { id: true, nome: true } } },
+        include: {
+          itens: { orderBy: { ordem: 'asc' } },
+          organizacao: { select: { id: true, nome: true } },
+          congregacao: { select: { id: true, nome: true } },
+        },
         orderBy: { data: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
@@ -55,6 +60,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('GET /api/liturgia error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -76,10 +82,15 @@ export async function POST(request: NextRequest) {
     const podeCriar = await canManageOrganization(user.id, organizacaoId);
     if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
 
+    const congregacaoId = await resolveCongregacaoId(organizacaoId, {
+      congregacaoId: body.congregacaoId,
+      congregacao,
+    });
+
     const liturgia = await prisma.liturgia.create({
       data: {
         organizacaoId,
-        congregacao: congregacao || null,
+        congregacaoId,
         data: new Date(data),
         horarioInicio,
         horarioFimPrevisto: horarioFimPrevisto || null,
@@ -117,13 +128,18 @@ export async function POST(request: NextRequest) {
           })),
         } : undefined,
       },
-      include: { itens: { orderBy: { ordem: 'asc' } }, organizacao: { select: { id: true, nome: true } } },
+      include: {
+        itens: { orderBy: { ordem: 'asc' } },
+        organizacao: { select: { id: true, nome: true } },
+        congregacao: { select: { id: true, nome: true } },
+      },
     });
 
     return NextResponse.json({ liturgia }, { status: 201 });
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('POST /api/liturgia error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

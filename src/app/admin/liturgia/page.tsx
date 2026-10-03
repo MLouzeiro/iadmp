@@ -17,7 +17,7 @@ interface Liturgia {
   dirigente?: string;
   pregador?: string;
   status: string;
-  congregacao?: string;
+  congregacao?: { id: string; nome: string } | null;
   organizacao: { id: string; nome: string };
   itens: any[];
 }

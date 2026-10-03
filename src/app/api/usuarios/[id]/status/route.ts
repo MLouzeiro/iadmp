@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
+import { assertTargetUserScope, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -27,6 +28,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!target) {
       return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
     }
+
+    await assertTargetUserScope(requester, id, request);
 
     if (target.role === 'SUPER_ADMIN' && requester.role !== 'SUPER_ADMIN') {
       return NextResponse.json({ error: 'Nao e possivel alterar status de SUPER_ADMIN' }, { status: 403 });
@@ -57,6 +60,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
     return NextResponse.json({ error: 'Erro ao alterar status' }, { status: 500 });
   }

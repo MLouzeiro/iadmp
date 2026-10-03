@@ -60,7 +60,7 @@ export default function EditarLiturgiaPage() {
         setPregador(l.pregador || '');
         setResponsavel(l.responsavel || '');
         setObservacoes(l.observacoes || '');
-        setCongregacao(l.congregacao || '');
+        setCongregacao(l.congregacao?.nome || '');
         setItens(l.itens.map((i: any) => ({
           tipo: i.tipo, titulo: i.titulo, horarioPrevisto: i.horarioPrevisto || '',
           duracaoPrevista: i.duracaoPrevista ? String(i.duracaoPrevista) : '',

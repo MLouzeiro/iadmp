@@ -28,7 +28,7 @@ interface Pregacao {
   liturgia?: {
     id: string; tema?: string; data: string; horarioInicio: string;
     horarioFimPrevisto?: string; tipoCulto: string; dirigente?: string;
-    pregador?: string; status: string; congregacao?: string;
+    pregador?: string; status: string; congregacao?: { id: string; nome: string } | null;
   };
   pregador?: { id: string; name: string; email: string };
   organizacao: { id: string; nome: string };

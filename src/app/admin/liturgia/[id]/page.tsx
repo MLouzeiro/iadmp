@@ -30,7 +30,7 @@ interface Liturgia {
   pregador?: string;
   responsavel?: string;
   observacoes?: string;
-  congregacao?: string;
+  congregacao?: { id: string; nome: string } | null;
   status: string;
   organizacao: { id: string; nome: string };
   itens: { id: string; ordem: number; tipo: string; titulo: string; horarioPrevisto?: string; duracaoPrevista?: number; responsavel?: string; descricao?: string; observacoes?: string; musica?: any; referenciaBiblica?: string; textoBiblico?: string; temaPregacao?: string; status?: string }[];

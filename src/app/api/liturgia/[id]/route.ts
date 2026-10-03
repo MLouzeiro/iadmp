@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
+import { resolveCongregacaoId, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       include: {
         itens: { orderBy: { ordem: 'asc' }, include: { musica: true } },
         organizacao: { select: { id: true, nome: true } },
+        congregacao: { select: { id: true, nome: true } },
       },
     });
 
@@ -23,6 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ liturgia });
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('GET /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -49,6 +52,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       if (!podeMover) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
     }
 
+    const congregacaoId =
+      congregacao !== undefined || body.congregacaoId !== undefined
+        ? await resolveCongregacaoId(existing.organizacaoId, {
+            congregacaoId: body.congregacaoId,
+            congregacao,
+          })
+        : existing.congregacaoId;
+
     const liturgia = await prisma.$transaction(async (tx) => {
       if (itens) {
         await tx.liturgiaItem.deleteMany({ where: { liturgiaId: id } });
@@ -58,7 +69,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         where: { id },
         data: {
           organizacaoId: organizacaoId || existing.organizacaoId,
-          congregacao: congregacao !== undefined ? congregacao : existing.congregacao,
+          congregacaoId,
           data: data ? new Date(data) : existing.data,
           horarioInicio: horarioInicio || existing.horarioInicio,
           horarioFimPrevisto: horarioFimPrevisto !== undefined ? horarioFimPrevisto : existing.horarioFimPrevisto,
@@ -91,7 +102,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             })),
           } : undefined,
         },
-        include: { itens: { orderBy: { ordem: 'asc' } }, organizacao: { select: { id: true, nome: true } } },
+        include: {
+          itens: { orderBy: { ordem: 'asc' } },
+          organizacao: { select: { id: true, nome: true } },
+          congregacao: { select: { id: true, nome: true } },
+        },
       });
     });
 
@@ -99,6 +114,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('PUT /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -123,6 +139,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
     if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('DELETE /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

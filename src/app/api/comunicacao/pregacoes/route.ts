@@ -141,6 +141,9 @@ export async function POST(request: NextRequest) {
     if (liturgiaId) {
       const liturgia = await prisma.liturgia.findUnique({ where: { id: liturgiaId } });
       if (!liturgia) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+      if (liturgia.organizacaoId !== organizacaoId) {
+        return NextResponse.json({ error: 'Liturgia pertence a outra organizacao' }, { status: 403 });
+      }
       const existingPregacao = await prisma.pregacao.findUnique({ where: { liturgiaId } });
       if (existingPregacao) return NextResponse.json({ error: 'Esta liturgia ja possui uma pregacao vinculada' }, { status: 400 });
     }

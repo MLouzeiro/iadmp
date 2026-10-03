@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/auth-helpers';
+import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 
 export async function GET() {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    const podeVer = await hasPermission(user.id, 'usuarios', 'visualizar');
+    if (!podeVer && user.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Sem permissao para listar perfis' }, { status: 403 });
+    }
+
     const perfis = await prisma.perfil.findMany({
       include: {
         permissoes: {

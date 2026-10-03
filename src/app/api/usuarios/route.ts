@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canAssignRole, canManageOrganization } from '@/lib/auth-helpers';
+import { assertOrgAccess, resolveOrgScope, orgFilter, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 const criarUsuarioSchema = z.object({
   name: z.string().min(1, 'Nome e obrigatorio'),
@@ -44,20 +45,13 @@ export async function GET(request: Request) {
       where.ativo = ativo === 'true';
     }
 
-    if (organizacaoId && user.role !== 'SUPER_ADMIN') {
+    if (organizacaoId) {
+      await assertOrgAccess(user.id, organizacaoId, request);
       where.organizacoes = { some: { organizacaoId } };
-    } else if (organizacaoId && user.role === 'SUPER_ADMIN') {
-      where.organizacoes = { some: { organizacaoId } };
-    }
-
-    if (user.role !== 'SUPER_ADMIN') {
-      const userOrgs = await prisma.usuarioOrganizacao.findMany({
-        where: { userId: user.id },
-        select: { organizacaoId: true },
-      });
-      const orgIds = userOrgs.map(uo => uo.organizacaoId);
-      if (!where.organizacoes) {
-        where.organizacoes = { some: { organizacaoId: { in: orgIds } } };
+    } else {
+      const scope = await resolveOrgScope(user);
+      if (scope.mode !== 'ALL') {
+        where.organizacoes = { some: { organizacaoId: { in: scope.orgIds } } };
       }
     }
 
@@ -99,6 +93,7 @@ export async function GET(request: Request) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
     return NextResponse.json({ error: 'Erro ao buscar usuarios' }, { status: 500 });
   }
@@ -200,6 +195,7 @@ export async function POST(request: Request) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
     return NextResponse.json({ error: 'Erro ao criar usuario' }, { status: 500 });
   }

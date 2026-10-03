@@ -14,7 +14,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         liturgia: {
           select: {
             id: true, tema: true, data: true, horarioInicio: true, horarioFimPrevisto: true,
-            tipoCulto: true, dirigente: true, pregador: true, status: true, congregacao: true,
+            tipoCulto: true, dirigente: true, pregador: true, status: true, congregacaoId: true,
+            congregacao: { select: { id: true, nome: true } },
           },
         },
         pregador: { select: { id: true, name: true, email: true } },
@@ -67,6 +68,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (liturgiaId && liturgiaId !== existing.liturgiaId) {
       const liturgia = await prisma.liturgia.findUnique({ where: { id: liturgiaId } });
       if (!liturgia) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+      if (liturgia.organizacaoId !== existing.organizacaoId) {
+        return NextResponse.json({ error: 'Liturgia pertence a outra organizacao' }, { status: 403 });
+      }
       const existingPregacao = await prisma.pregacao.findUnique({ where: { liturgiaId } });
       if (existingPregacao && existingPregacao.id !== id) {
         return NextResponse.json({ error: 'Esta liturgia ja possui uma pregacao vinculada' }, { status: 400 });

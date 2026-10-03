@@ -14,7 +14,7 @@ const MODULOS = [
   { nome: 'Galeria', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
   { nome: 'Oportunidades', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
   { nome: 'Configuracoes', permissoes: ['visualizar', 'editar'] },
-  { nome: 'Usuarios', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
+  { nome: 'Usuarios', permissoes: ['visualizar', 'criar', 'editar', 'excluir', 'ver_auditoria'] },
   { nome: 'Comunicacao', permissoes: ['visualizar', 'criar', 'editar', 'excluir', 'gerenciar_canais'] },
   { nome: 'Pregacoes', permissoes: ['visualizar', 'criar', 'editar', 'excluir', 'publicar', 'destacar'] },
 ];
@@ -36,7 +36,7 @@ const PERFIS_CONFIG = {
       'galeria:visualizar', 'galeria:criar', 'galeria:editar', 'galeria:excluir',
       'oportunidades:visualizar', 'oportunidades:criar', 'oportunidades:editar', 'oportunidades:excluir',
       'configuracoes:visualizar', 'configuracoes:editar',
-      'usuarios:visualizar', 'usuarios:criar', 'usuarios:editar',
+      'usuarios:visualizar', 'usuarios:criar', 'usuarios:editar', 'usuarios:ver_auditoria',
       'comunicacao:visualizar', 'comunicacao:criar', 'comunicacao:editar', 'comunicacao:excluir', 'comunicacao:gerenciar_canais',
       'pregacoes:visualizar', 'pregacoes:criar', 'pregacoes:editar', 'pregacoes:excluir', 'pregacoes:publicar', 'pregacoes:destacar',
     ],
