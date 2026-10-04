@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IADMP — Protótipo Interativo (Site Público + Painel)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root,[data-theme="dark"]{
+  --color-primary:#c9a84c;--color-primary-variant:#e0c068;--color-secondary:#d4a843;--color-accent:#b8922e;
+  --bg-primary:#0a1628;--bg-secondary:#0d1f35;--bg-card:rgba(13,31,53,.8);--bg-card-hover:rgba(20,45,75,.9);
+  --bg-nav:rgba(10,22,40,.95);--bg-hero:#070e1a;--bg-input:rgba(255,255,255,.05);
+  --border-color:rgba(201,168,76,.12);--border-hover:rgba(201,168,76,.3);
+  --text-primary:#f0ece2;--text-secondary:#c8c2b6;--text-muted:#8a8578;--text-accent:#c9a84c;
+  --shadow-card:0 4px 24px rgba(0,0,0,.4);--shadow-glow:0 0 30px rgba(201,168,76,.08);--overlay-dark:rgba(7,14,26,.85);
+}
+[data-theme="light"]{
+  --color-primary:#8b6914;--color-primary-variant:#a67c1a;--color-secondary:#c9a84c;--color-accent:#8b6914;
+  --bg-primary:#faf8f4;--bg-secondary:#f0ece2;--bg-card:rgba(255,255,255,.9);--bg-card-hover:#fff;
+  --bg-nav:rgba(250,248,244,.95);--bg-hero:#f0ece2;--bg-input:rgba(0,0,0,.04);
+  --border-color:rgba(139,105,20,.12);--border-hover:rgba(139,105,20,.25);
+  --text-primary:#1a1a1a;--text-secondary:#3d3d3d;--text-muted:#6b6b6b;--text-accent:#8b6914;
+  --shadow-card:0 4px 24px rgba(0,0,0,.06);--shadow-glow:0 0 30px rgba(139,105,20,.06);--overlay-dark:rgba(250,248,244,.9);
+}
+:root{
+  --gradient-gold:linear-gradient(135deg,#c9a84c,#a67c1a);
+  --gradient-gold-soft:linear-gradient(135deg,rgba(201,168,76,.15),rgba(166,124,26,.05));
+  --radius-sm:.5rem;--radius-md:.75rem;--radius-lg:1rem;
+  --transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--bg-primary);color:var(--text-secondary);line-height:1.7}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;color:var(--text-primary);line-height:1.25}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:var(--text-accent);text-decoration:none}
+.hidden{display:none!important}
+
+/* barra do protótipo */
+#proto-bar{position:sticky;top:0;z-index:900;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;
+  padding:.55rem 1.15rem;background:var(--bg-nav);border-bottom:1px solid var(--border-color);backdrop-filter:blur(12px);font-size:.78rem}
+#proto-bar .brand{font-family:'Playfair Display',serif;font-weight:700;color:var(--text-primary);font-size:.95rem;letter-spacing:.04em;margin-right:.5rem}
+#proto-bar .brand span{color:var(--color-primary)}
+.seg{display:flex;gap:2px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:2px}
+.seg button{background:transparent;border:0;color:var(--text-muted);padding:.35rem .85rem;border-radius:calc(var(--radius-sm) - 2px);cursor:pointer;font-size:.75rem;font-weight:600;transition:var(--transition)}
+.seg button:hover{color:var(--text-primary)}
+.seg button.on{background:var(--gradient-gold);color:#fff}
+.spacer{flex:1}
+.ctl{display:inline-flex;align-items:center;gap:.4rem;background:var(--bg-input);border:1px solid var(--border-color);
+  color:var(--text-secondary);padding:.35rem .7rem;border-radius:var(--radius-sm);cursor:pointer;font-size:.73rem;transition:var(--transition)}
+.ctl:hover{border-color:var(--border-hover);color:var(--text-primary)}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--border-hover);display:inline-block}
+
+/* botões e formulários */
+.btn{display:inline-flex;align-items:center;gap:.45rem;justify-content:center;padding:.62rem 1.15rem;
+  border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);
+  cursor:pointer;font-size:.82rem;font-weight:600;transition:var(--transition)}
+.btn:hover{border-color:var(--border-hover);transform:translateY(-1px)}
+.btn-primary{background:var(--gradient-gold);color:#fff;border-color:transparent}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-danger{background:rgba(231,76,60,.14);color:#ff8a80;border-color:rgba(231,76,60,.3)}
+.btn-sm{padding:.38rem .72rem;font-size:.74rem}
+.field{display:flex;flex-direction:column;gap:.32rem}
+.field label{font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.field input,.field select,.field textarea{background:var(--bg-input);border:1px solid var(--border-color);
+  border-radius:var(--radius-sm);padding:.6rem .75rem;color:var(--text-primary);font-size:.85rem;transition:var(--transition);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.field textarea{resize:vertical;min-height:84px}
+.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.95rem}
+
+/* cards, tabelas, badges */
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.35rem;box-shadow:var(--shadow-card)}
+.card-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1.15rem}
+.kpi{display:flex;align-items:center;gap:1rem}
+.kpi-ico{width:3rem;height:3rem;border-radius:var(--radius-md);display:grid;place-items:center;
+  background:var(--gradient-gold);color:#fff;font-size:1.25rem;flex-shrink:0}
+.kpi-val{font-family:'Playfair Display',serif;font-size:1.75rem;color:var(--text-primary);line-height:1.1}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:.65rem .7rem;color:var(--text-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;border-bottom:1px solid var(--border-color)}
+td{padding:.68rem .7rem;border-bottom:1px solid var(--border-color);vertical-align:middle}
+tr:hover td{background:var(--bg-card-hover)}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.03em}
+.badge.ok{background:rgba(76,175,80,.16);color:#7ee08a}
+.badge.warn{background:rgba(255,179,0,.16);color:#ffd54f}
+.badge.err{background:rgba(231,76,60,.16);color:#ff8a80}
+.badge.info{background:rgba(33,150,243,.16);color:#82b1ff}
+.badge.mut{background:var(--bg-input);color:var(--text-muted)}
+.toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin:1.15rem 0}
+.search{flex:1;min-width:190px;background:var(--bg-input);border:1px solid var(--border-color);
+  border-radius:var(--radius-sm);padding:.58rem .85rem;color:var(--text-primary);font-size:.83rem}
+.search:focus{outline:none;border-color:var(--border-hover)}
+
+/* site público */
+.pub-nav{position:sticky;top:42px;z-index:500;display:flex;align-items:center;gap:1.5rem;
+  padding:.85rem 4vw;background:var(--bg-nav);border-bottom:1px solid var(--border-color);backdrop-filter:blur(12px)}
+.pub-logo{font-family:'Playfair Display',serif;font-size:1.32rem;font-weight:700;color:var(--text-primary)}
+.pub-logo b{color:var(--color-primary)}
+.pub-links{display:flex;gap:.35rem;margin-left:auto;flex-wrap:wrap}
+.pub-links button{background:transparent;border:0;color:var(--text-secondary);cursor:pointer;
+  padding:.45rem .9rem;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500;transition:var(--transition)}
+.pub-links button:hover{color:var(--text-primary);background:var(--bg-input)}
+.pub-links button.on{color:var(--color-primary);background:var(--gradient-gold-soft);font-weight:700}
+.hero{position:relative;padding:6.5rem 4vw 5.5rem;background:var(--bg-hero);overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 78% 28%,rgba(201,168,76,.16) 0%,transparent 58%),
+             radial-gradient(ellipse at 12% 82%,rgba(196,30,30,.1) 0%,transparent 55%)}
+.hero>*{position:relative;z-index:1}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--color-primary);font-weight:700;margin-bottom:1.15rem}
+.hero h1{font-size:clamp(2.35rem,5.2vw,4.15rem);max-width:17ch;margin-bottom:1.15rem}
+.hero h1 em{font-style:normal;color:var(--color-primary)}
+.hero p{max-width:56ch;font-size:1.06rem;margin-bottom:2rem}
+.hero-actions{display:flex;gap:.85rem;flex-wrap:wrap}
+.hero-stats{display:flex;gap:2.65rem;margin-top:3.25rem;flex-wrap:wrap}
+.hero-stats .n{font-family:'Playfair Display',serif;font-size:2.15rem;color:var(--color-primary)}
+.hero-stats .l{font-size:.75rem;text-transform:uppercase;letter-spacing:.11em;color:var(--text-muted)}
+.section{padding:4.25rem 4vw}
+.section.alt{background:var(--bg-secondary)}
+.section-head{margin-bottom:2.25rem}
+.section-head .eyebrow{font-size:.71rem;letter-spacing:.21em;text-transform:uppercase;color:var(--color-primary);font-weight:700}
+.section-head h2{font-size:clamp(1.75rem,3.4vw,2.55rem);margin:.55rem 0 .75rem}
+.section-head p{max-width:62ch}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1.35rem}
+.pub-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.65rem;transition:var(--transition)}
+.pub-card:hover{transform:translateY(-4px);border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.pub-card .ico{width:2.85rem;height:2.85rem;border-radius:var(--radius-md);display:grid;place-items:center;
+  background:var(--gradient-gold-soft);color:var(--color-primary);font-size:1.3rem;margin-bottom:1.05rem}
+.pub-card h3{font-size:1.16rem;margin-bottom:.55rem}
+.pub-card p{font-size:.885rem}
+.pub-card .verse{margin-top:.95rem;font-size:.76rem;color:var(--color-primary);font-style:italic}
+.leader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:1.25rem}
+.leader{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);overflow:hidden;text-align:center;transition:var(--transition)}
+.leader:hover{transform:translateY(-4px);border-color:var(--border-hover)}
+.leader .ph{height:172px;background:var(--gradient-gold-soft);display:grid;place-items:center;font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--color-primary)}
+.leader .body{padding:1.05rem}
+.leader h4{font-size:1rem}
+.leader span{font-size:.775rem;color:var(--text-muted)}
+.prog-row{display:flex;gap:1.25rem;align-items:center;padding:1.15rem 0;border-bottom:1px solid var(--border-color)}
+.prog-row:last-child{border-bottom:0}
+.prog-day{min-width:112px;font-size:.715rem;letter-spacing:.11em;text-transform:uppercase;color:var(--color-primary);font-weight:700}
+.prog-time{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--text-primary);min-width:72px}
+.verse-box{background:var(--gradient-gold-soft);border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:2.65rem;text-align:center}
+.verse-box .ref{font-size:.745rem;letter-spacing:.19em;text-transform:uppercase;color:var(--color-primary);font-weight:700}
+.verse-box blockquote{font-family:'Playfair Display',serif;font-size:clamp(1.32rem,2.7vw,1.95rem);color:var(--text-primary);margin:1.15rem auto;max-width:42ch;line-height:1.55}
+.verse-box .refl{max-width:62ch;margin:0 auto;font-size:.915rem}
+.faq-item{border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:.72rem;overflow:hidden;background:var(--bg-card)}
+.faq-q{width:100%;text-align:left;background:transparent;border:0;cursor:pointer;padding:1.12rem 1.35rem;
+  color:var(--text-primary);font-weight:600;font-size:.925rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 1.35rem;font-size:.885rem}
+.faq-item.open .faq-a{max-height:320px;padding-bottom:1.25rem}
+.faq-item.open .faq-q .chev{transform:rotate(180deg)}
+.chev{transition:var(--transition);color:var(--color-primary)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:.85rem}
+.gal{aspect-ratio:1;border-radius:var(--radius-md);cursor:pointer;transition:var(--transition);display:grid;
+  place-items:center;color:var(--color-primary);font-family:'Playfair Display',serif;font-size:1.05rem;border:1px solid var(--border-color)}
+.gal:hover{transform:scale(1.03);border-color:var(--border-hover)}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:1.75rem}
+.pub-footer{background:var(--bg-hero);border-top:1px solid var(--border-color);padding:2.85rem 4vw;
+  display:flex;gap:1.85rem;flex-wrap:wrap;justify-content:space-between;align-items:center;font-size:.845rem}
+
+/* painel admin */
+.admin-wrap{display:flex;min-height:calc(100vh - 42px)}
+.sidebar{width:252px;background:var(--bg-nav);border-right:1px solid var(--border-color);
+  padding:1.5rem .85rem;position:sticky;top:42px;height:calc(100vh - 42px);overflow-y:auto}
+.side-label{font-size:.645rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);font-weight:700;padding:.85rem .85rem .42rem}
+.side-item{width:100%;display:flex;align-items:center;gap:.72rem;padding:.58rem .85rem;border-radius:var(--radius-sm);
+  border:0;cursor:pointer;background:transparent;color:var(--text-secondary);font-size:.825rem;text-align:left;transition:var(--transition)}
+.side-item:hover{background:var(--bg-input);color:var(--text-primary)}
+.side-item.on{background:var(--gradient-gold-soft);color:var(--color-primary);font-weight:700}
+.side-item .ico{width:1.15rem;text-align:center;opacity:.9}
+.admin-main{flex:1;padding:2.05rem 2.35rem;min-width:0}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:1.15rem;flex-wrap:wrap;margin-bottom:1.65rem}
+.page-head h2{font-size:1.65rem}
+.page-head .sub{color:var(--text-muted);font-size:.83rem;margin-top:.18rem}
+.tabs{display:flex;gap:.52rem;flex-wrap:wrap;margin-bottom:1.55rem}
+.tab{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary);
+  padding:.48rem 1.05rem;border-radius:999px;cursor:pointer;font-size:.785rem;font-weight:600;transition:var(--transition)}
+.tab:hover{border-color:var(--border-hover);color:var(--text-primary)}
+.tab.on{background:var(--gradient-gold);color:#fff;border-color:transparent}
+.filter-bar{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);
+  padding:1.05rem 1.25rem;display:flex;gap:1.05rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.55rem}
+.list-item{display:flex;align-items:center;gap:1.15rem;padding:.98rem 1.05rem;border:1px solid var(--border-color);
+  border-radius:var(--radius-md);background:var(--bg-card);margin-bottom:.68rem;transition:var(--transition)}
+.list-item:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
+.avatar{width:2.72rem;height:2.72rem;border-radius:50%;display:grid;place-items:center;background:var(--gradient-gold-soft);
+  color:var(--color-primary);font-weight:700;flex-shrink:0;font-size:.885rem}
+.list-item .info{flex:1;min-width:0}
+.list-item .info h4{font-size:.945rem;margin-bottom:.12rem}
+.list-item .info p{font-size:.775rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list-item .acts{display:flex;gap:.42rem;flex-shrink:0;align-items:center;flex-wrap:wrap}
+.empty{padding:2.85rem 1.35rem;text-align:center;color:var(--text-muted);border:1px dashed var(--border-color);border-radius:var(--radius-md);font-size:.885rem}
+.kpi-info{background:none;border:0;cursor:pointer;color:var(--text-muted);padding:0;font-size:.925rem;line-height:1}
+.pop{position:absolute;right:0;top:1.55rem;z-index:40;width:262px;background:var(--bg-card);
+  border:1px solid var(--border-hover);border-radius:var(--radius-sm);padding:.82rem;font-size:.735rem;
+  color:var(--text-muted);box-shadow:var(--shadow-card);text-align:left}
+.pop b{color:var(--text-primary);display:block;margin-bottom:.38rem}
+.var-up{color:#7ee08a;font-weight:700;font-size:.785rem}
+.var-down{color:#ff8a80;font-weight:700;font-size:.785rem}
+.var-none{color:var(--text-muted);font-size:.785rem}
+.group-title{font-size:.735rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin:1.75rem 0 .85rem}
+.group-title:first-child{margin-top:0}
+
+/* modal, toast, lightbox */
+.modal-bg{position:fixed;inset:0;background:var(--overlay-dark);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:4.25rem 1.25rem;overflow-y:auto}
+.modal-bg.on{display:flex}
+.modal{background:var(--bg-secondary);border:1px solid var(--border-hover);border-radius:var(--radius-lg);width:min(680px,100%);padding:1.85rem;box-shadow:var(--shadow-card)}
+.modal h3{margin-bottom:.35rem}
+.modal .desc{color:var(--text-muted);font-size:.83rem;margin-bottom:1.45rem}
+.modal-actions{display:flex;gap:.72rem;justify-content:flex-end;margin-top:1.65rem}
+#toast-wrap{position:fixed;right:1.35rem;bottom:1.35rem;z-index:1100;display:flex;flex-direction:column;gap:.55rem}
+.toast{background:var(--bg-card);border:1px solid var(--border-hover);border-left:3px solid var(--color-primary);
+  padding:.82rem 1.15rem;border-radius:var(--radius-sm);font-size:.825rem;color:var(--text-primary);box-shadow:var(--shadow-card);animation:slideIn .28s ease}
+.toast.err{border-left-color:#ff8a80}
+.toast.ok{border-left-color:#7ee08a}
+@keyframes slideIn{from{transform:translateX(22px);opacity:0}to{transform:none;opacity:1}}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1200;display:none;align-items:center;justify-content:center;cursor:zoom-out;padding:2rem}
+.lightbox.on{display:flex}
+.lightbox .frame{width:min(620px,92vw);aspect-ratio:1;border-radius:var(--radius-lg);background:var(--gradient-gold-soft);
+  display:grid;place-items:center;color:var(--color-primary);font-family:'Playfair Display',serif;font-size:2.1rem;border:1px solid var(--border-hover)}
+
+@media(max-width:980px){
+  .sidebar{display:none}
+  .admin-main{padding:1.55rem 1.15rem}
+  .pub-links{display:none}
+  .hero{padding:4.25rem 1.15rem 3.65rem}
+  .section{padding:3.15rem 1.15rem}
+}
+</style>
+</head>
+<body>
+<div id="proto-bar">
+  <div class="brand">IADMP<span>·protótipo</span></div>
+  <div class="seg" id="seg-mode">
+    <button data-mode="public" class="on">Site Público</button>
+    <button data-mode="admin">Painel Admin</button>
+    <button data-mode="login">Login</button>
+  </div>
+  <div class="spacer"></div>
+  <button class="ctl" id="btn-theme">◐ <span>Escuro</span></button>
+  <div class="seg" id="seg-palette">
+    <button data-pal="original" class="on">Original</button>
+    <button data-pal="elegante">Elegante</button>
+    <button data-pal="moderna">Moderna</button>
+    <button data-pal="clara">Clara</button>
+  </div>
+</div>
+
+<!-- ================= LOGIN ================= -->
+<div id="screen-login" class="hidden" style="min-height:calc(100vh - 42px);display:grid;place-items:center;padding:2rem 1.15rem">
+  <div class="card" style="width:min(430px,100%);padding:2.5rem">
+    <div style="text-align:center;margin-bottom:1.95rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1.85rem;color:var(--text-primary)">IA<span style="color:var(--color-primary)">DMP</span></div>
+      <p style="color:var(--text-muted);font-size:.845rem;margin-top:.35rem">Painel administrativo</p>
+    </div>
+    <div class="field" style="margin-bottom:1rem"><label>E-mail</label>
+      <input id="login-email" type="email" value="admin@iadmp.com.br" /></div>
+    <div class="field" style="margin-bottom:1.55rem"><label>Senha</label>
+      <input id="login-pass" type="password" value="senha-simulada" /></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Entrar</button>
+    <p style="text-align:center;color:var(--text-muted);font-size:.755rem;margin-top:1.15rem">
+      Protótipo: login simulado (no sistema real é NextAuth Credentials + bcrypt + JWT em cookie).</p>
+  </div>
+</div>
+
+<!-- ================= SITE PÚBLICO ================= -->
+<div id="screen-public">
+  <nav class="pub-nav">
+    <div class="pub-logo">IA<b>DMP</b></div>
+    <div class="pub-links" id="pub-links">
+      <button data-page="home" class="on">Início</button>
+      <button data-page="sobre">A Igreja</button>
+      <button data-page="eventos">Programações</button>
+      <button data-page="pregacoes">Pregações</button>
+      <button data-page="galeria">Galeria</button>
+      <button data-page="lideranca">Liderança</button>
+      <button data-page="contato">Contato</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="switchMode('admin')">Área do Líder</button>
+  </nav>
+
+  <div class="pub-page" data-page="home">
+    <header class="hero">
+      <div class="eyebrow">◆ Igreja Assembleia de Deus · Missão da Promessa</div>
+      <h1>Uma comunidade de fé, <em>amor</em> e esperança</h1>
+      <p>Onde cada pessoa é acolhida e transformada pelo poder de Deus. Venha viver a presença do Senhor conosco — em São Luís e em nossas congregações.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="showPublicPage('eventos')">Ver programações</button>
+        <button class="btn" onclick="showPublicPage('contato')">Fale conosco</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="n">5</div><div class="l">Congregações</div></div>
+        <div><div class="n">11</div><div class="l">Líderes</div></div>
+        <div><div class="n">32</div><div class="l">Anos de história</div></div>
+        <div><div class="n">6</div><div class="l">Ministérios</div></div>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Nossos valores</div>
+        <h2>O que nos move</h2>
+        <p>Quatro pilares que sustentam nossa vida comunitária e nossa caminhada de fé.</p>
+      </div>
+      <div class="cards-grid" id="home-values"></div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-head">
+        <div class="eyebrow">Versículo do dia</div>
+        <h2>Palavra para hoje</h2>
+      </div>
+      <div class="verse-box" id="home-verse"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Agenda</div>
+        <h2>Nossas programações</h2>
+        <p>Tempos fixos de oração, ensino e adoração ao longo da semana.</p>
+      </div>
+      <div class="card" id="home-programs"></div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-head">
+        <div class="eyebrow">Eventos em destaque</div>
+        <h2>Próximos eventos</h2>
+      </div>
+      <div class="cards-grid" id="home-events"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="sobre">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">A Igreja</div>
+        <h2>Quem somos</h2>
+        <p>A Igreja Assembleia de Deus Missão da Promessa nasceu do desejo de ver vidas transformadas pelo Evangelho. Hoje somos uma família de fé presente em cinco congregações.</p>
+      </div>
+      <div class="cards-grid" id="sobre-sections"></div>
+    </section>
+    <section class="section alt">
+      <div class="section-head">
+        <div class="eyebrow">Perguntas frequentes</div>
+        <h2>Dúvidas sobre a fé</h2>
+      </div>
+      <div id="sobre-faq"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="eventos">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Programações</div>
+        <h2>Eventos e cultos</h2>
+        <p>Toda a agenda da igreja e das congregações.</p>
+      </div>
+      <div class="cards-grid" id="public-events"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="pregacoes">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Palavra</div>
+        <h2>Pregações</h2>
+        <p>Mensagens que edificam a fé — assista, leia e compartilhe.</p>
+      </div>
+      <div class="cards-grid" id="public-pregacoes"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="galeria">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Momentos</div>
+        <h2>Galeria de fotos</h2>
+        <p>Registros da nossa caminhada juntos.</p>
+      </div>
+      <div class="gallery-grid" id="public-galeria"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="lideranca">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Liderança</div>
+        <h2>Quem nos conduz</h2>
+        <p>Pastores, diáconos e líderes que servem à igreja com dedicação.</p>
+      </div>
+      <div class="leader-grid" id="public-lideres"></div>
+    </section>
+    <section class="section alt">
+      <div class="section-head">
+        <div class="eyebrow">Estrutura</div>
+        <h2>Congregações</h2>
+      </div>
+      <div class="cards-grid" id="public-congregacoes"></div>
+    </section>
+  </div>
+
+  <div class="pub-page hidden" data-page="contato">
+    <section class="section">
+      <div class="section-head">
+        <div class="eyebrow">Contato</div>
+        <h2>Fale conosco</h2>
+        <p>Estamos à disposição para orar com você e responder suas dúvidas.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="card">
+          <h3 style="margin-bottom:1.15rem">Envie uma mensagem</h3>
+          <div class="field" style="margin-bottom:.95rem"><label>Nome</label><input id="c-nome" placeholder="Seu nome" /></div>
+          <div class="field" style="margin-bottom:.95rem"><label>E-mail</label><input id="c-email" type="email" placeholder="voce@email.com" /></div>
+          <div class="field" style="margin-bottom:1.35rem"><label>Mensagem</label><textarea id="c-msg" placeholder="Como podemos ajudar?"></textarea></div>
+          <button class="btn btn-primary" onclick="enviarContato()">Enviar mensagem</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:1.15rem">Informações</h3>
+          <p style="margin-bottom:1.05rem"><b style="color:var(--text-primary)">Endereço</b><br />Maranhão, Brasil</p>
+          <p style="margin-bottom:1.05rem"><b style="color:var(--text-primary)">Telefone</b><br />+55 98 98803-5646</p>
+          <p style="margin-bottom:1.05rem"><b style="color:var(--text-primary)">E-mail</b><br />marcio@codemed.com.br</p>
+          <p><b style="color:var(--text-primary)">Redes</b><br />YouTube · Instagram · WhatsApp</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="pub-footer">
+    <div>
+      <div class="pub-logo" style="font-size:1.12rem">IA<b>DMP</b></div>
+      <p style="color:var(--text-muted);margin-top:.32rem">© 2026 Igreja Assembleia de Deus Missão da Promessa</p>
+    </div>
+    <div style="display:flex;gap:1.35rem;color:var(--text-muted);flex-wrap:wrap">
+      <a href="#" onclick="showPublicPage('sobre');return false">A Igreja</a>
+      <a href="#" onclick="showPublicPage('eventos');return false">Programações</a>
+      <a href="#" onclick="showPublicPage('contato');return false">Contato</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ================= PAINEL ADMIN ================= -->
+<div id="screen-admin" class="hidden">
+  <div class="admin-wrap">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="admin-main" id="admin-main"></main>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modal-title">Título</h3>
+    <p class="desc" id="modal-desc"></p>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="modal-save">Salvar</button>
+    </div>
+  </div>
+</div>
+<div id="toast-wrap"></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('on')">
+  <div class="frame" id="lightbox-frame"></div>
+</div>
+<script>
+/* ===================== DADOS DE EXEMPLO ===================== */
+const DB = {
+  orgs: [{ id: 'org1', nome: 'IADMP - Igreja Assembleia de Deus Ministério da Promessa' }],
+  congregacoes: [
+    { id: 'c1', nome: 'Matriz' }, { id: 'c2', nome: 'Cohabiano' },
+    { id: 'c3', nome: 'Res. Tiradentes' }, { id: 'c4', nome: 'Vila Sarney' },
+    { id: 'c5', nome: 'Novo Renascer' },
+  ],
+  membros: [
+    { id: 'm1', nome: 'Marcio Louzeiro', email: 'marcio@codemed.com.br', tel: '(98) 98803-5646', cong: 'Matriz', status: 'ATIVO', entrada: '2019-03-12' },
+    { id: 'm2', nome: 'Ana Caroline', email: 'ana@email.com', tel: '(98) 99111-2233', cong: 'Vila Sarney', status: 'ATIVO', entrada: '2021-07-04' },
+    { id: 'm3', nome: 'Ayton Sena', email: 'ayton@email.com', tel: '(98) 98222-3344', cong: 'Cohabiano', status: 'ATIVO', entrada: '2020-01-19' },
+    { id: 'm4', nome: 'Thiane Louzeiro', email: 'thiane@email.com', tel: '(98) 98333-4455', cong: 'Matriz', status: 'ATIVO', entrada: '2018-11-02' },
+    { id: 'm5', nome: 'Cristiano Alves', email: 'cristiano@email.com', tel: '(98) 98444-5566', cong: 'Novo Renascer', status: 'INATIVO', entrada: '2017-05-21' },
+    { id: 'm6', nome: 'Suenne Barros', email: 'suenne@email.com', tel: '(98) 98555-6677', cong: 'Res. Tiradentes', status: 'ATIVO', entrada: '2022-02-08' },
+  ],
+  lideres: [
+    { id: 'l1', nome: 'Pr. Cleiginaldo Barros', cargo: 'Pastor Presidente', cong: 'Matriz', ativo: true },
+    { id: 'l2', nome: 'Pr. Walmorio', cargo: 'Pastor da Vila Sarney', cong: 'Vila Sarney', ativo: true },
+    { id: 'l3', nome: 'Pr. Melquesedeque', cargo: 'Pastor', cong: 'Cohabiano', ativo: true },
+    { id: 'l4', nome: 'Pb. Marcio Louzeiro', cargo: '1º Dirigente', cong: 'Matriz', ativo: true },
+    { id: 'l5', nome: 'Missionário Cristiano', cargo: '2º Dirigente', cong: 'Novo Renascer', ativo: true },
+    { id: 'l6', nome: 'Dc. Thiane Louzeiro', cargo: 'Regente das Heróis da Fé', cong: 'Matriz', ativo: true },
+  ],
+  eventos: [
+    { id: 'e1', nome: 'Congresso de Jovens 2026', data: '2026-10-18', local: 'Templo Matriz', status: 'PLANEJADO', tema: 'Fogo Renovado', publico: true, orc: 8500 },
+    { id: 'e2', nome: 'Culto de Adoração', data: '2026-10-05', local: 'Templo Matriz', status: 'CONCLUIDO', tema: 'Adoração em Espírito', publico: true, orc: 0 },
+    { id: 'e3', nome: 'Vigília de Oração', data: '2026-10-24', local: 'Res. Tiradentes', status: 'PLANEJADO', tema: 'Noite de Intercessão', publico: true, orc: 1200 },
+    { id: 'e4', nome: 'Café da Manhã das Heróis', data: '2026-11-01', local: 'Salão Social', status: 'PLANEJADO', tema: 'Comunhão', publico: false, orc: 2200 },
+    { id: 'e5', nome: 'Batismo nas Águas', data: '2026-09-14', local: 'Praia do Cal', status: 'CONCLUIDO', tema: 'Nova Criatura', publico: true, orc: 900 },
+    { id: 'e6', nome: 'Semana da Família', data: '2026-12-07', local: 'Templo Matriz', status: 'CANCELADO', tema: 'Família Firme', publico: true, orc: 5000 },
+  ],
+  financeiro: [
+    { id: 'f1', desc: 'Dízimos - Setembro', valor: 12450, tipo: 'ENTRADA', cat: 'DIZIMO', data: '2026-09-30', resp: 'Jannes' },
+    { id: 'f2', desc: 'Ofertas - Culto de Adoração', valor: 3180.5, tipo: 'ENTRADA', cat: 'OFERTA', data: '2026-10-05', resp: 'Jannes' },
+    { id: 'f3', desc: 'Aluguel do som', valor: 1450, tipo: 'SAIDA', cat: 'DESPESA', data: '2026-10-02', resp: 'Marcio' },
+    { id: 'f4', desc: 'Doação - Missões', valor: 2600, tipo: 'ENTRADA', cat: 'DOACAO', data: '2026-10-01', resp: 'Thiane' },
+    { id: 'f5', desc: 'Material de limpeza', valor: 389.9, tipo: 'SAIDA', cat: 'DESPESA', data: '2026-10-03', resp: 'Suenne' },
+    { id: 'f6', desc: 'Inscrições Congresso', valor: 4750, tipo: 'ENTRADA', cat: 'INSCRICAO', data: '2026-10-04', resp: 'Ayton' },
+  ],
+  avisos: [
+    { id: 'a1', titulo: 'Ensaio do coral', desc: 'Sábado às 16h no templo.', urg: 'NORMAL', ativo: true, fim: '2026-10-11' },
+    { id: 'a2', titulo: 'Mutirão de limpeza', desc: 'Domingo após o culto da manhã.', urg: 'ALTA', ativo: true, fim: '2026-10-12' },
+    { id: 'a3', titulo: 'Campanha do agasalho', desc: 'Doe casacos até 30/11.', urg: 'NORMAL', ativo: true, fim: '2026-11-30' },
+    { id: 'a4', titulo: 'Reunião de líderes', desc: 'Terça às 20h.', urg: 'URGENTE', ativo: false, fim: '2026-10-01' },
+  ],
+  oportunidades: [
+    { id: 'o1', titulo: 'Voluntários - Som e Áudio', desc: 'Apoio técnico nos cultos.', vagas: 4, status: 'ATIVA', prazo: '2026-11-15' },
+    { id: 'o2', titulo: 'Professoras - EBD Infantil', desc: 'Aulas aos domingos.', vagas: 3, status: 'ATIVA', prazo: '2026-10-30' },
+    { id: 'o3', titulo: 'Fotografia de Eventos', desc: 'Registro dos congressos.', vagas: 2, status: 'ENCERRADA', prazo: '2026-09-20' },
+  ],
+  usuarios: [
+    { id: 'u1', nome: 'Marcio Louzeiro', email: 'admin@iadmp.com.br', role: 'SUPER_ADMIN', org: 'IADMP', ativo: true },
+    { id: 'u2', nome: 'Cleiginaldo Barros', email: 'pastor@iadmp.com.br', role: 'ADMIN_IGREJA', org: 'IADMP', ativo: true },
+    { id: 'u3', nome: 'Ayton Sena', email: 'ayton@iadmp.com.br', role: 'LIDER', org: 'IADMP', ativo: true },
+    { id: 'u4', nome: 'Jannes Costa', email: 'jannes@iadmp.com.br', role: 'FINANCEIRO', org: 'IADMP', ativo: true },
+    { id: 'u5', nome: 'Ana Caroline', email: 'ana@iadmp.com.br', role: 'MEMBER', org: 'IADMP', ativo: false },
+  ],
+  liturgias: [
+    { id: 'li1', data: '2026-10-05', culto: 'Celebração', tema: 'Adoração em Espírito', dirigente: 'Pr. Cleiginaldo', pregador: 'Pr. Walmorio', status: 'REALIZADA', cong: 'Matriz' },
+    { id: 'li2', data: '2026-10-08', culto: 'Reunião de Oração', tema: 'Intercessão', dirigente: 'Pb. Marcio', pregador: 'Pr. Melquesedeque', status: 'PRONTA', cong: 'Cohabiano' },
+    { id: 'li3', data: '2026-10-12', culto: 'Celebração', tema: 'Fogo Renovado', dirigente: 'Pr. Cleiginaldo', pregador: 'Pr. Cleiginaldo', status: 'RASCUNHO', cong: 'Matriz' },
+  ],
+  pregacoes: [
+    { id: 'p1', titulo: 'A força do perdão', pregador: 'Pr. Cleiginaldo Barros', data: '2026-10-05', status: 'PUBLICADA', ref: 'Mateus 6:14-15', views: 412 },
+    { id: 'p2', titulo: 'Fogo que não se apaga', pregador: 'Pr. Walmorio', data: '2026-09-28', status: 'PUBLICADA', ref: 'Atos 2:1-4', views: 287 },
+    { id: 'p3', titulo: 'Caminhos da sabedoria', pregador: 'Pr. Melquesedeque', data: '2026-09-21', status: 'ARQUIVADA', ref: 'Provérbios 3:5-6', views: 156 },
+    { id: 'p4', titulo: 'Vencendo o desânimo', pregador: 'Pr. Cleiginaldo Barros', data: '2026-10-12', status: 'RASCUNHO', ref: 'Isaías 40:31', views: 0 },
+  ],
+  canais: [
+    { id: 'cn1', tipo: 'YouTube', nome: 'IADMP MA', url: 'https://youtube.com/@iadmpma', ativo: true },
+    { id: 'cn2', tipo: 'Instagram', nome: '@iadmpma', url: 'https://instagram.com/iadmpma', ativo: true },
+    { id: 'cn3', tipo: 'WhatsApp', nome: 'Comunidade', url: 'https://wa.me/5598988035646', ativo: true },
+    { id: 'cn4', tipo: 'Facebook', nome: 'IADMP Oficial', url: 'https://m.me/ernest_achiever', ativo: false },
+  ],
+  versiculos: [
+    { id: 'v1', ref: 'João 3:16', texto: 'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito...', ativo: true },
+    { id: 'v2', ref: 'Filipenses 4:13', texto: 'Tudo posso naquele que me fortalece.', ativo: true },
+    { id: 'v3', ref: 'Salmos 23:1', texto: 'O Senhor é o meu pastor; nada me faltará.', ativo: true },
+    { id: 'v4', ref: 'Isaías 41:10', texto: 'Não temas, porque eu sou contigo...', ativo: true },
+    { id: 'v5', ref: 'Romanos 12:2', texto: 'E não vos conformeis com este mundo...', ativo: true },
+    { id: 'v6', ref: 'Salmos 46:1', texto: 'Deus é o nosso refúgio e fortaleza...', ativo: false },
+  ],
+  galeria: Array.from({ length: 15 }, (_, i) => ({
+    id: 'g' + (i + 1), titulo: 'Momento ' + (i + 1),
+    album: ['Cultos', 'Congressos', 'Batismos', 'Comunhão'][i % 4],
+  })),
+  audit: [
+    { quando: '03/10/2026 21:48', user: 'Marcio Louzeiro', acao: 'UPDATE', entidade: 'ConfiguracoesIgreja', org: 'IADMP', resultado: 'SUCESSO', ip: '189.45.12.8' },
+    { quando: '03/10/2026 21:12', user: 'Marcio Louzeiro', acao: 'CREATE', entidade: 'Evento', org: 'IADMP', resultado: 'SUCESSO', ip: '189.45.12.8' },
+    { quando: '03/10/2026 19:55', user: 'Ayton Sena', acao: 'ACESSO_NEGADO', entidade: 'Organizacao', org: 'IADMP', resultado: 'NEGADO', ip: '177.92.4.19' },
+    { quando: '03/10/2026 18:30', user: 'Cleiginaldo Barros', acao: 'DELETE', entidade: 'Aviso', org: 'IADMP', resultado: 'SUCESSO', ip: '201.17.88.4' },
+    { quando: '02/10/2026 22:04', user: 'Jannes Costa', acao: 'CREATE', entidade: 'EventoFinanceiro', org: 'IADMP', resultado: 'SUCESSO', ip: '189.45.12.31' },
+    { quando: '02/10/2026 15:19', user: 'Marcio Louzeiro', acao: 'PERMISSION_CHANGE', entidade: 'User', org: 'IADMP', resultado: 'SUCESSO', ip: '189.45.12.8' },
+  ],
+};
+
+const INDICADORES = [
+  { chave: 'membrosAtivos', grupo: 'pessoas', titulo: 'Membros ativos', valor: 248, ant: 236, media: 231.4, formula: 'COUNT(Membro WHERE status = ATIVO)', origem: 'Membro.status', un: 'un' },
+  { chave: 'novosMembros', grupo: 'pessoas', titulo: 'Novos membros no período', valor: 14, ant: 9, media: 11.2, formula: 'COUNT(Membro WHERE dataEntrada no período)', origem: 'Membro.dataEntrada', un: 'un' },
+  { chave: 'lideresAtivos', grupo: 'pessoas', titulo: 'Líderes ativos', valor: 14, ant: 14, media: null, estoque: true, formula: 'COUNT(Lideranca WHERE ativo = true)', origem: 'Lideranca.ativo', un: 'un' },
+  { chave: 'eventosRealizados', grupo: 'eventos', titulo: 'Eventos realizados', valor: 6, ant: 4, media: 5.1, formula: 'COUNT(Evento WHERE status = CONCLUIDO)', origem: 'Evento.status + .dataEvento', un: 'un' },
+  { chave: 'eventosFuturos', grupo: 'eventos', titulo: 'Eventos futuros', valor: 3, ant: 3, media: null, estoque: true, formula: 'COUNT(Evento WHERE status = PLANEJADO)', origem: 'Evento.status + .dataEvento', un: 'un' },
+  { chave: 'eventosCancelados', grupo: 'eventos', titulo: 'Eventos cancelados', valor: 1, ant: 0, media: 0.7, formula: 'COUNT(Evento WHERE status = CANCELADO)', origem: 'Evento.status + .dataEvento', un: 'un' },
+  { chave: 'inscricoes', grupo: 'eventos', titulo: 'Inscrições no período', valor: 95, ant: 61, media: 78.3, formula: 'COUNT(Inscricao WHERE createdAt no período)', origem: 'Inscricao.createdAt', un: 'un' },
+  { chave: 'checkIns', grupo: 'eventos', titulo: 'Check-ins realizados', valor: 78, ant: 52, media: 65.0, formula: 'COUNT(Inscricao WHERE checkIn = true)', origem: 'Inscricao.checkIn + .dataCheckIn', un: 'un' },
+  { chave: 'receitas', grupo: 'financeiro', titulo: 'Receitas', valor: 22980.5, ant: 18740, media: 19820.3, formula: 'SUM(EventoFinanceiro.valor WHERE ENTRADA)', origem: 'EventoFinanceiro.generoMovimentacao', un: 'R$' },
+  { chave: 'despesas', grupo: 'financeiro', titulo: 'Despesas', valor: 1839.9, ant: 2410, media: 2105.7, formula: 'SUM(EventoFinanceiro.valor WHERE SAIDA)', origem: 'EventoFinanceiro.generoMovimentacao', un: 'R$' },
+  { chave: 'dizimos', grupo: 'financeiro', titulo: 'Dízimos', valor: 12450, ant: 11200, media: 11830, formula: 'SUM(EventoFinanceiro.valor WHERE categoria = DIZIMO)', origem: 'EventoFinanceiro.categoria', un: 'R$' },
+  { chave: 'ofertas', grupo: 'financeiro', titulo: 'Ofertas', valor: 3180.5, ant: 2940, media: 3012.4, formula: 'SUM(EventoFinanceiro.valor WHERE categoria = OFERTA)', origem: 'EventoFinanceiro.categoria', un: 'R$' },
+  { chave: 'doacoes', grupo: 'financeiro', titulo: 'Doações', valor: 2600, ant: 1800, media: 2150, formula: 'SUM(EventoFinanceiro.valor WHERE categoria = DOACAO)', origem: 'EventoFinanceiro.categoria', un: 'R$' },
+  { chave: 'valorPagoInscricoes', grupo: 'financeiro', titulo: 'Recebido em inscrições', valor: 4750, ant: 2400, media: 3520, formula: 'SUM(Inscricao.valorPago)', origem: 'Inscricao.valorPago', un: 'R$' },
+  { chave: 'liturgiasRealizadas', grupo: 'conteudo', titulo: 'Liturgias realizadas', valor: 8, ant: 7, media: 7.4, formula: 'COUNT(Liturgia WHERE status = REALIZADA)', origem: 'Liturgia.status + .data', un: 'un' },
+  { chave: 'pregacoesPublicadas', grupo: 'conteudo', titulo: 'Pregações publicadas', valor: 2, ant: 3, media: 2.6, formula: 'COUNT(Pregacao WHERE status = PUBLICADA)', origem: 'Pregacao.status + .data', un: 'un' },
+  { chave: 'canaisAtivos', grupo: 'conteudo', titulo: 'Canais oficiais ativos', valor: 3, ant: 3, media: null, estoque: true, formula: 'COUNT(CanalOficial WHERE ativo = true)', origem: 'CanalOficial.ativo', un: 'un' },
+  { chave: 'avisosAtivos', grupo: 'conteudo', titulo: 'Avisos ativos', valor: 3, ant: 4, media: null, estoque: true, formula: 'COUNT(Aviso WHERE situacaoAviso = ATIVO)', origem: 'Aviso.situacaoAviso', un: 'un' },
+];
+
+const PENDENCIAS = [
+  { niv: 'URGENTE', titulo: 'Pagamento pendente — Congresso de Jovens', origem: 'Inscrição #1042', resp: 'Jannes Costa', data: '02/10/2026', link: 'Ver inscrição' },
+  { niv: 'URGENTE', titulo: 'Divergência financeira no evento "Vigília de Oração"', origem: 'EventoFinanceiro', resp: 'Jannes Costa', data: '03/10/2026', link: 'Ver conciliação' },
+  { niv: 'ATENCAO', titulo: 'Evento "Café da Manhã" sem liturgia publicada', origem: 'Evento #e4', resp: 'Thiane Louzeiro', data: '01/10/2026', link: 'Abrir liturgia' },
+  { niv: 'ATENCAO', titulo: 'Aviso "Campanha do agasalho" expira em 8 dias', origem: 'Aviso #a3', resp: 'Suenne Barros', data: '30/09/2026', link: 'Renovar aviso' },
+  { niv: 'INFORMATIVO', titulo: '4 inscrições aguardando check-in', origem: 'Evento #e3', resp: 'Ayton Sena', data: '03/10/2026', link: 'Ver lista' },
+  { niv: 'INFORMATIVO', titulo: 'Publicação de pregação atrasada há 2 semanas', origem: 'Pregações', resp: 'Pr. Melquesedeque', data: '28/09/2026', link: 'Ver rascunhos' },
+];
+
+const OBSERVACOES = [
+  {
+    obs: 'O número de novos membros subiu 55% em relação ao período anterior.',
+    padrao: 'Crescimento concentrado nas congregações Vila Sarney e Cohabiano.',
+    dados: '14 novos vs 9 no período anterior. Vila Sarney: 6 · Cohabiano: 4 · Matriz: 3 · Outras: 1.',
+    investigar: 'Verificar se houve evento de evangelização que explique o pico.',
+  },
+  {
+    obs: 'A taxa de comparecimento (check-in) caiu de 85% para 82%.',
+    padrao: 'Queda maior em eventos noturnos.',
+    dados: '78 check-ins de 95 inscrições. Em eventos diurnos: 89%. Em noturnos: 74%.',
+    investigar: 'Conferir horário e logística dos cultos noturnos.',
+  },
+  {
+    obs: 'Despesas caíram 23% enquanto receitas cresceram 22%.',
+    padrao: 'Saldo positivo consistente há 3 meses.',
+    dados: 'Receitas R$ 22.980,50 · Despesas R$ 1.839,90 · Saldo R$ 21.140,60.',
+    investigar: 'Confirmar se despesas de material ainda não foram lançadas.',
+  },
+];
+
+const VALORES = [
+  { ico: '✦', t: 'Adoração', d: 'Exaltem o nome do Senhor em espírito e verdade.', v: '1 Crônicas 16:29' },
+  { ico: '⛓', t: 'Comunhão', d: 'Unidos em Cristo, fortalecemos a fé juntos.', v: 'Salmo 27:4' },
+  { ico: '⚖', t: 'Obediência', d: 'Seguindo a Palavra de Deus em todas as coisas.', v: 'Deuteronômio 11:1' },
+  { ico: '✧', t: 'Transformação', d: 'Renovados pela renovação da mente.', v: 'Romanos 12:2' },
+];
+const PROGRAMAS = [
+  { dia: 'Quarta e Domingo', titulo: 'Consagrações', hora: '06:00', desc: 'Tempo de oração e consagração diante do Senhor.' },
+  { dia: 'Terça-Feira', titulo: 'Culto de Doutrina', hora: '19:30', desc: 'Estudo aprofundado da Palavra de Deus.' },
+  { dia: 'Quarta-Feira', titulo: 'Culto no Res. Tiradentes', hora: '19:30', desc: 'Estudo aprofundado da Palavra de Deus.' },
+  { dia: 'Sexta-Feira', titulo: 'Círculo de Oração', hora: '19:30', desc: 'Momento de intercessão e busca por Deus.' },
+  { dia: 'Domingo', titulo: 'Culto de Adoração', hora: '18:30', desc: 'Adoração, palavra e comunhão.' },
+];
+const LIDERES_PUB = [
+  { n: 'Pr. Cleiginaldo Barros', c: 'Pastor Presidente' },
+  { n: 'Pr. Walmorio', c: 'Pastor da Vila Sarney' },
+  { n: 'Pr. Melquesedeque', c: 'Pastor' },
+  { n: 'Pb. Marcio Louzeiro', c: '1º Dirigente' },
+  { n: 'Missionário Cristiano', c: '2º Dirigente' },
+  { n: 'Ayton Sena', c: 'Líder de Jovens' },
+  { n: 'Ana Caroline', c: 'Líder de Jovens' },
+  { n: 'Miss. Suenne Barros', c: '1ª Dirigente do Círculo de Oração' },
+  { n: 'Dc. Thiane Louzeiro', c: 'Regente das Heróis da Fé' },
+  { n: 'Dc. Dayane', c: 'Regente das Heróis da Fé' },
+  { n: 'Jannes', c: 'Tesoureiro' },
+];
+const CONGREGACOES_PUB = [
+  { n: 'Matriz', d: 'Templo sede em São Luís.' },
+  { n: 'Cohabiano', d: 'Congregação Cohabiano.' },
+  { n: 'Res. Tiradentes', d: 'Reuniões às quartas-feiras.' },
+  { n: 'Vila Sarney', d: 'Pastoreio do Pr. Walmorio.' },
+  { n: 'Novo Renascer', d: 'Novo Renascer (Albino Soero).' },
+];
+const SOBRE_SECOES = [
+  { ico: '☕', t: 'Café da Manhã', d: 'Um tempo de comunhão e adoração ao Senhor, começando o dia com fé e esperança.', v: 'Adorai ao Senhor na formosura da sua santidade — 1 Crônicas 16:29' },
+  { ico: '🤝', t: 'Comunhão', d: 'A comunhão entre os irmãos é fundamental para o crescimento espiritual e o fortalecimento da fé.', v: 'Uma coisa peço ao Senhor... habitar na casa do Senhor — Salmo 27:4' },
+  { ico: '📖', t: 'Obediência', d: 'A obediência à Palavra de Deus é o caminho para uma vida abençoada e cheia de propósito.', v: 'Ame o Senhor, seu Deus, de todo o seu coração — Deuteronômio 11:1' },
+];
+const FAQS = [
+  { q: 'O que é Salvação?', a: 'A salvação na Bíblia se refere à libertação do pecado e suas consequências, incluindo a morte eterna, e à reconciliação com Deus. É um dom gratuito de Deus, concedido através da fé em Jesus Cristo.' },
+  { q: 'O que é Fé?', a: 'A fé é a confiança total em Deus e em suas promessas. É crer em algo que não podemos ver, mas que sabemos ser verdade por causa da revelação de Deus na Bíblia.' },
+  { q: 'O que é Amor?', a: 'O amor na Bíblia é definido como o sentimento mais perfeito e sublime que Deus sente por nós e que Ele nos chama a ter uns pelos outros.' },
+  { q: 'O que é Sabedoria?', a: 'A sabedoria na Bíblia é o conhecimento aplicado à vida, buscando o que é justo, bom e verdadeiro.' },
+  { q: 'Como posso ser salvo?', a: 'Reconheça que é pecador e precisa da salvação de Deus. Coloque sua fé em Jesus Cristo como seu Senhor e Salvador.' },
+  { q: 'Como posso crescer na fé?', a: 'O crescimento na fé é um processo contínuo que se baseia em três pilares: Leitura da Bíblia, Oração e Comunhão com outros crentes.' },
+];
+const VERSICULO = {
+  ref: 'Filipenses 4:13',
+  txt: 'Tudo posso naquele que me fortalece.',
+  refl: 'Paulo escreveu desta prisão, não de um palácio. A força que ele descreve não é para vencer na vida, mas para enfrentar qualquer circunstância sem perder a paz. Em Cristo, você pode passar pela tempestade e ainda assim cantar.',
+};
+const PALETAS = {
+  original: { corPrincipal: '#C8960C', corSecundaria: '#C41E1E', corDestaque: '#D4A017', corFundo: '#0A1628', corSuperficie: '#0D1F35', corTexto: '#F0ECE2', corTextoSecundario: '#C8C2B6', corBorda: 'rgba(201,168,76,0.12)' },
+  elegante: { corPrincipal: '#B8860B', corSecundaria: '#8B0000', corDestaque: '#DAA520', corFundo: '#111827', corSuperficie: '#1F2937', corTexto: '#F9FAFB', corTextoSecundario: '#D1D5DB', corBorda: 'rgba(184,134,11,0.15)' },
+  moderna: { corPrincipal: '#D97706', corSecundaria: '#DC2626', corDestaque: '#F59E0B', corFundo: '#0F172A', corSuperficie: '#1E293B', corTexto: '#F8FAFC', corTextoSecundario: '#CBD5E1', corBorda: 'rgba(217,119,6,0.15)' },
+  clara: { corPrincipal: '#92700C', corSecundaria: '#B91C1C', corDestaque: '#A16207', corFundo: '#FFFBEB', corSuperficie: '#FFFFFF', corTexto: '#1C1917', corTextoSecundario: '#57534E', corBorda: 'rgba(146,112,12,0.15)' },
+};
+/* ===================== HELPERS ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = (n) => 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const num = (n) => Number(n).toLocaleString('pt-BR');
+const dataBR = (iso) => { if (!iso) return '—'; const d = new Date(iso + (iso.length === 10 ? 'T12:00:00' : '')); return isNaN(d) ? iso : d.toLocaleDateString('pt-BR'); };
+const iniciais = (n) => String(n).split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+function toast(msg, tipo = 'ok') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + tipo;
+  el.textContent = msg;
+  $('#toast-wrap').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* ===================== MODAL ===================== */
+let modalOnSave = null;
+function openModal({ titulo, desc = '', campos = [], onSave, saveLabel = 'Salvar' }) {
+  $('#modal-title').textContent = titulo;
+  $('#modal-desc').textContent = desc;
+  $('#modal-save').textContent = saveLabel;
+  $('#modal-body').innerHTML = '<div class="grid-form">' + campos.map((c) => {
+    const v = esc(c.valor ?? '');
+    if (c.tipo === 'select') {
+      return '<div class="field"><label>' + esc(c.label) + '</label><select data-campo="' + esc(c.nome) + '">' +
+        c.opcoes.map((o) => '<option ' + (o === c.valor ? 'selected' : '') + '>' + esc(o) + '</option>').join('') +
+        '</select></div>';
+    }
+    if (c.tipo === 'textarea') {
+      return '<div class="field"><label>' + esc(c.label) + '</label><textarea data-campo="' + esc(c.nome) + '">' + v + '</textarea></div>';
+    }
+    return '<div class="field"><label>' + esc(c.label) + '</label><input data-campo="' + esc(c.nome) + '" type="' + (c.tipo || 'text') + '" value="' + v + '" placeholder="' + esc(c.placeholder || '') + '" /></div>';
+  }).join('') + '</div>';
+  modalOnSave = onSave;
+  $('#modal-bg').classList.add('on');
+}
+function closeModal() { $('#modal-bg').classList.remove('on'); modalOnSave = null; }
+$('#modal-save').addEventListener('click', () => {
+  const dados = {};
+  $$('#modal-body [data-campo]').forEach((el) => { dados[el.dataset.campo] = el.value.trim(); });
+  if (modalOnSave) modalOnSave(dados);
+});
+
+/* ===================== TEMA E PALETAS ===================== */
+let paletaAtual = 'original';
+let temaAtual = 'dark';
+
+function aplicarTema() {
+  document.documentElement.setAttribute('data-theme', temaAtual);
+  $('#btn-theme').innerHTML = (temaAtual === 'dark' ? '◐ <span>Escuro</span>' : '◑ <span>Claro</span>');
+}
+function aplicarPaleta(id) {
+  paletaAtual = id;
+  const p = PALETAS[id];
+  const r = document.documentElement.style;
+  r.setProperty('--color-primary', p.corPrincipal);
+  r.setProperty('--color-secondary', p.corSecundaria);
+  r.setProperty('--color-accent', p.corDestaque);
+  r.setProperty('--text-accent', p.corPrincipal);
+  r.setProperty('--gradient-gold', 'linear-gradient(135deg, ' + p.corPrincipal + ', ' + p.corDestaque + ')');
+  r.setProperty('--gradient-gold-soft', 'linear-gradient(135deg, ' + p.corPrincipal + '26, ' + p.corPrincipal + '0d)');
+  if (temaAtual === 'dark') {
+    r.setProperty('--bg-primary', p.corFundo);
+    r.setProperty('--bg-secondary', p.corSuperficie);
+    r.setProperty('--bg-card', p.corSuperficie + 'cc');
+    r.setProperty('--bg-nav', p.corFundo + 'f0');
+    r.setProperty('--bg-hero', p.corFundo);
+    r.setProperty('--text-primary', p.corTexto);
+    r.setProperty('--text-secondary', p.corTextoSecundario);
+    r.setProperty('--border-color', p.corBorda);
+    r.setProperty('--border-hover', p.corPrincipal + '40');
+  }
+}
+$('#btn-theme').addEventListener('click', () => {
+  temaAtual = (temaAtual === 'dark') ? 'light' : 'dark';
+  aplicarTema();
+  aplicarPaleta(paletaAtual);
+  const r = document.documentElement.style;
+  if (temaAtual === 'light') {
+    r.setProperty('--bg-primary', '#faf8f4');
+    r.setProperty('--bg-secondary', '#f0ece2');
+    r.setProperty('--bg-card', 'rgba(255,255,255,0.9)');
+    r.setProperty('--bg-nav', 'rgba(250,248,244,0.95)');
+    r.setProperty('--bg-hero', '#f0ece2');
+    r.setProperty('--text-primary', '#1a1a1a');
+    r.setProperty('--text-secondary', '#3d3d3d');
+    r.setProperty('--border-color', 'rgba(139,105,20,0.12)');
+    r.setProperty('--border-hover', 'rgba(139,105,20,0.25)');
+  }
+});
+$$('#seg-palette button').forEach((b) => b.addEventListener('click', () => {
+  $$('#seg-palette button').forEach((x) => x.classList.remove('on'));
+  b.classList.add('on');
+  aplicarPaleta(b.dataset.pal);
+  renderPublico();
+  if (!$('#screen-admin').classList.contains('hidden')) showAdminPage(paginaAtual);
+}));
+
+/* ===================== NAVEGAÇÃO ===================== */
+function switchMode(mode) {
+  ['public', 'admin', 'login'].forEach((m) => $('#screen-' + m).classList.toggle('hidden', m !== mode));
+  $$('#seg-mode button').forEach((b) => b.classList.toggle('on', b.dataset.mode === mode));
+  window.scrollTo({ top: 0 });
+}
+$$('#seg-mode button').forEach((b) => b.addEventListener('click', () => switchMode(b.dataset.mode)));
+
+function doLogin() {
+  switchMode('admin');
+  showAdminPage('dashboard');
+  toast('Sessão iniciada como SUPER_ADMIN (simulada)');
+}
+
+function showPublicPage(page) {
+  switchMode('public');
+  $$('.pub-page').forEach((p) => p.classList.toggle('hidden', p.dataset.page !== page));
+  $$('#pub-links button').forEach((b) => b.classList.toggle('on', b.dataset.page === page));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$$('#pub-links button').forEach((b) => b.addEventListener('click', () => showPublicPage(b.dataset.page)));
+
+function abrirLightbox(titulo) {
+  $('#lightbox-frame').textContent = titulo;
+  $('#lightbox').classList.add('on');
+}
+function enviarContato() {
+  const nome = $('#c-nome').value.trim();
+  const email = $('#c-email').value.trim();
+  const msg = $('#c-msg').value.trim();
+  if (!nome || !email || !msg) return toast('Preencha todos os campos.', 'err');
+  $('#c-nome').value = $('#c-email').value = $('#c-msg').value = '';
+  toast('Mensagem enviada! Entraremos em contato em breve.');
+}
+
+/* ===================== RENDER DO SITE PÚBLICO ===================== */
+function renderPublico() {
+  $('#home-values').innerHTML = VALORES.map((v) =>
+    '<div class="pub-card"><div class="ico">' + v.ico + '</div><h3>' + esc(v.t) + '</h3><p>' + esc(v.d) +
+    '</p><div class="verse">' + esc(v.v) + '</div></div>').join('');
+
+  $('#home-verse').innerHTML =
+    '<div class="ref">' + esc(VERSICULO.ref) + '</div>' +
+    '<blockquote>“' + esc(VERSICULO.txt) + '”</blockquote>' +
+    '<p class="refl">' + esc(VERSICULO.refl) + '</p>';
+
+  $('#home-programs').innerHTML = PROGRAMAS.map((p) =>
+    '<div class="prog-row"><div class="prog-day">' + esc(p.dia) + '</div>' +
+    '<div class="prog-time">' + esc(p.hora) + '</div>' +
+    '<div><h4 style="font-size:1.02rem">' + esc(p.titulo) + '</h4>' +
+    '<p style="color:var(--text-muted);font-size:.85rem">' + esc(p.desc) + '</p></div></div>').join('');
+
+  const cardEvento = (e) =>
+    '<div class="pub-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem">' +
+    badgeStatus(e.status) + '<span style="color:var(--text-muted);font-size:.765rem">' + dataBR(e.data) + '</span></div>' +
+    '<h3>' + esc(e.nome) + '</h3><p>' + esc(e.tema) + ' · ' + esc(e.local) + '</p></div>';
+
+  $('#home-events').innerHTML = DB.eventos.filter((e) => e.publico).slice(0, 3).map(cardEvento).join('');
+  $('#public-events').innerHTML = DB.eventos.map(cardEvento).join('');
+
+  $('#sobre-sections').innerHTML = SOBRE_SECOES.map((s) =>
+    '<div class="pub-card"><div class="ico">' + s.ico + '</div><h3>' + esc(s.t) + '</h3><p>' + esc(s.d) +
+    '</p><div class="verse">' + esc(s.v) + '</div></div>').join('');
+
+  $('#sobre-faq').innerHTML = FAQS.map((f) =>
+    '<div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle(\'open\')">' +
+    esc(f.q) + ' <span class="chev">▾</span></button><div class="faq-a">' + esc(f.a) + '</div></div>').join('');
+
+  $('#public-pregacoes').innerHTML = DB.pregacoes.filter((p) => p.status === 'PUBLICADA').map((p) =>
+    '<div class="pub-card"><div class="ico">▶</div><h3>' + esc(p.titulo) + '</h3><p>' + esc(p.pregador) + '</p>' +
+    '<p style="margin-top:.55rem;color:var(--text-muted);font-size:.815rem">' + esc(p.ref) + ' · ' +
+    dataBR(p.data) + ' · ' + num(p.views) + ' visualizações</p></div>').join('') ||
+    '<div class="empty">Nenhuma pregação publicada.</div>';
+
+  $('#public-galeria').innerHTML = DB.galeria.map((g) =>
+    '<div class="gal" style="background:var(--gradient-gold-soft)" onclick="abrirLightbox(\'' + esc(g.titulo) + '\')">' +
+    esc(g.titulo) + '</div>').join('');
+
+  $('#public-lideres').innerHTML = LIDERES_PUB.map((l) =>
+    '<div class="leader"><div class="ph">' + esc(iniciais(l.n)) + '</div>' +
+    '<div class="body"><h4>' + esc(l.n) + '</h4><span>' + esc(l.c) + '</span></div></div>').join('');
+
+  $('#public-congregacoes').innerHTML = CONGREGACOES_PUB.map((c) =>
+    '<div class="pub-card"><div class="ico">⛪</div><h3>' + esc(c.n) + '</h3><p>' + esc(c.d) + '</p></div>').join('');
+}
+/* ===================== PAINEL ADMIN ===================== */
+const MENU = [
+  { grupo: 'Visão', itens: [
+    { id: 'dashboard', nome: 'Dashboard', ico: '▦' },
+    { id: 'gestao', nome: 'Centro de Gestão', ico: '◔' },
+  ]},
+  { grupo: 'Pessoas', itens: [
+    { id: 'membros', nome: 'Membros', ico: '☺' },
+    { id: 'lideranca', nome: 'Liderança', ico: '★' },
+    { id: 'usuarios', nome: 'Usuários', ico: '⚿' },
+  ]},
+  { grupo: 'Operação', itens: [
+    { id: 'eventos', nome: 'Eventos', ico: '▤' },
+    { id: 'financeiro', nome: 'Financeiro', ico: '₽' },
+    { id: 'liturgia', nome: 'Liturgia', ico: '❦' },
+    { id: 'avisos', nome: 'Avisos', ico: '◈' },
+    { id: 'galeria', nome: 'Galeria', ico: '▣' },
+    { id: 'oportunidades', nome: 'Oportunidades', ico: '✚' },
+  ]},
+  { grupo: 'Comunicação', itens: [
+    { id: 'comunicacao', nome: 'Comunicação', ico: '◉' },
+    { id: 'configuracoes', nome: 'Configurações', ico: '⚙' },
+    { id: 'auditoria', nome: 'Auditoria', ico: '☰' },
+  ]},
+];
+
+let paginaAtual = 'dashboard';
+let buscaGlobal = '';
+
+function renderSidebar() {
+  $('#sidebar').innerHTML = MENU.map((g) =>
+    '<div class="side-label">' + esc(g.grupo) + '</div>' +
+    g.itens.map((i) =>
+      '<button class="side-item ' + (i.id === paginaAtual ? 'on' : '') + '" onclick="showAdminPage(\'' + i.id + '\')">' +
+      '<span class="ico">' + i.ico + '</span>' + esc(i.nome) + '</button>').join('')
+  ).join('') +
+  '<div class="side-label">Sessão</div>' +
+  '<button class="side-item" onclick="switchMode(\'public\')"><span class="ico">↩</span>Voltar ao site</button>' +
+  '<button class="side-item" onclick="switchMode(\'login\')"><span class="ico">⇥</span>Sair</button>';
+}
+
+function showAdminPage(page) {
+  paginaAtual = page;
+  renderSidebar();
+  const render = RENDERERS[page] || (() => '<div class="empty">Página não encontrada.</div>');
+  $('#admin-main').innerHTML = render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function pageHead(titulo, sub, acao) {
+  return '<div class="page-head"><div><h2>' + esc(titulo) + '</h2><div class="sub">' + esc(sub) +
+    '</div></div><div style="display:flex;gap:.65rem;flex-wrap:wrap">' + (acao || '') + '</div></div>';
+}
+function toolbarBusca(ph, extra) {
+  return '<div class="toolbar"><input class="search" id="busca" placeholder="' + esc(ph) + '" value="' +
+    esc(buscaGlobal) + '" oninput="buscaGlobal=this.value;showAdminPage(paginaAtual)" />' + (extra || '') + '</div>';
+}
+function filtrar(lista, campos) {
+  const q = buscaGlobal.toLowerCase();
+  if (!q) return lista;
+  return lista.filter((o) => campos.some((c) => String(o[c] ?? '').toLowerCase().includes(q)));
+}
+function badgeStatus(s) {
+  const map = {
+    ATIVO: 'ok', CONCLUIDO: 'ok', PUBLICADA: 'ok', REALIZADA: 'ok', APROVADA: 'ok', PAGO: 'ok', ATIVA: 'ok',
+    PLANEJADO: 'info', PRONTA: 'info', EM_ANDAMENTO: 'info', PENDENTE: 'warn', RASCUNHO: 'mut',
+    INATIVO: 'mut', ARQUIVADA: 'mut', ENCERRADA: 'mut', CANCELADO: 'err', CANCELADA: 'err', ERRO: 'err',
+  };
+  return '<span class="badge ' + (map[s] || 'mut') + '">' + esc(s) + '</span>';
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard() {
+  const I = INDICADORES.map(indAtual);
+  const kpis = [
+    { ico: '☺', l: 'Membros ativos', v: num(I[0].valor) },
+    { ico: '★', l: 'Líderes', v: num(I[2].valor) },
+    { ico: '▤', l: 'Eventos realizados', v: num(I[3].valor) },
+    { ico: '◷', l: 'Eventos futuros', v: num(I[4].valor) },
+    { ico: '◈', l: 'Avisos ativos', v: num(I[17].valor) },
+    { ico: '₽', l: 'Saldo do período', v: money(I[8].valor - I[9].valor) },
+  ];
+  return pageHead('Dashboard', 'Visão geral do período — fonte única: src/lib/indicadores.ts',
+      '<button class="btn" onclick="showAdminPage(\'gestao\')">Abrir Centro de Gestão</button>') +
+    '<div class="kpi-grid">' + kpis.map((k) =>
+      '<div class="card kpi"><div class="kpi-ico">' + k.ico + '</div><div><div class="card-title">' +
+      esc(k.l) + '</div><div class="kpi-val">' + k.v + '</div></div></div>').join('') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.15rem;margin-top:1.55rem">' +
+      '<div class="card"><div class="card-title">Últimos eventos</div><table style="margin-top:.85rem"><tbody>' +
+        DB.eventos.slice(0, 4).map((e) => '<tr><td>' + esc(e.nome) + '</td><td style="text-align:right">' +
+          dataBR(e.data) + '</td><td style="text-align:right">' + badgeStatus(e.status) + '</td></tr>').join('') +
+      '</tbody></table></div>' +
+      '<div class="card"><div class="card-title">Pendências críticas</div><div style="margin-top:.85rem">' +
+        PENDENCIAS.slice(0, 4).map((p) =>
+          '<div class="list-item" style="margin-bottom:.55rem"><div class="avatar">!</div>' +
+          '<div class="info"><h4>' + esc(p.titulo) + '</h4><p>' + esc(p.origem) + ' · ' + esc(p.resp) +
+          '</p></div></div>').join('') +
+      '</div></div>' +
+    '</div>';
+}
+
+/* ---------- CENTRO DE GESTÃO ---------- */
+let abaGestao = 'visao';
+let periodoGestao = 'mes_atual';
+const ABAS_GESTAO = [
+  ['visao', 'Visão Executiva'], ['indicadores', 'Indicadores'], ['pendencias', 'Pendências'],
+  ['decisao', 'Tomada de Decisão'], ['auditoria', 'Auditoria'], ['relatorios', 'Relatórios'],
+];
+
+const FATOR_PERIODO = {
+  hoje: 0.04, ontem: 0.035, '7d': 0.25, '30d': 1, mes_atual: 1,
+  mes_anterior: 0.86, trimestre: 2.9, semestre: 5.6, ano: 11.4, personalizado: 1.2,
+};
+function indAtual(i) {
+  if (i.estoque) return Object.assign({}, i);
+  const f = FATOR_PERIODO[periodoGestao] ?? 1;
+  return Object.assign({}, i, {
+    valor: Math.round(i.valor * f * 100) / 100,
+    ant: i.ant === null ? null : Math.round(i.ant * f * 100) / 100,
+    media: i.media === null ? null : Math.round(i.media * f * 100) / 100,
+  });
+}
+
+function fmtInd(i) { return i.un === 'R$' ? money(i.valor) : num(i.valor); }
+function variacaoHTML(i) {
+  if (i.ant === null || i.ant === undefined || !i.ant) return '<span class="var-none">—</span>';
+  const v = ((i.valor - i.ant) / i.ant) * 100;
+  return '<span class="' + (v >= 0 ? 'var-up' : 'var-down') + '">' + (v >= 0 ? '▲ +' : '▼ ') + v.toFixed(1) + '%</span>';
+}
+function kpiCard(i) {
+  return '<div class="card" style="position:relative"><div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+    '<div class="card-title">' + esc(i.titulo) + '</div>' +
+    '<button class="kpi-info" title="Detalhes" onclick="togglePop(this)">ⓘ</button></div>' +
+    '<div class="pop hidden"><b>' + esc(i.titulo) + '</b>Fórmula: ' + esc(i.formula) + '<br>Origem: ' + esc(i.origem) +
+    '<br>Período: ' + esc(periodoGestao) + '<br>Média 6m: ' + (i.media === null ? '—' : (i.un === 'R$' ? money(i.media) : num(i.media))) + '</div>' +
+    '<div class="kpi-val" style="margin:.42rem 0 .55rem">' + fmtInd(i) + '</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center">' + variacaoHTML(i) +
+    '<span style="font-size:.735rem;color:var(--text-muted)">média 6m: ' +
+    (i.media === null ? '—' : (i.un === 'R$' ? money(i.media) : num(i.media))) + '</span></div></div>';
+}
+function togglePop(btn) {
+  const pop = btn.parentElement.querySelector('.pop');
+  $$('.pop').forEach((p) => { if (p !== pop) p.classList.add('hidden'); });
+  pop.classList.toggle('hidden');
+}
+
+function gestaoVisao() {
+  return [['pessoas', 'Pessoas'], ['eventos', 'Eventos'], ['financeiro', 'Financeiro'], ['conteudo', 'Conteúdo']]
+    .map(([g, l]) => '<div class="group-title">' + l + '</div><div class="kpi-grid">' +
+      INDICADORES.filter((i) => i.grupo === g).map(indAtual).map(kpiCard).join('') + '</div>').join('');
+}
+function gestaoIndicadores() {
+  return '<div class="card" style="overflow-x:auto"><table><thead><tr><th>Indicador</th><th>Grupo</th>' +
+    '<th style="text-align:right">Valor</th><th style="text-align:right">Período anterior</th>' +
+    '<th style="text-align:right">Variação</th><th style="text-align:right">Média 6m</th><th>Fórmula</th></tr></thead><tbody>' +
+    INDICADORES.map(indAtual).map((i) => '<tr><td>' + esc(i.titulo) + '</td><td style="color:var(--text-muted)">' + esc(i.grupo) +
+      '</td><td style="text-align:right;font-weight:600">' + fmtInd(i) +
+      '</td><td style="text-align:right;color:var(--text-muted)">' + (i.ant === null ? '—' : (i.un === 'R$' ? money(i.ant) : num(i.ant))) +
+      '</td><td style="text-align:right">' + variacaoHTML(i) +
+      '</td><td style="text-align:right;color:var(--text-muted)">' + (i.media === null ? '—' : (i.un === 'R$' ? money(i.media) : num(i.media))) +
+      '</td><td style="color:var(--text-muted);font-size:.735rem">' + esc(i.formula) + '</td></tr>').join('') +
+    '</tbody></table></div>';
+}
+function gestaoPendencias() {
+  const cores = { URGENTE: 'err', ATENCAO: 'warn', INFORMATIVO: 'info' };
+  return PENDENCIAS.map((p) =>
+    '<div class="list-item"><div class="avatar">' + p.niv[0] + '</div><div class="info"><h4>' + esc(p.titulo) +
+    '</h4><p>' + esc(p.origem) + ' · responsável: ' + esc(p.resp) + ' · ' + esc(p.data) + '</p></div><div class="acts">' +
+    '<span class="badge ' + cores[p.niv] + '">' + esc(p.niv) + '</span>' +
+    '<button class="btn btn-sm" onclick="toast(\'Abrindo: ' + esc(p.link) + '\')">' + esc(p.link) + '</button></div></div>').join('') +
+    '<p style="margin-top:1.15rem;color:var(--text-muted);font-size:.815rem">Origem: <code style="color:var(--text-primary)">GET /api/gestao/pendencias</code> (Fase 3) — regras determinísticas, sem decisão administrativa automática.</p>';
+}
+function gestaoDecisao() {
+  return OBSERVACOES.map((o, i) =>
+    '<div class="card" style="margin-bottom:1.05rem"><div style="display:flex;gap:.85rem;align-items:flex-start">' +
+    '<div class="kpi-ico" style="width:2.3rem;height:2.3rem;font-size:1.05rem">' + (i + 1) + '</div><div style="flex:1">' +
+    '<h3 style="font-size:1.08rem;margin-bottom:.72rem">' + esc(o.obs) + '</h3><div class="grid-form">' +
+    '<div><div class="card-title" style="margin-bottom:.28rem">Possível padrão</div><p style="font-size:.865rem">' + esc(o.padrao) + '</p></div>' +
+    '<div><div class="card-title" style="margin-bottom:.28rem">Dados que sustentam</div><p style="font-size:.865rem">' + esc(o.dados) + '</p></div>' +
+    '<div><div class="card-title" style="margin-bottom:.28rem">Pontos para investigação</div><p style="font-size:.865rem">' + esc(o.investigar) + '</p></div>' +
+    '</div></div></div></div>').join('') +
+    '<p style="margin-top:1.15rem;color:var(--text-muted);font-size:.815rem">Heurísticas determinísticas (sem LLM). Não inferem causa nem tomam decisão administrativa — <code style="color:var(--text-primary)">GET /api/gestao/observacoes</code> (Fase 3).</p>';
+}
+function gestaoAuditoria() {
+  return '<div class="card" style="overflow-x:auto"><table><thead><tr><th>Quando</th><th>Usuário</th><th>Ação</th>' +
+    '<th>Entidade</th><th>Organização</th><th>Resultado</th><th>IP</th></tr></thead><tbody>' +
+    DB.audit.map((a) => '<tr><td>' + esc(a.quando) + '</td><td>' + esc(a.user) + '</td><td style="font-weight:600">' +
+      esc(a.acao) + '</td><td>' + esc(a.entidade) + '</td><td style="color:var(--text-muted)">' + esc(a.org) +
+      '</td><td><span class="badge ' + (a.resultado === 'NEGADO' ? 'err' : 'ok') + '">' + esc(a.resultado) +
+      '</span></td><td style="color:var(--text-muted)">' + esc(a.ip) + '</td></tr>').join('') +
+    '</tbody></table></div>';
+}
+function gestaoRelatorios() {
+  return '<div class="cards-grid">' + [
+    ['⤓', 'CSV', 'Exportação tabular de todos os indicadores e filtros aplicados.'],
+    ['⎙', 'Impressão', 'CSS @media print com cabeçalho: igreja, congregação, período e filtros.'],
+    ['▤', 'PDF', 'Composição a partir da impressão do navegador.'],
+  ].map(([i, t, d]) =>
+    '<div class="pub-card"><div class="ico">' + i + '</div><h3>' + esc(t) + '</h3><p>' + esc(d) +
+    '</p><button class="btn btn-sm" style="margin-top:.95rem" onclick="toast(\'Disponível na Fase 4\')">Gerar</button></div>').join('') + '</div>';
+}
+
+function renderGestao() {
+  const corpo = {
+    visao: gestaoVisao, indicadores: gestaoIndicadores, pendencias: gestaoPendencias,
+    decisao: gestaoDecisao, auditoria: gestaoAuditoria, relatorios: gestaoRelatorios,
+  }[abaGestao]();
+  const periodos = [['hoje', 'Hoje'], ['ontem', 'Ontem'], ['7d', 'Últimos 7 dias'], ['30d', 'Últimos 30 dias'],
+    ['mes_atual', 'Mês atual'], ['mes_anterior', 'Mês anterior'], ['trimestre', 'Trimestre'],
+    ['semestre', 'Semestre'], ['ano', 'Ano'], ['personalizado', 'Personalizado']];
+  return pageHead('Centro de Gestão', 'Indicadores consolidados · período anterior · média 6 meses · fórmula e origem por KPI',
+      '<button class="btn" onclick="toast(\'Dados atualizados (simulado)\')">↻ Atualizar</button>' +
+      '<button class="btn btn-primary" onclick="toast(\'Exportação CSV — Fase 4\')">⤓ Exportar</button>') +
+    '<div class="filter-bar">' +
+      '<div class="field" style="min-width:172px"><label>Período</label><select onchange="periodoGestao=this.value;showAdminPage(\'gestao\')">' +
+        periodos.map(([v, l]) => '<option value="' + v + '" ' + (v === periodoGestao ? 'selected' : '') + '>' + l + '</option>').join('') +
+      '</select></div>' +
+      '<div class="field" style="min-width:195px"><label>Organização</label><select><option>Todas as minhas</option>' +
+        DB.orgs.map((o) => '<option>' + esc(o.nome) + '</option>').join('') + '</select></div>' +
+      '<div class="field" style="min-width:155px"><label>Congregação</label><select><option>Todas</option>' +
+        DB.congregacoes.map((c) => '<option>' + esc(c.nome) + '</option>').join('') + '</select></div>' +
+      '<div class="field" style="min-width:135px"><label>Categoria</label><select><option>Todas</option>' +
+        '<option>Dízimo</option><option>Oferta</option><option>Doação</option><option>Inscrição</option></select></div>' +
+      '<div style="margin-left:auto;font-size:.775rem;color:var(--text-muted);align-self:flex-end">Período: <b style="color:var(--text-primary)">' +
+        esc(periodoGestao.replace('_', ' ')) + '</b></div>' +
+    '</div>' +
+    '<div class="tabs">' + ABAS_GESTAO.map(([id, l]) =>
+      '<button class="tab ' + (id === abaGestao ? 'on' : '') + '" onclick="abaGestao=\'' + id + '\';showAdminPage(\'gestao\')">' +
+      esc(l) + '</button>').join('') + '</div>' + corpo;
+}
+/* ---------- LISTAS CRUD ---------- */
+function renderMembros() {
+  const lista = filtrar(DB.membros, ['nome', 'email', 'cong', 'status']);
+  return pageHead('Gestão de Membros', 'Escopo por organização + congregação · validação Zod · soft delete por status',
+      '<button class="btn btn-primary" onclick="editarMembro()">＋ Novo Membro</button>') +
+    toolbarBusca('Buscar membro...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum membro encontrado.</div>' :
+      lista.map((m) => '<div class="list-item"><div class="avatar">' + esc(iniciais(m.nome)) + '</div>' +
+        '<div class="info"><h4>' + esc(m.nome) + '</h4><p>' + esc(m.email || 'Sem email') + ' · ' + esc(m.tel) +
+        ' · ' + esc(m.cong) + ' · desde ' + dataBR(m.entrada) + '</p></div><div class="acts">' + badgeStatus(m.status) +
+        '<button class="btn btn-sm" onclick="editarMembro(\'' + m.id + '\')">Editar</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'membros\',\'' + m.id + '\')">Excluir</button>' +
+        '</div></div>').join(''));
+}
+function renderLideranca() {
+  const lista = filtrar(DB.lideres, ['nome', 'cargo', 'cong']);
+  return pageHead('Liderança', 'Ordem de exibição no site público · vínculo com membro e ministério',
+      '<button class="btn btn-primary" onclick="editarLider()">＋ Novo Líder</button>') +
+    toolbarBusca('Buscar líder...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum líder encontrado.</div>' :
+      lista.map((l) => '<div class="list-item"><div class="avatar">' + esc(iniciais(l.nome)) + '</div>' +
+        '<div class="info"><h4>' + esc(l.nome) + '</h4><p>' + esc(l.cargo) + ' · ' + esc(l.cong) + '</p></div>' +
+        '<div class="acts">' + badgeStatus(l.ativo ? 'ATIVO' : 'INATIVO') +
+        '<button class="btn btn-sm" onclick="editarLider(\'' + l.id + '\')">Editar</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'lideres\',\'' + l.id + '\')">Excluir</button>' +
+        '</div></div>').join(''));
+}
+function renderEventos() {
+  const lista = filtrar(DB.eventos, ['nome', 'tema', 'local', 'status']);
+  return pageHead('Eventos', 'Inscrições · pagamentos · check-in · campanhas · conciliação',
+      '<button class="btn btn-primary" onclick="editarEvento()">＋ Novo Evento</button>') +
+    toolbarBusca('Buscar evento...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum evento encontrado.</div>' :
+      lista.map((e) => '<div class="list-item"><div class="avatar">' + new Date(e.data + 'T12:00:00').getDate() + '</div>' +
+        '<div class="info"><h4>' + esc(e.nome) + '</h4><p>' + esc(e.tema) + ' · ' + esc(e.local) + ' · ' +
+        dataBR(e.data) + ' · orçamento ' + money(e.orc) + '</p></div><div class="acts">' + badgeStatus(e.status) +
+        '<button class="btn btn-sm" onclick="editarEvento(\'' + e.id + '\')">Editar</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'eventos\',\'' + e.id + '\')">Excluir</button>' +
+        '</div></div>').join(''));
+}
+function renderFinanceiro() {
+  const lista = filtrar(DB.financeiro, ['desc', 'tipo', 'cat', 'resp']);
+  const ent = DB.financeiro.filter((f) => f.tipo === 'ENTRADA').reduce((s, f) => s + f.valor, 0);
+  const sai = DB.financeiro.filter((f) => f.tipo === 'SAIDA').reduce((s, f) => s + f.valor, 0);
+  return pageHead('Financeiro', 'Livro-razão único (EventoFinanceiro) · DÍZIMO/OFERTA/DOAÇÃO/INSCRIÇÃO/DESPESA',
+      '<button class="btn btn-primary" onclick="editarLancamento()">＋ Novo Lançamento</button>') +
+    '<div class="kpi-grid" style="margin-bottom:1.35rem">' +
+      '<div class="card kpi"><div class="kpi-ico">↑</div><div><div class="card-title">Receitas</div><div class="kpi-val">' + money(ent) + '</div></div></div>' +
+      '<div class="card kpi"><div class="kpi-ico" style="background:rgba(231,76,60,.2);color:#ff8a80">↓</div><div><div class="card-title">Despesas</div><div class="kpi-val">' + money(sai) + '</div></div></div>' +
+      '<div class="card kpi"><div class="kpi-ico">=</div><div><div class="card-title">Saldo</div><div class="kpi-val">' + money(ent - sai) + '</div></div></div>' +
+    '</div>' +
+    toolbarBusca('Buscar lançamento...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum lançamento encontrado.</div>' :
+      '<div class="card" style="overflow-x:auto"><table><thead><tr><th>Descrição</th><th>Categoria</th><th>Data</th>' +
+      '<th>Responsável</th><th style="text-align:right">Valor</th><th></th></tr></thead><tbody>' +
+      lista.map((f) => '<tr><td>' + esc(f.desc) + '</td><td><span class="badge ' +
+        (f.tipo === 'ENTRADA' ? 'ok' : 'err') + '">' + esc(f.cat) + '</span></td><td>' + dataBR(f.data) +
+        '</td><td style="color:var(--text-muted)">' + esc(f.resp) + '</td><td style="text-align:right;font-weight:600;color:' +
+        (f.tipo === 'ENTRADA' ? '#7ee08a' : '#ff8a80') + '">' + (f.tipo === 'ENTRADA' ? '+' : '−') + ' ' + money(f.valor) +
+        '</td><td style="text-align:right"><button class="btn btn-sm" onclick="editarLancamento(\'' + f.id + '\')">Editar</button> ' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'financeiro\',\'' + f.id + '\')">Excluir</button></td></tr>').join('') +
+      '</tbody></table></div>');
+}
+function renderLiturgia() {
+  const lista = filtrar(DB.liturgias, ['tema', 'dirigente', 'pregador', 'status', 'cong']);
+  return pageHead('Liturgia', 'Programações · momentos · modo culto · impressão · modelos e músicas',
+      '<button class="btn btn-primary" onclick="editarLiturgia()">＋ Nova Programação</button>' +
+      '<button class="btn" onclick="toast(\'Biblioteca de músicas\')">♫ Músicas</button>' +
+      '<button class="btn" onclick="toast(\'Modelos de liturgia\')">▤ Modelos</button>') +
+    toolbarBusca('Buscar programação...') +
+    (lista.length === 0 ? '<div class="empty">Nenhuma programação encontrada.</div>' :
+      lista.map((l) => '<div class="list-item"><div class="avatar">' + esc(l.cong[0]) + '</div>' +
+        '<div class="info"><h4>' + esc(l.tema) + '</h4><p>' + dataBR(l.data) + ' · ' + esc(l.culto) + ' · ' +
+        esc(l.cong) + ' · dirige ' + esc(l.dirigente) + ' · prega ' + esc(l.pregador) + '</p></div><div class="acts">' +
+        badgeStatus(l.status) + '<button class="btn btn-sm" onclick="toast(\'Abrindo modo culto (simulado)\')">▶ Culto</button>' +
+        '<button class="btn btn-sm" onclick="editarLiturgia(\'' + l.id + '\')">Editar</button></div></div>').join(''));
+}
+function renderAvisos() {
+  const lista = filtrar(DB.avisos, ['titulo', 'desc', 'urg']);
+  return pageHead('Avisos', 'Publicação no site e no painel · urgência · validade',
+      '<button class="btn btn-primary" onclick="editarAviso()">＋ Novo Aviso</button>') +
+    toolbarBusca('Buscar aviso...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum aviso encontrado.</div>' :
+      lista.map((a) => '<div class="list-item"><div class="avatar">◈</div><div class="info"><h4>' + esc(a.titulo) +
+        '</h4><p>' + esc(a.desc) + ' · válido até ' + dataBR(a.fim) + '</p></div><div class="acts">' +
+        '<span class="badge ' + (a.urg === 'URGENTE' ? 'err' : a.urg === 'ALTA' ? 'warn' : 'info') + '">' + esc(a.urg) + '</span>' +
+        badgeStatus(a.ativo ? 'ATIVO' : 'INATIVO') +
+        '<button class="btn btn-sm" onclick="editarAviso(\'' + a.id + '\')">Editar</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'avisos\',\'' + a.id + '\')">Excluir</button>' +
+        '</div></div>').join(''));
+}
+function renderUsuarios() {
+  const lista = filtrar(DB.usuarios, ['nome', 'email', 'role', 'org']);
+  return pageHead('Usuários', 'RBAC por perfil e permissão · escopo por organização · canAssignRole',
+      '<button class="btn btn-primary" onclick="editarUsuario()">＋ Novo Usuário</button>') +
+    toolbarBusca('Buscar usuário...') +
+    (lista.length === 0 ? '<div class="empty">Nenhum usuário encontrado.</div>' :
+      lista.map((u) => '<div class="list-item"><div class="avatar">' + esc(iniciais(u.nome)) + '</div>' +
+        '<div class="info"><h4>' + esc(u.nome) + '</h4><p>' + esc(u.email) + ' · ' + esc(u.org) + '</p></div><div class="acts">' +
+        '<span class="badge ' + (u.role === 'SUPER_ADMIN' ? 'warn' : u.role === 'MEMBER' ? 'mut' : 'info') + '">' + esc(u.role) + '</span>' +
+        badgeStatus(u.ativo ? 'ATIVO' : 'INATIVO') +
+        '<button class="btn btn-sm" onclick="editarUsuario(\'' + u.id + '\')">Editar</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="excluirItem(\'usuarios\',\'' + u.id + '\')">Excluir</button>' +
+        '</div></div>').join(''));
+}
+function renderGaleria() {
+  const lista = filtrar(DB.galeria, ['titulo', 'album']);
+  return pageHead('Galeria', 'Álbuns e itens · vinculação com eventos',
+      '<button class="btn btn-primary" onclick="toast(\'Upload de imagem (simulado)\')">＋ Novo Item</button>') +
+    toolbarBusca('Buscar na galeria...') +
+    '<div class="gallery-grid">' + lista.map((g) =>
+      '<div class="gal" style="background:var(--gradient-gold-soft)" onclick="abrirLightbox(\'' + esc(g.titulo) + '\')">' +
+      '<div style="text-align:center"><div>' + esc(g.titulo) + '</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:.35rem">' +
+      esc(g.album) + '</div></div></div>').join('') + '</div>';
+}
+function renderOportunidades() {
+  const lista = filtrar(DB.oportunidades, ['titulo', 'desc', 'status']);
+  return pageHead('Oportunidades', 'Vagas de voluntariado e ministérios',
+      '<button class="btn btn-primary" onclick="editarOportunidade()">＋ Nova Oportunidade</button>') +
+    toolbarBusca('Buscar oportunidade...') +
+    (lista.length === 0 ? '<div class="empty">Nenhuma oportunidade encontrada.</div>' :
+      lista.map((o) => '<div class="list-item"><div class="avatar">✚</div><div class="info"><h4>' + esc(o.titulo) +
+        '</h4><p>' + esc(o.desc) + ' · ' + o.vagas + ' vagas · prazo ' + dataBR(o.prazo) + '</p></div><div class="acts">' +
+        badgeStatus(o.status) + '<button class="btn btn-sm" onclick="editarOportunidade(\'' + o.id + '\')">Editar</button>' +
+        '</div></div>').join(''));
+}
+function renderComunicacao() {
+  return pageHead('Comunicação', 'Canais oficiais · pregações · versículos diários') +
+    '<div class="group-title">Canais oficiais</div><div class="cards-grid">' + DB.canais.map((c) =>
+      '<div class="pub-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.62rem">' +
+      '<span class="badge info">' + esc(c.tipo) + '</span>' + badgeStatus(c.ativo ? 'ATIVO' : 'INATIVO') + '</div>' +
+      '<h3>' + esc(c.nome) + '</h3><p style="font-size:.815rem;word-break:break-all">' + esc(c.url) + '</p>' +
+      '<button class="btn btn-sm" style="margin-top:.85rem" onclick="toast(\'Editando canal\')">Editar</button></div>').join('') + '</div>' +
+    '<div class="group-title">Pregações</div><div class="card" style="overflow-x:auto"><table><thead><tr>' +
+      '<th>Título</th><th>Pregador</th><th>Referência</th><th>Data</th><th style="text-align:right">Views</th><th>Status</th>' +
+      '</tr></thead><tbody>' + DB.pregacoes.map((p) => '<tr><td>' + esc(p.titulo) + '</td><td>' + esc(p.pregador) +
+      '</td><td style="color:var(--text-muted)">' + esc(p.ref) + '</td><td>' + dataBR(p.data) +
+      '</td><td style="text-align:right">' + num(p.views) + '</td><td>' + badgeStatus(p.status) + '</td></tr>').join('') +
+      '</tbody></table></div>' +
+    '<div class="group-title">Versículos diários</div><div class="cards-grid">' + DB.versiculos.map((v) =>
+      '<div class="pub-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">' +
+      '<span class="badge mut">' + esc(v.ref) + '</span>' + badgeStatus(v.ativo ? 'ATIVO' : 'INATIVO') + '</div><p>' +
+      esc(v.texto) + '</p></div>').join('') + '</div>';
+}
+function renderConfiguracoes() {
+  return pageHead('Configurações', 'Identidade visual por organização · tema · logos') +
+    '<div class="cards-grid"><div class="card"><div class="card-title">Identidade</div>' +
+      '<div class="field" style="margin-top:.95rem"><label>Nome da igreja</label><input value="Igreja Assembleia de Deus Ministério da Promessa" /></div>' +
+      '<div class="field" style="margin-top:.85rem"><label>Logo (tema escuro)</label><input value="/images/iadmp/logo.png" /></div>' +
+      '<div class="field" style="margin-top:.85rem"><label>Favicon</label><input value="/images/iadmp/favicon.ico" /></div>' +
+      '<button class="btn btn-primary" style="margin-top:1.15rem" onclick="toast(\'Configurações salvas (simulado)\')">Salvar</button></div>' +
+    '<div class="card"><div class="card-title">Tema e paleta</div>' +
+      '<p style="margin:.95rem 0 1.15rem;color:var(--text-muted);font-size:.855rem">As cores são aplicadas em tempo real via variáveis CSS ' +
+      '(<code style="color:var(--text-primary)">--color-primary</code>, <code style="color:var(--text-primary)">--bg-primary</code>, ...). ' +
+      'Use os seletores no topo para testar.</p>' +
+      '<div class="group-title" style="margin-top:0">Paleta atual: ' + esc(paletaAtual) + '</div>' +
+      '<div style="display:flex;gap:.62rem;flex-wrap:wrap;margin-top:.85rem">' + Object.entries(PALETAS).map(([id, p]) =>
+        '<button class="btn btn-sm" onclick="document.querySelector(\'[data-pal=' + id + ']\').click()" style="gap:.55rem">' +
+        '<span class="dot" style="background:' + p.corPrincipal + '"></span>' +
+        '<span class="dot" style="background:' + p.corSecundaria + '"></span>' + esc(id) + '</button>').join('') + '</div>' +
+      '<div class="group-title">Permissões do sistema</div>' +
+      '<p style="color:var(--text-muted);font-size:.855rem">57 permissões no formato ' +
+      '<code style="color:var(--text-primary)">módulo:ação</code>, atribuídas por perfil (SUPER_ADMIN, ADMIN_IGREJA, ' +
+      'LIDER, COORDENADOR, MUSICO, MEMBER) ou por exceção em <code style="color:var(--text-primary)">UsuarioPermissao</code>.</p></div></div>';
+}
+
+const RENDERERS = {
+  dashboard: renderDashboard, gestao: renderGestao, membros: renderMembros,
+  lideranca: renderLideranca, eventos: renderEventos, financeiro: renderFinanceiro,
+  liturgia: renderLiturgia, avisos: renderAvisos, usuarios: renderUsuarios,
+  galeria: renderGaleria, oportunidades: renderOportunidades,
+  comunicacao: renderComunicacao, configuracoes: renderConfiguracoes, auditoria: gestaoAuditoria,
+};
+/* ---------- FORMULÁRIOS (CRUD simulado) ---------- */
+function salvar(chave, id, dados) {
+  const lista = DB[chave];
+  if (id) {
+    const i = lista.findIndex((x) => x.id === id);
+    if (i >= 0) Object.assign(lista[i], dados);
+    toast('Registro atualizado.');
+  } else {
+    lista.push(Object.assign({ id: chave + Date.now() }, dados));
+    toast('Registro criado.');
+  }
+  closeModal();
+  showAdminPage(paginaAtual);
+}
+function excluirItem(chave, id) {
+  DB[chave] = DB[chave].filter((x) => x.id !== id);
+  toast('Registro excluído.');
+  showAdminPage(paginaAtual);
+}
+
+function editarMembro(id) {
+  const m = DB.membros.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Membro' : 'Novo Membro',
+    desc: 'POST /api/membros · schema Zod membroSchema · organização via resolveTargetOrgId.',
+    campos: [
+      { nome: 'nome', label: 'Nome completo', valor: m.nome },
+      { nome: 'email', label: 'E-mail', tipo: 'email', valor: m.email },
+      { nome: 'tel', label: 'Telefone', valor: m.tel },
+      { nome: 'cong', label: 'Congregação', tipo: 'select', valor: m.cong || 'Matriz', opcoes: DB.congregacoes.map((c) => c.nome) },
+      { nome: 'status', label: 'Status', tipo: 'select', valor: m.status || 'ATIVO', opcoes: ['ATIVO', 'INATIVO', 'TRANSFERIDO', 'FALECIDO'] },
+      { nome: 'entrada', label: 'Data de entrada', tipo: 'date', valor: m.entrada },
+    ],
+    onSave: (d) => salvar('membros', id, d),
+  });
+}
+function editarLider(id) {
+  const l = DB.lideres.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Líder' : 'Novo Líder',
+    desc: 'POST /api/lideranca · schema Zod liderancaSchema.',
+    campos: [
+      { nome: 'nome', label: 'Nome', valor: l.nome },
+      { nome: 'cargo', label: 'Cargo', valor: l.cargo },
+      { nome: 'cong', label: 'Congregação', tipo: 'select', valor: l.cong || 'Matriz', opcoes: DB.congregacoes.map((c) => c.nome) },
+      { nome: 'ativo', label: 'Ativo', tipo: 'select', valor: l.ativo === false ? 'Não' : 'Sim', opcoes: ['Sim', 'Não'] },
+    ],
+    onSave: (d) => { d.ativo = d.ativo === 'Sim'; salvar('lideres', id, d); },
+  });
+}
+function editarEvento(id) {
+  const e = DB.eventos.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Evento' : 'Novo Evento',
+    desc: 'POST /api/eventos · schema Zod eventoSchema · org resolvida + assertOrgAccess.',
+    campos: [
+      { nome: 'nome', label: 'Nome', valor: e.nome },
+      { nome: 'tema', label: 'Tema', valor: e.tema },
+      { nome: 'local', label: 'Local', valor: e.local },
+      { nome: 'data', label: 'Data', tipo: 'date', valor: e.data },
+      { nome: 'status', label: 'Status', tipo: 'select', valor: e.status || 'PLANEJADO', opcoes: ['PLANEJADO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO'] },
+      { nome: 'orc', label: 'Orçamento previsto (R$)', tipo: 'number', valor: e.orc || 0 },
+    ],
+    onSave: (d) => { d.orc = Number(d.orc || 0); d.publico = e.publico ?? true; salvar('eventos', id, d); },
+  });
+}
+function editarLancamento(id) {
+  const f = DB.financeiro.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Lançamento' : 'Novo Lançamento',
+    desc: 'POST /api/financeiro · livro-razão único (EventoFinanceiro) com categoria.',
+    campos: [
+      { nome: 'desc', label: 'Descrição', valor: f.desc },
+      { nome: 'valor', label: 'Valor (R$)', tipo: 'number', valor: f.valor || 0 },
+      { nome: 'tipo', label: 'Movimentação', tipo: 'select', valor: f.tipo || 'ENTRADA', opcoes: ['ENTRADA', 'SAIDA'] },
+      { nome: 'cat', label: 'Categoria', tipo: 'select', valor: f.cat || 'DIZIMO', opcoes: ['DIZIMO', 'OFERTA', 'DOACAO', 'INSCRICAO', 'DESPESA', 'OUTRO'] },
+      { nome: 'data', label: 'Data', tipo: 'date', valor: f.data },
+      { nome: 'resp', label: 'Responsável', valor: f.resp },
+    ],
+    onSave: (d) => { d.valor = Number(d.valor || 0); salvar('financeiro', id, d); },
+  });
+}
+function editarLiturgia(id) {
+  const l = DB.liturgias.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Programação' : 'Nova Programação',
+    desc: 'POST /api/liturgia · congregação resolvida por nome (resolveCongregacaoId).',
+    campos: [
+      { nome: 'tema', label: 'Tema', valor: l.tema },
+      { nome: 'data', label: 'Data', tipo: 'date', valor: l.data },
+      { nome: 'culto', label: 'Tipo de culto', tipo: 'select', valor: l.culto || 'Celebração', opcoes: ['Celebração', 'Encontro', 'Reunião de Oração', 'Vigília', 'Batismo', 'Ceia', 'Especial'] },
+      { nome: 'dirigente', label: 'Dirigente', valor: l.dirigente },
+      { nome: 'pregador', label: 'Pregador', valor: l.pregador },
+      { nome: 'cong', label: 'Congregação', tipo: 'select', valor: l.cong || 'Matriz', opcoes: DB.congregacoes.map((c) => c.nome) },
+      { nome: 'status', label: 'Status', tipo: 'select', valor: l.status || 'RASCUNHO', opcoes: ['RASCUNHO', 'EM_PREPARACAO', 'PRONTA', 'EM_ANDAMENTO', 'REALIZADA', 'CANCELADA'] },
+    ],
+    onSave: (d) => salvar('liturgias', id, d),
+  });
+}
+function editarAviso(id) {
+  const a = DB.avisos.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Aviso' : 'Novo Aviso',
+    desc: 'POST /api/avisos · schema Zod avisoSchema.',
+    campos: [
+      { nome: 'titulo', label: 'Título', valor: a.titulo },
+      { nome: 'desc', label: 'Descrição', tipo: 'textarea', valor: a.desc },
+      { nome: 'urg', label: 'Urgência', tipo: 'select', valor: a.urg || 'NORMAL', opcoes: ['BAIXA', 'NORMAL', 'ALTA', 'URGENTE'] },
+      { nome: 'fim', label: 'Válido até', tipo: 'date', valor: a.fim },
+      { nome: 'ativo', label: 'Situação', tipo: 'select', valor: a.ativo === false ? 'INATIVO' : 'ATIVO', opcoes: ['ATIVO', 'INATIVO'] },
+    ],
+    onSave: (d) => { d.ativo = d.ativo === 'ATIVO'; salvar('avisos', id, d); },
+  });
+}
+function editarUsuario(id) {
+  const u = DB.usuarios.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Usuário' : 'Novo Usuário',
+    desc: 'POST /api/usuarios · canAssignRole impede atribuir papel acima do próprio nível.',
+    campos: [
+      { nome: 'nome', label: 'Nome', valor: u.nome },
+      { nome: 'email', label: 'E-mail', tipo: 'email', valor: u.email },
+      { nome: 'role', label: 'Perfil', tipo: 'select', valor: u.role || 'MEMBER', opcoes: ['SUPER_ADMIN', 'ADMIN_IGREJA', 'PASTOR', 'LIDER', 'COORDENADOR', 'SECRETARIA', 'FINANCEIRO', 'MUSICO', 'EDITOR_SITE', 'MEMBER'] },
+      { nome: 'org', label: 'Organização', tipo: 'select', valor: u.org || 'IADMP', opcoes: ['IADMP'] },
+      { nome: 'ativo', label: 'Ativo', tipo: 'select', valor: u.ativo === false ? 'Não' : 'Sim', opcoes: ['Sim', 'Não'] },
+    ],
+    onSave: (d) => { d.ativo = d.ativo === 'Sim'; salvar('usuarios', id, d); },
+  });
+}
+function editarOportunidade(id) {
+  const o = DB.oportunidades.find((x) => x.id === id) || {};
+  openModal({
+    titulo: id ? 'Editar Oportunidade' : 'Nova Oportunidade',
+    desc: 'POST /api/oportunidades.',
+    campos: [
+      { nome: 'titulo', label: 'Título', valor: o.titulo },
+      { nome: 'desc', label: 'Descrição', tipo: 'textarea', valor: o.desc },
+      { nome: 'vagas', label: 'Vagas', tipo: 'number', valor: o.vagas || 1 },
+      { nome: 'prazo', label: 'Prazo', tipo: 'date', valor: o.prazo },
+      { nome: 'status', label: 'Status', tipo: 'select', valor: o.status || 'ATIVA', opcoes: ['ATIVA', 'ENCERRADA'] },
+    ],
+    onSave: (d) => { d.vagas = Number(d.vagas || 1); salvar('oportunidades', id, d); },
+  });
+}
+
+/* ===================== INICIALIZAÇÃO ===================== */
+renderPublico();
+aplicarTema();
+renderSidebar();
+switchMode('public');
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.kpi-info') && !e.target.closest('.pop')) {
+    $$('.pop').forEach((p) => p.classList.add('hidden'));
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeModal(); $('#lightbox').classList.remove('on'); }
+});
+</script>
+</body>
+</html>
