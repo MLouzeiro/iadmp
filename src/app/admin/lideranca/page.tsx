@@ -11,6 +11,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface Lider {
   id: string;
@@ -26,12 +27,14 @@ interface Lider {
 
 export default function LiderancaPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [lideres, setLideres] = useState<Lider[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState<Lider | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     nome: '',
     cargo: '',
     congregacao: '',
@@ -53,13 +56,14 @@ export default function LiderancaPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ nome: '', cargo: '', congregacao: '', biografia: '', publico: true, ativo: true, ordemExibicao: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', cargo: '', congregacao: '', biografia: '', publico: true, ativo: true, ordemExibicao: '' });
     setModalOpen(true);
   };
 
   const openEditar = (l: Lider) => {
     setEditando(l);
     setForm({
+      organizacaoId: (l as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       nome: l.nome,
       cargo: l.cargo,
       congregacao: l.congregacao?.nome || '',
@@ -72,11 +76,16 @@ export default function LiderancaPage() {
   };
 
   const salvar = async () => {
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização.', 'warn');
+      return;
+    }
     if (!form.nome.trim() || !form.cargo.trim()) {
       toast('Preencha nome e cargo.', 'warn');
       return;
     }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       nome: form.nome,
       cargo: form.cargo,
       congregacao: form.congregacao || undefined,
@@ -115,6 +124,16 @@ export default function LiderancaPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'nome', label: 'Nome', value: form.nome, required: true },
     { name: 'cargo', label: 'Cargo', value: form.cargo, required: true },
     { name: 'congregacao', label: 'Congregação', value: form.congregacao, placeholder: 'Ex: Matriz' },

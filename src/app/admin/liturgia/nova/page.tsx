@@ -87,8 +87,9 @@ export default function NovaLiturgiaPage() {
 
   useEffect(() => {
     fetch('/api/organizacoes').then(r => r.json()).then(d => {
-      setOrganizacoes(d.organizacoes || []);
-      if (d.organizacoes?.length === 1) setOrganizacaoId(d.organizacoes[0].id);
+      const list = Array.isArray(d) ? d : d?.organizacoes || [];
+      setOrganizacoes(list);
+      if (list.length === 1) setOrganizacaoId(list[0].id);
     });
   }, []);
 

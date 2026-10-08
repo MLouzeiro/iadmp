@@ -12,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
 import { formatarDataBR } from '@/lib/datas';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface Aviso {
   id: string;
@@ -39,12 +40,14 @@ function dataBR(iso?: string | null) {
 
 export default function AvisosPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState<Aviso | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     titulo: '',
     descricao: '',
     categoria: '',
@@ -70,7 +73,7 @@ export default function AvisosPage() {
   const openNovo = () => {
     setEditando(null);
     setForm({
-      titulo: '', descricao: '', categoria: '', urgencia: 'NORMAL', situacaoAviso: 'ATIVO',
+      organizacaoId: orgs.length === 1 ? orgs[0].id : '', titulo: '', descricao: '', categoria: '', urgencia: 'NORMAL', situacaoAviso: 'ATIVO',
       publicarSite: false, mostrarPainel: true, destaque: false, terminaEm: '', publicoAlvo: '',
     });
     setModalOpen(true);
@@ -79,6 +82,7 @@ export default function AvisosPage() {
   const openEditar = (a: Aviso) => {
     setEditando(a);
     setForm({
+      organizacaoId: (a as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       titulo: a.titulo,
       descricao: a.descricao,
       categoria: a.categoria || '',
@@ -94,11 +98,16 @@ export default function AvisosPage() {
   };
 
   const salvar = async () => {
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização.', 'warn');
+      return;
+    }
     if (!form.titulo.trim() || !form.descricao.trim()) {
       toast('Preencha título e descrição.', 'warn');
       return;
     }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       titulo: form.titulo,
       descricao: form.descricao,
       categoria: form.categoria || null,
@@ -140,6 +149,16 @@ export default function AvisosPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'titulo', label: 'Título', value: form.titulo, required: true, full: true },
     { name: 'descricao', label: 'Descrição', type: 'textarea', value: form.descricao, required: true, full: true },
     { name: 'categoria', label: 'Categoria', value: form.categoria, placeholder: 'Ex: Culto, Congresso...' },

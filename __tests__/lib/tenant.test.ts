@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { resolveOrgScope, assertOrgAccess, withOrgScope, orgFilter, ORG_FORBIDDEN } from '@/lib/tenant';
+import { resolveOrgScope, resolveTargetOrgId, assertOrgAccess, withOrgScope, orgFilter, ORG_FORBIDDEN, ORG_REQUIRED } from '@/lib/tenant';
 import { canManageOrganization } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 
@@ -10,6 +10,9 @@ jest.mock('@/lib/prisma', () => ({
     usuarioOrganizacao: {
       findMany: jest.fn().mockResolvedValue([]),
       findUnique: jest.fn().mockResolvedValue(null),
+    },
+    organizacao: {
+      findMany: jest.fn().mockResolvedValue([]),
     },
     auditLog: {
       create: jest.fn().mockResolvedValue({}),
@@ -24,6 +27,7 @@ jest.mock('@/lib/auth-helpers', () => ({
 const mockFindMany = prisma.usuarioOrganizacao.findMany as jest.Mock;
 const mockAudit = prisma.auditLog.create as jest.Mock;
 const mockCan = canManageOrganization as jest.Mock;
+const mockOrgs = prisma.organizacao.findMany as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -77,6 +81,37 @@ describe('resolveOrgScope', () => {
     expect(scope.mode).toBe('ALL');
     expect(scope.requestedOrgId).toBe('org-qualquer');
     expect(mockFindMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('resolveTargetOrgId', () => {
+  it('usa a organizacao pedida quando informada', async () => {
+    mockFindMany.mockResolvedValue([{ organizacaoId: 'org-a' }]);
+    const id = await resolveTargetOrgId({ id: 'u1', role: 'PASTOR' }, 'org-a');
+    expect(id).toBe('org-a');
+  });
+
+  it('resolve automatico quando o usuario tem um unico vinculo', async () => {
+    mockFindMany.mockResolvedValue([{ organizacaoId: 'org-a' }]);
+    const id = await resolveTargetOrgId({ id: 'u1', role: 'PASTOR' });
+    expect(id).toBe('org-a');
+  });
+
+  it('SUPER_ADMIN com uma unica organizacao ativa resolve automatico', async () => {
+    mockOrgs.mockResolvedValue([{ id: 'org-unica' }]);
+    const id = await resolveTargetOrgId({ id: 'u1', role: 'SUPER_ADMIN' });
+    expect(id).toBe('org-unica');
+  });
+
+  it('SUPER_ADMIN com multiplas organizacoes ativas lanca ORG_REQUIRED', async () => {
+    mockOrgs.mockResolvedValue([{ id: 'org-a' }, { id: 'org-b' }]);
+    await expect(resolveTargetOrgId({ id: 'u1', role: 'SUPER_ADMIN' })).rejects.toThrow(ORG_REQUIRED);
+  });
+
+  it('usuario com multiplas organizacoes e varias ativas lanca ORG_REQUIRED', async () => {
+    mockFindMany.mockResolvedValue([{ organizacaoId: 'org-a' }, { organizacaoId: 'org-b' }]);
+    mockOrgs.mockResolvedValue([{ id: 'org-a' }, { id: 'org-b' }]);
+    await expect(resolveTargetOrgId({ id: 'u1', role: 'LIDER' })).rejects.toThrow(ORG_REQUIRED);
   });
 });
 

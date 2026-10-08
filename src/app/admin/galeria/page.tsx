@@ -11,6 +11,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import Lightbox from '@/components/ui/Lightbox';
 import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface GaleriaItem {
   id: string;
@@ -25,6 +26,7 @@ interface GaleriaItem {
 
 export default function GaleriaAdminPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [itens, setItens] = useState<GaleriaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -32,6 +34,7 @@ export default function GaleriaAdminPage() {
   const [editando, setEditando] = useState<GaleriaItem | null>(null);
   const [lightbox, setLightbox] = useState<GaleriaItem | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     titulo: '',
     descricao: '',
     url: '',
@@ -51,13 +54,14 @@ export default function GaleriaAdminPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ titulo: '', descricao: '', url: '', classArquivo: 'FOTO', ordem: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', titulo: '', descricao: '', url: '', classArquivo: 'FOTO', ordem: '' });
     setModalOpen(true);
   };
 
   const openEditar = (g: GaleriaItem) => {
     setEditando(g);
     setForm({
+      organizacaoId: (g as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       titulo: g.titulo || '',
       descricao: g.descricao || '',
       url: g.url,
@@ -73,6 +77,7 @@ export default function GaleriaAdminPage() {
       return;
     }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       titulo: form.titulo || undefined,
       descricao: form.descricao || undefined,
       url: form.url,
@@ -109,6 +114,16 @@ export default function GaleriaAdminPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'titulo', label: 'Título', value: form.titulo, full: true },
     { name: 'url', label: 'URL da imagem', value: form.url, required: true, full: true, placeholder: '/images/... ou https://...' },
     { name: 'descricao', label: 'Descrição', type: 'textarea', value: form.descricao, full: true },

@@ -14,6 +14,7 @@ import CategoriasManager from '@/components/admin/CategoriasManager';
 import { Tag } from 'lucide-react';
 import { formatarDataBR } from '@/lib/datas';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface Lancamento {
   id: string;
@@ -48,6 +49,7 @@ function dataBR(iso: string) {
 
 export default function FinanceiroPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -55,6 +57,7 @@ export default function FinanceiroPage() {
   const [editando, setEditando] = useState<Lancamento | null>(null);
   const [catsOpen, setCatsOpen] = useState(false);
   const [form, setForm] = useState({
+    organizacaoId: '',
     descricao: '',
     valor: '',
     tipo: 'ENTRADA',
@@ -84,13 +87,14 @@ export default function FinanceiroPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ descricao: '', valor: '', tipo: 'ENTRADA', categoria: 'DIZIMO', data: '', responsavel: '', fornecedor: '', observacoes: '', categoriaFinanceiraId: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', descricao: '', valor: '', tipo: 'ENTRADA', categoria: 'DIZIMO', data: '', responsavel: '', fornecedor: '', observacoes: '', categoriaFinanceiraId: '' });
     setModalOpen(true);
   };
 
   const openEditar = (l: Lancamento) => {
     setEditando(l);
     setForm({
+      organizacaoId: (l as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       descricao: l.descricao,
       valor: String(l.valor),
       tipo: l.generoMovimentacao,
@@ -150,6 +154,16 @@ export default function FinanceiroPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'descricao', label: 'Descrição', value: form.descricao, required: true, full: true },
     { name: 'valor', label: 'Valor (R$)', type: 'number', value: form.valor, required: true, min: 0, step: 0.01 },
     {

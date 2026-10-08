@@ -75,6 +75,15 @@ export async function resolveTargetOrgId(
   const scope = await resolveOrgScope(user, requestedOrgId);
   if (scope.requestedOrgId) return scope.requestedOrgId;
   if (scope.mode === 'SINGLE' && scope.orgIds.length === 1) return scope.orgIds[0];
+
+  // SUPER_ADMIN (modo ALL) ou usuário com múltiplos vínculos:
+  // se só existe uma organização ativa no sistema, usa ela.
+  const ativas = await prisma.organizacao.findMany({
+    where: { ativo: true },
+    select: { id: true },
+  });
+  if (ativas.length === 1) return ativas[0].id;
+
   throw new Error(ORG_REQUIRED);
 }
 

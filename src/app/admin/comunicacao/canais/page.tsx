@@ -5,6 +5,7 @@ import SectionHead from '@/components/ui/SectionHead';
 import { Radio, Plus, ExternalLink, Trash2, Pencil, GripVertical, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface CanalOficial {
   id: string;
@@ -35,7 +36,8 @@ export default function CanaisPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ tipo: 'youtube', nome: '', url: '', descricao: '', ativo: true, ordem: 0 });
+  const { orgs, multiOrg } = useOrganizacoes();
+  const [form, setForm] = useState({ organizacaoId: '', tipo: 'youtube', nome: '', url: '', descricao: '', ativo: true, ordem: 0 });
 
   const fetchCanais = useCallback(async () => {
     setLoading(true);
@@ -55,13 +57,13 @@ export default function CanaisPage() {
   useEffect(() => { fetchCanais(); }, [fetchCanais]);
 
   const resetForm = () => {
-    setForm({ tipo: 'youtube', nome: '', url: '', descricao: '', ativo: true, ordem: 0 });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', tipo: 'youtube', nome: '', url: '', descricao: '', ativo: true, ordem: 0 });
     setEditingId(null);
     setShowForm(false);
   };
 
   const handleEdit = (canal: CanalOficial) => {
-    setForm({ tipo: canal.tipo, nome: canal.nome, url: canal.url, descricao: canal.descricao || '', ativo: canal.ativo, ordem: canal.ordem });
+    setForm({ organizacaoId: canal.organizacao?.id || (orgs.length === 1 ? orgs[0].id : ''), tipo: canal.tipo, nome: canal.nome, url: canal.url, descricao: canal.descricao || '', ativo: canal.ativo, ordem: canal.ordem });
     setEditingId(canal.id);
     setShowForm(true);
   };
@@ -139,6 +141,15 @@ export default function CanaisPage() {
             <button className={styles.formClose} onClick={resetForm}>✕</button>
           </div>
           <form onSubmit={handleSubmit} className={styles.formGrid}>
+            {multiOrg && (
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Organização <span className={styles.fieldRequired}>*</span></label>
+                <select className={styles.select} value={form.organizacaoId} onChange={e => setForm({ ...form, organizacaoId: e.target.value })} required>
+                  <option value="">Selecione...</option>
+                  {orgs.map(o => <option key={o.id} value={o.id}>{o.nome}</option>)}
+                </select>
+              </div>
+            )}
             <div className={styles.field}>
               <label className={styles.fieldLabel}>Tipo <span className={styles.fieldRequired}>*</span></label>
               <select className={styles.select} value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })} required>

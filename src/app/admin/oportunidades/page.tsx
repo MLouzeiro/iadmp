@@ -12,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
 import { formatarDataBR } from '@/lib/datas';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface Oportunidade {
   id: string;
@@ -33,12 +34,14 @@ function dataBR(iso?: string | null) {
 
 export default function OportunidadesPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [oportunidades, setOportunidades] = useState<Oportunidade[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState<Oportunidade | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     titulo: '',
     descricao: '',
     generoOportunidade: 'VOLUNTARIADO',
@@ -61,13 +64,14 @@ export default function OportunidadesPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ titulo: '', descricao: '', generoOportunidade: 'VOLUNTARIADO', responsavel: '', prazo: '', vagas: '', abrirOportunidade: 'ATIVA', observacoes: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', titulo: '', descricao: '', generoOportunidade: 'VOLUNTARIADO', responsavel: '', prazo: '', vagas: '', abrirOportunidade: 'ATIVA', observacoes: '' });
     setModalOpen(true);
   };
 
   const openEditar = (o: Oportunidade) => {
     setEditando(o);
     setForm({
+      organizacaoId: (o as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       titulo: o.titulo,
       descricao: o.descricao,
       generoOportunidade: o.generoOportunidade,
@@ -81,11 +85,16 @@ export default function OportunidadesPage() {
   };
 
   const salvar = async () => {
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização.', 'warn');
+      return;
+    }
     if (!form.titulo.trim() || !form.descricao.trim()) {
       toast('Preencha título e descrição.', 'warn');
       return;
     }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       titulo: form.titulo,
       descricao: form.descricao,
       generoOportunidade: form.generoOportunidade,
@@ -125,6 +134,16 @@ export default function OportunidadesPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'titulo', label: 'Título', value: form.titulo, required: true, full: true },
     { name: 'descricao', label: 'Descrição', type: 'textarea', value: form.descricao, required: true, full: true },
     {

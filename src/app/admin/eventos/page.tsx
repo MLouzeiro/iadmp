@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/Toast';
 import InscricoesManager from '@/components/admin/InscricoesManager';
 import Tabs from '@/components/ui/Tabs';
 import { formatarDataBR } from '@/lib/datas';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 import styles from '@/components/ui/form.module.css';
 
 interface Evento {
@@ -39,12 +40,14 @@ function dataBR(iso: string) {
 
 export default function EventosAdminPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState<Evento | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     nome: '',
     dataEvento: '',
     dataInicio: '',
@@ -75,13 +78,14 @@ export default function EventosAdminPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ nome: '', dataEvento: '', dataInicio: '', tema: '', local: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', dataEvento: '', dataInicio: '', tema: '', local: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
     setModalOpen(true);
   };
 
   const openEditar = (e: Evento) => {
     setEditando(e);
     setForm({
+      organizacaoId: (e as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       nome: e.nome,
       dataEvento: e.dataEvento ? e.dataEvento.slice(0, 10) : '',
       dataInicio: e.dataInicio ? e.dataInicio.slice(0, 10) : '',
@@ -106,7 +110,12 @@ export default function EventosAdminPage() {
       toast('Preencha nome e data do evento.', 'warn');
       return;
     }
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização do evento.', 'warn');
+      return;
+    }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       nome: form.nome,
       dataEvento: form.dataEvento,
       dataInicio: form.dataInicio || undefined,
@@ -153,6 +162,16 @@ export default function EventosAdminPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'nome', label: 'Nome', value: form.nome, required: true, full: true },
     { name: 'dataEvento', label: 'Data do evento', type: 'date', value: form.dataEvento, required: true },
     { name: 'dataInicio', label: 'Data de início', type: 'date', value: form.dataInicio },

@@ -12,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
 import { formatarDataBR } from '@/lib/datas';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface Membro {
   id: string;
@@ -31,12 +32,14 @@ function dataBR(iso?: string | null) {
 
 export default function MembrosPage() {
   const { toast, confirm } = useToast();
+  const { orgs, multiOrg } = useOrganizacoes();
   const [membros, setMembros] = useState<Membro[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState<Membro | null>(null);
   const [form, setForm] = useState({
+    organizacaoId: '',
     nome: '',
     email: '',
     telefone: '',
@@ -59,13 +62,14 @@ export default function MembrosPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ nome: '', email: '', telefone: '', congregacao: '', status: 'ATIVO', dataEntrada: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', email: '', telefone: '', congregacao: '', status: 'ATIVO', dataEntrada: '' });
     setModalOpen(true);
   };
 
   const openEditar = (m: Membro) => {
     setEditando(m);
     setForm({
+      organizacaoId: (m as unknown as { organizacaoId?: string }).organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
       nome: m.nome,
       email: m.email || '',
       telefone: m.telefone || '',
@@ -77,11 +81,16 @@ export default function MembrosPage() {
   };
 
   const salvar = async () => {
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização.', 'warn');
+      return;
+    }
     if (!form.nome.trim()) {
       toast('Preencha o nome.', 'warn');
       return;
     }
     const payload = {
+      organizacaoId: form.organizacaoId || undefined,
       nome: form.nome,
       email: form.email || null,
       telefone: form.telefone || null,
@@ -119,6 +128,16 @@ export default function MembrosPage() {
   };
 
   const campos: ModalField[] = [
+    ...(multiOrg
+      ? [{
+          name: 'organizacaoId',
+          label: 'Organização',
+          type: 'select' as const,
+          value: form.organizacaoId,
+          required: true,
+          options: orgs.map((o) => ({ value: o.id, label: o.nome })),
+        }]
+      : []),
     { name: 'nome', label: 'Nome completo', value: form.nome, required: true, full: true },
     { name: 'email', label: 'E-mail', type: 'email', value: form.email },
     { name: 'telefone', label: 'Telefone', type: 'tel', value: form.telefone },

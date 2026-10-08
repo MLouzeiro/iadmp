@@ -5,6 +5,7 @@ import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, Plus, Trash2, Pencil, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
 interface VersiculoDiario {
   id: string;
@@ -22,7 +23,8 @@ export default function VersiculosPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ referencia: '', versiculo: '', reflexao: '', ativo: true });
+  const { orgs, multiOrg } = useOrganizacoes();
+  const [form, setForm] = useState({ organizacaoId: '', referencia: '', versiculo: '', reflexao: '', ativo: true });
 
   const fetchVersiculos = useCallback(async () => {
     setLoading(true);
@@ -42,13 +44,13 @@ export default function VersiculosPage() {
   useEffect(() => { fetchVersiculos(); }, [fetchVersiculos]);
 
   const resetForm = () => {
-    setForm({ referencia: '', versiculo: '', reflexao: '', ativo: true });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', referencia: '', versiculo: '', reflexao: '', ativo: true });
     setEditingId(null);
     setShowForm(false);
   };
 
   const handleEdit = (v: VersiculoDiario) => {
-    setForm({ referencia: v.referencia, versiculo: v.versiculo, reflexao: v.reflexao, ativo: v.ativo });
+    setForm({ organizacaoId: (v as unknown as { organizacao?: { id?: string } }).organizacao?.id || (orgs.length === 1 ? orgs[0].id : ''), referencia: v.referencia, versiculo: v.versiculo, reflexao: v.reflexao, ativo: v.ativo });
     setEditingId(v.id);
     setShowForm(true);
   };
@@ -120,6 +122,15 @@ export default function VersiculosPage() {
           <h3>{editingId ? 'Editar Versículo' : 'Novo Versículo'}</h3>
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
+              {multiOrg && (
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Organização *</label>
+                  <select className={styles.select} value={form.organizacaoId} onChange={e => setForm({ ...form, organizacaoId: e.target.value })} required>
+                    <option value="">Selecione...</option>
+                    {orgs.map(o => <option key={o.id} value={o.id}>{o.nome}</option>)}
+                  </select>
+                </div>
+              )}
               <div className={styles.formGroup}>
                 <label>Referência Biblica *</label>
                 <input
