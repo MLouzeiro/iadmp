@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
+import { parseDataDateOnly } from '@/lib/datas';
 import {
   assertOrgAccess,
   resolveCongregacaoId,
@@ -26,15 +27,15 @@ export async function GET(
       },
     });
     if (!lider) {
-      return NextResponse.json({ error: 'Lider nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Líder não encontrado' }, { status: 404 });
     }
     await assertOrgAccess(user.id, lider.organizacaoId, request);
     return NextResponse.json(lider);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
-    return NextResponse.json({ error: 'Erro ao buscar lider' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar líder' }, { status: 500 });
   }
 }
 
@@ -45,11 +46,11 @@ export async function PUT(
   try {
     const user = await requireAuth();
     const podeEditar = await hasPermission(user.id, 'lideranca', 'editar');
-    if (!podeEditar) return NextResponse.json({ error: 'Sem permissao para editar lideranca' }, { status: 403 });
+    if (!podeEditar) return NextResponse.json({ error: 'Sem permissão para editar liderança' }, { status: 403 });
 
     const { id } = await params;
     const existing = await prisma.lideranca.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Lider nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Líder não encontrado' }, { status: 404 });
 
     await assertOrgAccess(user.id, existing.organizacaoId, request);
 
@@ -63,9 +64,9 @@ export async function PUT(
     if (body.publico !== undefined) data.publico = body.publico;
     if (body.ativo !== undefined) data.ativo = body.ativo;
     if (body.dataInicio !== undefined) {
-      data.dataInicio = body.dataInicio ? new Date(body.dataInicio) : null;
+      data.dataInicio = body.dataInicio ? parseDataDateOnly(body.dataInicio) : null;
     }
-    if (body.dataFim !== undefined) data.dataFim = body.dataFim ? new Date(body.dataFim) : null;
+    if (body.dataFim !== undefined) data.dataFim = body.dataFim ? parseDataDateOnly(body.dataFim) : null;
     if (body.membroId !== undefined) data.membroId = body.membroId || null;
     if (body.ministerioId !== undefined) data.ministerioId = body.ministerioId || null;
     if (body.congregacaoId !== undefined || body.congregacao !== undefined) {
@@ -94,10 +95,10 @@ export async function PUT(
 
     return NextResponse.json(lider);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
-    return NextResponse.json({ error: 'Erro ao atualizar lider' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao atualizar líder' }, { status: 500 });
   }
 }
 
@@ -108,11 +109,11 @@ export async function DELETE(
   try {
     const user = await requireAuth();
     const podeExcluir = await hasPermission(user.id, 'lideranca', 'excluir');
-    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissao para excluir lideranca' }, { status: 403 });
+    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissão para excluir liderança' }, { status: 403 });
 
     const { id } = await params;
     const existing = await prisma.lideranca.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Lider nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Líder não encontrado' }, { status: 404 });
 
     await assertOrgAccess(user.id, existing.organizacaoId, request);
     await prisma.lideranca.delete({ where: { id } });
@@ -127,11 +128,11 @@ export async function DELETE(
       req: request,
     });
 
-    return NextResponse.json({ message: 'Lider excluido' });
+    return NextResponse.json({ message: 'Líder excluído' });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
-    return NextResponse.json({ error: 'Erro ao excluir lider' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao excluir líder' }, { status: 500 });
   }
 }

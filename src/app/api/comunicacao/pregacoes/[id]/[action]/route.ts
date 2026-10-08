@@ -11,15 +11,15 @@ export async function POST(
     const { id, action } = await params;
 
     const existing = await prisma.pregacao.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Pregacao nao encontrada' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Pregação não encontrada' }, { status: 404 });
 
     const canManage = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     switch (action) {
       case 'publicar': {
         const hasPerm = await hasPermission(user.id, 'pregacoes', 'publicar');
-        if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para publicar' }, { status: 403 });
+        if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para publicar' }, { status: 403 });
 
         const pregacao = await prisma.pregacao.update({
           where: { id },
@@ -30,7 +30,7 @@ export async function POST(
 
       case 'arquivar': {
         const hasPerm = await hasPermission(user.id, 'pregacoes', 'editar');
-        if (!hasPerm) return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+        if (!hasPerm) return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
 
         const pregacao = await prisma.pregacao.update({
           where: { id },
@@ -41,7 +41,7 @@ export async function POST(
 
       case 'destacar': {
         const hasPerm = await hasPermission(user.id, 'pregacoes', 'destacar');
-        if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para destacar' }, { status: 403 });
+        if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para destacar' }, { status: 403 });
 
         await prisma.pregacao.updateMany({
           where: { organizacaoId: existing.organizacaoId, destaque: true },
@@ -57,7 +57,7 @@ export async function POST(
 
       case 'remover-destaque': {
         const hasPerm = await hasPermission(user.id, 'pregacoes', 'destacar');
-        if (!hasPerm) return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+        if (!hasPerm) return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
 
         const pregacao = await prisma.pregacao.update({
           where: { id },
@@ -67,12 +67,12 @@ export async function POST(
       }
 
       default:
-        return NextResponse.json({ error: 'Acao invalida' }, { status: 400 });
+        return NextResponse.json({ error: 'Ação inválida' }, { status: 400 });
     }
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/comunicacao/pregacoes/[id]/[action] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

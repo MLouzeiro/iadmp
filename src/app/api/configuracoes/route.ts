@@ -27,7 +27,7 @@ export async function GET(request?: NextRequest) {
       config = await prisma.configuracoesIgreja.create({
         data: {
           organizacaoId,
-          nomeIgreja: 'Igreja Assembleia de Deus Ministerio da Promessa',
+          nomeIgreja: 'Igreja Assembleia de Deus Ministério da Promessa',
           ...defaultColors,
         },
       });
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
     const user = await requireAuth();
     const podeEditar = await hasPermission(user.id, 'configuracoes', 'editar');
     if (!podeEditar) {
-      return NextResponse.json({ error: 'Sem permissao para editar configuracoes' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para editar configurações' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
     const organizacaoId = scope.requestedOrgId || (scope.mode === 'SINGLE' ? scope.orgIds[0] : null);
     if (!organizacaoId) {
       return NextResponse.json(
-        { error: 'organizacaoId e obrigatorio para editar configuracoes' },
+        { error: 'organizacaoId é obrigatório para editar configurações' },
         { status: 400 }
       );
     }
@@ -99,12 +99,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(config);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('Error updating church config:', error);
     return NextResponse.json(
-      { error: 'Erro ao salvar configuracoes' },
+      { error: 'Erro ao salvar configurações' },
       { status: 500 }
     );
   }

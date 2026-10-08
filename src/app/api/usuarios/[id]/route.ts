@@ -19,7 +19,7 @@ const editarUsuarioSchema = z.object({
 }).refine((data) => {
   if (data.password && data.password !== data.confirmPassword) return false;
   return true;
-}, { message: 'Senhas nao conferem', path: ['confirmPassword'] });
+}, { message: 'Senhas não conferem', path: ['confirmPassword'] });
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -47,7 +47,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     });
 
     if (!usuario) {
-      return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
     await assertTargetUserScope(requester, id, request);
@@ -68,10 +68,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json(safe);
   } catch (error) {
     if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
-    return NextResponse.json({ error: 'Erro ao buscar usuario' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar usuário' }, { status: 500 });
   }
 }
 
@@ -82,12 +82,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const canEdit = await hasPermission(requester.id, 'Usuarios', 'editar');
     if (!canEdit && requester.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Sem permissao para editar usuarios' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para editar usuários' }, { status: 403 });
     }
 
     const target = await prisma.user.findUnique({ where: { id }, select: { role: true } });
     if (!target) {
-      return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
     await assertTargetUserScope(requester, id, request);
@@ -100,7 +100,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       const tentouEscalar = privilegiados.some(c => (validated as Record<string, unknown>)[c] !== undefined);
       if (tentouEscalar) {
         return NextResponse.json(
-          { error: 'Nao e permitido alterar propria permissao, perfil ou organizacao' },
+          { error: 'Não e permitido alterar própria permissão, perfil ou organização' },
           { status: 403 }
         );
       }
@@ -109,7 +109,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (validated.role && requester.role !== 'SUPER_ADMIN') {
       const allowed = await canAssignRole(requester.id, validated.role);
       if (!allowed) {
-        return NextResponse.json({ error: 'Nao e permitido atribuir este perfil' }, { status: 403 });
+        return NextResponse.json({ error: 'Não e permitido atribuir este perfil' }, { status: 403 });
       }
     }
 
@@ -118,7 +118,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       if (current && validated.email !== current.email) {
         const existing = await prisma.user.findUnique({ where: { email: validated.email } });
         if (existing) {
-          return NextResponse.json({ error: 'Este email ja esta cadastrado' }, { status: 409 });
+          return NextResponse.json({ error: 'Este email já esta cadastrado' }, { status: 409 });
         }
       }
     }
@@ -127,7 +127,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       for (const orgId of validated.organizacoes) {
         const canManage = await canManageOrganization(requester.id, orgId);
         if (!canManage) {
-          return NextResponse.json({ error: 'Voce nao tem acesso a uma das organizacoes selecionadas' }, { status: 403 });
+          return NextResponse.json({ error: 'Você não tem acesso a uma das organizações selecionadas' }, { status: 403 });
         }
       }
     }
@@ -189,11 +189,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: msg }, { status: 400 });
     }
     if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
-    return NextResponse.json({ error: 'Erro ao editar usuario' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao editar usuário' }, { status: 500 });
   }
 }
 
@@ -203,16 +203,16 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params;
 
     if (requester.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Apenas SUPER_ADMIN pode excluir usuarios' }, { status: 403 });
+      return NextResponse.json({ error: 'Apenas SUPER_ADMIN pode excluir usuários' }, { status: 403 });
     }
 
     if (requester.id === id) {
-      return NextResponse.json({ error: 'Nao e possivel excluir seu proprio usuario' }, { status: 400 });
+      return NextResponse.json({ error: 'Não e possível excluir seu próprio usuário' }, { status: 400 });
     }
 
     const target = await prisma.user.findUnique({ where: { id }, select: { role: true } });
     if (!target) {
-      return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
     await prisma.$transaction(async (tx) => {
@@ -233,9 +233,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
-    return NextResponse.json({ error: 'Erro ao excluir usuario' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao excluir usuário' }, { status: 500 });
   }
 }

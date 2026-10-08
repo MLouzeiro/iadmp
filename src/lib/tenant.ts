@@ -20,7 +20,7 @@ export interface SessionUserLike {
 }
 
 export function orgForbiddenResponse() {
-  return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+  return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 }
 
 /**
@@ -97,7 +97,7 @@ export async function assertOrgAccess(
       entidade: 'Organizacao',
       entidadeId: organizacaoId,
       resultado: 'NEGADO',
-      detalhes: { motivo: 'sem vinculo com a organizacao' },
+      detalhes: { motivo: 'sem vinculo com a organização' },
       req,
     });
     throw new Error(ORG_FORBIDDEN);
@@ -145,7 +145,7 @@ export async function assertTargetUserScope(
       entidade: 'User',
       entidadeId: targetUserId,
       resultado: 'NEGADO',
-      detalhes: { motivo: 'alvo fora do escopo de organizacao do requisitante' },
+      detalhes: { motivo: 'alvo fora do escopo de organização do requisitante' },
       req,
     });
     throw new Error(ORG_FORBIDDEN);

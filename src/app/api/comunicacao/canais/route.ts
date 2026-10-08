@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     }
     if (tipo) where.tipo = tipo;
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ canais });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('GET /api/comunicacao/canais error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -47,31 +47,31 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'gerenciar_canais');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para gerenciar canais' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para gerenciar canais' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, tipo, nome, url, descricao, ativo, ordem } = body;
 
     if (!organizacaoId || !tipo || !nome || !url) {
-      return NextResponse.json({ error: 'organizacaoId, tipo, nome e url sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId, tipo, nome e url são obrigatórios' }, { status: 400 });
     }
 
     const canManage = await canManageOrganization(user.id, organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const tiposValidos = ['youtube', 'instagram', 'facebook', 'tiktok', 'whatsapp', 'site', 'telegram'];
     if (!tiposValidos.includes(tipo)) {
-      return NextResponse.json({ error: 'Tipo de canal invalido' }, { status: 400 });
+      return NextResponse.json({ error: 'Tipo de canal inválido' }, { status: 400 });
     }
 
     try {
       new URL(url);
     } catch {
-      return NextResponse.json({ error: 'URL invalida' }, { status: 400 });
+      return NextResponse.json({ error: 'URL inválida' }, { status: 400 });
     }
 
     if (url.startsWith('javascript:') || url.startsWith('data:')) {
-      return NextResponse.json({ error: 'URL contem esquema nao permitido' }, { status: 400 });
+      return NextResponse.json({ error: 'URL contém esquema não permitido' }, { status: 400 });
     }
 
     const canal = await prisma.canalOficial.create({
@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ canal }, { status: 201 });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/comunicacao/canais error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

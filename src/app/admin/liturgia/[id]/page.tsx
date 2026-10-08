@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, ArrowLeft, Edit, Copy, Play, Printer, Trash2, Clock, User, CheckCircle } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../liturgia.module.css';
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -13,9 +14,9 @@ const STATUS_LABELS: Record<string, string> = {
   EM_ANDAMENTO: 'Em andamento', REALIZADA: 'Realizada', CANCELADA: 'Cancelada',
 };
 const MOMENTO_LABELS: Record<string, string> = {
-  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oracao', DIZIMOS: 'Dizimos',
+  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oração', DIZIMOS: 'Dízimos',
   ALAS: 'Alas', DINAMICA: 'Dinamica', MENSAGEM: 'Mensagem', RESPOSTA: 'Resposta',
-  COMUNICADOS: 'Comunicados', BENCAO: 'Bencao', MUSICA_ESPECIAL: 'Musica Especial',
+  COMUNICADOS: 'Comunicados', BENCAO: 'Bênção', MUSICA_ESPECIAL: 'Música Especial',
   TESTEMUNHO: 'Testemunho', CEIA: 'Ceia', BAPTISMO: 'Batismo', OUTRO: 'Outro',
 };
 
@@ -38,6 +39,7 @@ interface Liturgia {
 
 export default function LiturgiaViewPage() {
   const params = useParams();
+  const { toast } = useToast();
   const router = useRouter();
   const id = params.id as string;
   const [liturgia, setLiturgia] = useState<Liturgia | null>(null);
@@ -73,14 +75,15 @@ export default function LiturgiaViewPage() {
     if (res.ok) {
       const data = await res.json();
       setLiturgia(data.liturgia);
+      toast('Status atualizado.', 'ok');
     } else {
-      const err = await res.json();
-      alert(err.error || 'Erro ao alterar status');
+      const err = await res.json().catch(() => ({}));
+      toast(err.error || 'Erro ao alterar status', 'err');
     }
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Carregando...</div>;
-  if (!liturgia) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Liturgia nao encontrada</div>;
+  if (!liturgia) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Liturgia não encontrada</div>;
 
   const dt = new Date(liturgia.data + 'T12:00:00');
   const dataFormatada = `${dt.getDate()} de ${['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][dt.getMonth()]} de ${dt.getFullYear()}`;
@@ -140,7 +143,7 @@ export default function LiturgiaViewPage() {
             <div style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{dataFormatada}</div>
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Horario</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Horário</div>
             <div style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{liturgia.horarioInicio}{liturgia.horarioFimPrevisto ? ` - ${liturgia.horarioFimPrevisto}` : ''}</div>
           </div>
           <div>
@@ -165,7 +168,7 @@ export default function LiturgiaViewPage() {
           )}
           {liturgia.responsavel && (
             <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Responsavel</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Responsável</div>
               <div style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{liturgia.responsavel}</div>
             </div>
           )}

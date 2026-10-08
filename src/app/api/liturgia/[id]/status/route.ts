@@ -10,27 +10,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { status } = body;
 
     if (!status || !['RASCUNHO', 'EM_PREPARACAO', 'PRONTA', 'EM_ANDAMENTO', 'REALIZADA', 'CANCELADA'].includes(status)) {
-      return NextResponse.json({ error: 'Status invalido' }, { status: 400 });
+      return NextResponse.json({ error: 'Status inválido' }, { status: 400 });
     }
 
     const hasPermCriar = await hasPermission(user.id, 'liturgia', 'criar');
     const hasPermEditar = await hasPermission(user.id, 'liturgia', 'editar');
-    if (!hasPermCriar && !hasPermEditar) return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (!hasPermCriar && !hasPermEditar) return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
 
     const existing = await prisma.liturgia.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
 
     const podeAlterar = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!podeAlterar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeAlterar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     if (status === 'EM_ANDAMENTO') {
       const hasPermIniciar = await hasPermission(user.id, 'liturgia', 'iniciar_culto');
-      if (!hasPermIniciar) return NextResponse.json({ error: 'Sem permissao para iniciar culto' }, { status: 403 });
+      if (!hasPermIniciar) return NextResponse.json({ error: 'Sem permissão para iniciar culto' }, { status: 403 });
     }
 
     if (status === 'REALIZADA') {
       const hasPermFinalizar = await hasPermission(user.id, 'liturgia', 'finalizar_culto');
-      if (!hasPermFinalizar) return NextResponse.json({ error: 'Sem permissao para finalizar culto' }, { status: 403 });
+      if (!hasPermFinalizar) return NextResponse.json({ error: 'Sem permissão para finalizar culto' }, { status: 403 });
     }
 
     const liturgia = await prisma.liturgia.update({
@@ -41,7 +41,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return NextResponse.json({ liturgia });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('PATCH /api/liturgia/[id]/status error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

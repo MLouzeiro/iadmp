@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth();
     const podeVer = await hasPermission(user.id, 'usuarios', 'ver_auditoria');
     if (!podeVer && user.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Sem permissao para consultar auditoria' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para consultar auditoria' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -74,10 +74,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') {
-        return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       }
       if (error.message === 'FORBIDDEN') {
-        return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+        return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
       }
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }

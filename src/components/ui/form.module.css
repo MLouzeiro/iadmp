@@ -419,12 +419,111 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-sm);
   font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badgeOk {
+  background: rgba(76, 175, 80, 0.16);
+  color: #7ee08a;
+  border-color: rgba(76, 175, 80, 0.32);
+}
+
+.badgeWarn {
+  background: rgba(224, 160, 32, 0.16);
+  color: #f0c060;
+  border-color: rgba(224, 160, 32, 0.32);
+}
+
+.badgeErr {
+  background: rgba(231, 76, 60, 0.16);
+  color: #ff8a80;
+  border-color: rgba(231, 76, 60, 0.32);
+}
+
+.badgeInfo {
+  background: rgba(33, 150, 243, 0.16);
+  color: #8fc7ff;
+  border-color: rgba(33, 150, 243, 0.32);
+}
+
+.badgeMut {
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+.badgeGold {
+  background: var(--gradient-gold-soft);
+  color: var(--text-accent);
+  border-color: var(--border-hover);
+}
+
+/* === AVATAR === */
+.avatar {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--gradient-gold);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.855rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
+
+.avatarSm {
+  width: 2.15rem;
+  height: 2.15rem;
+  font-size: 0.72rem;
+}
+
+.avatarLg {
+  width: 3.4rem;
+  height: 3.4rem;
+  font-size: 1.05rem;
+}
+
+/* === FILTER BAR === */
+.filterBar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.05rem 1.25rem;
+  margin-bottom: 1.35rem;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+  min-width: 145px;
+}
+
+.filterMeta {
+  margin-left: auto;
+  align-self: flex-end;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.filterMeta b {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* === EMPTY STATE === */
@@ -433,6 +532,123 @@
   padding: 3rem 2rem;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+.emptyIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1.15rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 1.35rem;
+}
+
+.emptyTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  margin-bottom: 0.45rem;
+}
+
+.emptyMessage {
+  max-width: 420px;
+  margin: 0 auto 1.25rem;
+  line-height: 1.65;
+}
+
+.emptyAction {
+  display: flex;
+  justify-content: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* === PAGE HEAD === */
+.pageHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.pageHeadTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.pageHeadSub {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.pageHeadActions {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* === LIST ITEM COM AVATAR === */
+.listItemAvatar {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  min-width: 0;
+}
+
+.listItemClickable {
+  cursor: pointer;
+}
+
+/* === SECTION HEAD === */
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sectionHeadIcon {
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--gradient-gold-soft);
+  border: 1px solid var(--border-color);
+  color: var(--text-accent);
+  flex-shrink: 0;
+}
+
+.sectionHeadTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sectionHeadSubtitle {
+  color: var(--text-muted);
+  font-size: 0.855rem;
+  margin: 0.15rem 0 0;
+}
+
+.sectionHeadActions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-left: auto;
+  flex-wrap: wrap;
 }
 
 .loadingState {

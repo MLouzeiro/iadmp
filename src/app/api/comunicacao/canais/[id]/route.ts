@@ -12,15 +12,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       include: { organizacao: { select: { id: true, nome: true } } },
     });
 
-    if (!canal) return NextResponse.json({ error: 'Canal nao encontrado' }, { status: 404 });
+    if (!canal) return NextResponse.json({ error: 'Canal não encontrado' }, { status: 404 });
 
     const podeVer = await canManageOrganization(user.id, canal.organizacaoId);
-    if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     return NextResponse.json({ canal });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('GET /api/comunicacao/canais/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -31,13 +31,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const user = await requireAuth();
     const { id } = await params;
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'gerenciar_canais');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para gerenciar canais' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para gerenciar canais' }, { status: 403 });
 
     const existing = await prisma.canalOficial.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Canal nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Canal não encontrado' }, { status: 404 });
 
     const canManage = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const body = await request.json();
     const { tipo, nome, url, descricao, ativo, ordem } = body;
@@ -46,17 +46,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       try {
         new URL(url);
       } catch {
-        return NextResponse.json({ error: 'URL invalida' }, { status: 400 });
+        return NextResponse.json({ error: 'URL inválida' }, { status: 400 });
       }
       if (url.startsWith('javascript:') || url.startsWith('data:')) {
-        return NextResponse.json({ error: 'URL contem esquema nao permitido' }, { status: 400 });
+        return NextResponse.json({ error: 'URL contém esquema não permitido' }, { status: 400 });
       }
     }
 
     if (tipo) {
       const tiposValidos = ['youtube', 'instagram', 'facebook', 'tiktok', 'whatsapp', 'site', 'telegram'];
       if (!tiposValidos.includes(tipo)) {
-        return NextResponse.json({ error: 'Tipo de canal invalido' }, { status: 400 });
+        return NextResponse.json({ error: 'Tipo de canal inválido' }, { status: 400 });
       }
     }
 
@@ -77,8 +77,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ canal });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('PUT /api/comunicacao/canais/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -89,21 +89,21 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const user = await requireAuth();
     const { id } = await params;
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'excluir');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para excluir canais' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para excluir canais' }, { status: 403 });
 
     const existing = await prisma.canalOficial.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Canal nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Canal não encontrado' }, { status: 404 });
 
     const canManage = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     await prisma.canalOficial.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('DELETE /api/comunicacao/canais/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

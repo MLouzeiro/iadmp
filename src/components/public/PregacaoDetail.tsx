@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatarDataCurta, formatarDataLonga } from '@/lib/datas';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, BookOpen, Play, Share2, MessageCircle } from 'lucide-react';
 
@@ -23,11 +24,7 @@ interface Pregacao {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
+  return formatarDataLonga(dateStr);
 }
 
 function getReference(p: Pregacao): string | null {
@@ -47,6 +44,7 @@ function extractYouTubeId(url: string): string | null {
 export default function PregacaoDetail({ slug }: { slug: string }) {
   const [pregacao, setPregacao] = useState<Pregacao | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
     async function fetchPregacao() {
@@ -57,7 +55,7 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
           setPregacao(data.pregacao);
         }
       } catch (err) {
-        console.error('Erro ao buscar pregacao:', err);
+        console.error('Erro ao buscar pregação:', err);
       } finally {
         setLoading(false);
       }
@@ -82,17 +80,17 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
       <>
         <div className="page-header">
           <div className="container">
-            <h1>Pregacao</h1>
+            <h1>Pregação</h1>
           </div>
         </div>
         <section>
           <div className="container">
             <div className="empty-state">
               <Play size={64} style={{ color: 'var(--color-primary)' }} />
-              <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Nao encontrada</h3>
-              <p>Esta pregacao nao esta disponivel.</p>
+              <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Não encontrada</h3>
+              <p>Esta pregação não está disponível.</p>
               <Link href="/pregacoes" className="btn btn-outline" style={{ marginTop: '1.5rem' }}>
-                <ArrowLeft size={14} /> Voltar para pregacoes
+                <ArrowLeft size={14} /> Voltar para pregações
               </Link>
             </div>
           </div>
@@ -112,7 +110,8 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copiado!');
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2500);
   };
 
   return (
@@ -120,7 +119,7 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
       <div className="page-header">
         <div className="container">
           <Link href="/pregacoes" className="pregacao-back">
-            <ArrowLeft size={16} /> Voltar para pregacoes
+            <ArrowLeft size={16} /> Voltar para pregações
           </Link>
           <h1>{pregacao.titulo}</h1>
           {pregacao.tema && <p className="pregacao-tema">{pregacao.tema}</p>}
@@ -153,7 +152,7 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
                 <iframe
                   src={`https://www.youtube.com/embed/${ytId}`}
                   title={pregacao.titulo}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-média; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
@@ -176,7 +175,7 @@ export default function PregacaoDetail({ slug }: { slug: string }) {
 
           <div className="pregacao-share">
             <span><Share2 size={14} /> Compartilhar</span>
-            <button onClick={copyLink} className="btn btn-outline btn-sm">Copiar link</button>
+            <button onClick={copyLink} className="btn btn-outline btn-sm">{copiado ? 'Link copiado!' : 'Copiar link'}</button>
             <button onClick={shareWhatsApp} className="btn btn-outline btn-sm">
               <MessageCircle size={14} /> WhatsApp
             </button>

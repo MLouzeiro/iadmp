@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import SectionHead from '@/components/ui/SectionHead';
 import { Radio, Plus, ExternalLink, Trash2, Pencil, GripVertical, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
 
 interface CanalOficial {
@@ -29,6 +30,7 @@ const TIPOS_CANAL = [
 const getEmoji = (tipo: string) => TIPOS_CANAL.find(t => t.value === tipo)?.emoji || '🔗';
 
 export default function CanaisPage() {
+  const { toast, confirm } = useToast();
   const [canais, setCanais] = useState<CanalOficial[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -77,23 +79,32 @@ export default function CanaisPage() {
       if (res.ok) {
         resetForm();
         fetchCanais();
+        toast(editingId ? 'Canal atualizado.' : 'Canal criado.', 'ok');
       } else {
-        const data = await res.json();
-        alert(data.error || 'Erro ao salvar canal');
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Erro ao salvar canal', 'err');
       }
     } catch (err) {
       console.error('Erro ao salvar canal:', err);
+      toast('Erro de conexao ao salvar canal.', 'err');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este canal?')) return;
-    try {
-      const res = await fetch(`/api/comunicacao/canais/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchCanais();
-    } catch (err) {
-      console.error('Erro ao excluir:', err);
-    }
+    confirm('Tem certeza que deseja excluir este canal?', async () => {
+      try {
+        const res = await fetch(`/api/comunicacao/canais/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast('Canal excluído.', 'ok');
+          fetchCanais();
+        } else {
+          toast('Erro ao excluir canal.', 'err');
+        }
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        toast('Erro de conexao ao excluir.', 'err');
+      }
+    }, { title: 'Excluir canal', danger: true });
   };
 
   const toggleAtivo = async (canal: CanalOficial) => {
@@ -143,8 +154,8 @@ export default function CanaisPage() {
               <input className={styles.input} type="url" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." required />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
-              <label className={styles.fieldLabel}>Descricao</label>
-              <textarea className={styles.textarea} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} placeholder="Breve descricao do canal" rows={2} />
+              <label className={styles.fieldLabel}>Descrição</label>
+              <textarea className={styles.textarea} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} placeholder="Breve descrição do canal" rows={2} />
             </div>
             <div className={styles.field}>
               <label className={styles.fieldLabel}>Ordem</label>

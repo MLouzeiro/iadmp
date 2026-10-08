@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { eventoSchema } from '@/lib/validations';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
+import { parseDataDateOnly } from '@/lib/datas';
 import {
   resolveOrgScope,
   resolveTargetOrgId,
@@ -44,8 +45,8 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(eventos);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar eventos' }, { status: 500 });
   }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const podeCriar = await hasPermission(user.id, 'eventos', 'criar');
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para criar eventos' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para criar eventos' }, { status: 403 });
 
     const body = await request.json();
     const validated = eventoSchema.parse(body);
@@ -72,9 +73,9 @@ export async function POST(request: NextRequest) {
         congregacaoId,
         nome: validated.nome,
         categoriaId: validated.categoriaId || null,
-        dataInicio: new Date(validated.dataInicio),
-        dataEvento: new Date(validated.dataEvento),
-        dataFim: validated.dataFim ? new Date(validated.dataFim) : null,
+        dataInicio: parseDataDateOnly(validated.dataInicio),
+        dataEvento: parseDataDateOnly(validated.dataEvento),
+        dataFim: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
         tema: validated.tema || null,
         preletores: validated.preletores || [],
         diasDuracao: validated.diasDuracao || null,
@@ -84,6 +85,13 @@ export async function POST(request: NextRequest) {
         responsavelGeral: validated.responsavelGeral || null,
         publicarNoSite: validated.publicarNoSite ?? false,
         orcamentoPrevisto: validated.orcamentoPrevisto || null,
+        aceitaInscricoes: validated.aceitaInscricoes ?? false,
+        limiteInscricoes: validated.limiteInscricoes ?? null,
+        taxaInscricao: validated.taxaInscricao ?? null,
+        chavePix: validated.chavePix || null,
+        tipoChavePix: validated.tipoChavePix || null,
+        nomeRecebedor: validated.nomeRecebedor || null,
+        cidadeRecebedor: validated.cidadeRecebedor || null,
       },
       include: { categoria: true, congregacao: { select: { id: true, nome: true } } },
     });
@@ -100,14 +108,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(evento, { status: 201 });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     if (error?.message === ORG_REQUIRED) {
-      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
     }
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Dados invalidos' }, { status: 400 });
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Erro ao criar evento' }, { status: 500 });
   }

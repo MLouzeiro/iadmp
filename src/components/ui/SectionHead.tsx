@@ -1,3 +1,6 @@
+import React from 'react';
+import styles from './form.module.css';
+
 interface SectionHeadProps {
   icon?: React.ReactNode;
   title: string;
@@ -8,33 +11,16 @@ interface SectionHeadProps {
 
 const SectionHead = ({ icon, title, subtitle, action, children }: SectionHeadProps) => {
   return (
-    <div className="section__head">
-      <span>{icon}</span>
+    <div className={styles.sectionHead}>
+      {icon && <div className={styles.sectionHeadIcon}>{icon}</div>}
       <div>
-        <h2>{title}</h2>
-        {subtitle && <p className="section__subtitle">{subtitle}</p>}
+        <h2 className={styles.sectionHeadTitle}>{title}</h2>
+        {subtitle && <p className={styles.sectionHeadSubtitle}>{subtitle}</p>}
       </div>
       {(action || children) && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+        <div className={styles.sectionHeadActions}>
           {action && (
-            <button
-              type="button"
-              onClick={action.onClick}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.6rem 1.25rem',
-                background: 'var(--gradient-gold)',
-                color: '#000',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                fontWeight: 600,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-              }}
-            >
+            <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={action.onClick}>
               {action.label}
             </button>
           )}

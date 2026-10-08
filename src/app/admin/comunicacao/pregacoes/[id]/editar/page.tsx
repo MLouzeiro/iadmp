@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { Mic, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../../pregacoes.module.css';
 import formStyles from '@/components/ui/form.module.css';
 
@@ -35,17 +36,18 @@ interface PregacaoData {
   status: string;
 }
 
-const TIPOS_PREGACAO = ['Pregacao', 'Estudo biblico', 'Devocional', 'Palavra', 'Sermao', 'Palestra', 'Conferencia', 'Outro'];
+const TIPOS_PREGACAO = ['Pregação', 'Estudo bíblico', 'Devocional', 'Palavra', 'Sermão', 'Palestra', 'Conferência', 'Outro'];
 
 export default function EditarPregacaoPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const params = useParams();
   const id = params.id as string;
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [liturgias, setLiturgias] = useState<Liturgia[]>([]);
   const [form, setForm] = useState({
-    titulo: '', descricao: '', tema: '', tipo: 'Pregacao', pregadorNome: '',
+    titulo: '', descricao: '', tema: '', tipo: 'Pregação', pregadorNome: '',
     data: '', liturgiaId: '',
     referenciaLivro: '', referenciaCapitulo: '', referenciaVersIni: '', referenciaVersFim: '',
     videoUrl: '', capaUrl: '', observacoes: '', status: 'RASCUNHO',
@@ -89,14 +91,15 @@ export default function EditarPregacaoPage() {
         body: JSON.stringify(body),
       });
       if (res.ok) {
+        toast('Pregação salva.', 'ok');
         router.push(`/admin/comunicacao/pregacoes/${id}`);
       } else {
-        const data = await res.json();
-        alert(data.error || 'Erro ao salvar');
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Erro ao salvar', 'err');
       }
     } catch (err) {
       console.error('Erro:', err);
-      alert('Erro ao salvar');
+      toast('Erro ao salvar', 'err');
     } finally {
       setSaving(false);
     }
@@ -109,12 +112,12 @@ export default function EditarPregacaoPage() {
       <Link href={`/admin/comunicacao/pregacoes/${id}`} className={styles.detailBack}>
         <ArrowLeft size={16} /> Voltar para detalhes
       </Link>
-      <SectionHead icon={<Mic size={24} />} title="Editar Pregacao" />
+      <SectionHead icon={<Mic size={24} />} title="Editar Pregação" />
 
       <div className={formStyles.formCard}>
         <form onSubmit={handleSubmit} className={formStyles.formGrid}>
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Titulo <span className={formStyles.fieldRequired}>*</span></label>
+            <label className={formStyles.fieldLabel}>Título <span className={formStyles.fieldRequired}>*</span></label>
             <input className={formStyles.input} type="text" value={form.titulo} onChange={e => setForm({ ...form, titulo: e.target.value })} required />
           </div>
 
@@ -151,7 +154,7 @@ export default function EditarPregacaoPage() {
           </div>
 
           <div className={formStyles.sectionDivider}>
-            <div className={formStyles.sectionDividerTitle}>Referencia Biblica</div>
+            <div className={formStyles.sectionDividerTitle}>Referência Biblica</div>
           </div>
 
           <div className={formStyles.field}>
@@ -165,12 +168,12 @@ export default function EditarPregacaoPage() {
           </div>
 
           <div className={formStyles.field}>
-            <label className={formStyles.fieldLabel}>Versiculo Inicial</label>
+            <label className={formStyles.fieldLabel}>Versículo Inicial</label>
             <input className={formStyles.input} type="number" value={form.referenciaVersIni} onChange={e => setForm({ ...form, referenciaVersIni: e.target.value })} />
           </div>
 
           <div className={formStyles.field}>
-            <label className={formStyles.fieldLabel}>Versiculo Final</label>
+            <label className={formStyles.fieldLabel}>Versículo Final</label>
             <input className={formStyles.input} type="number" value={form.referenciaVersFim} onChange={e => setForm({ ...form, referenciaVersFim: e.target.value })} />
           </div>
 
@@ -189,12 +192,12 @@ export default function EditarPregacaoPage() {
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Descricao</label>
+            <label className={formStyles.fieldLabel}>Descrição</label>
             <textarea className={formStyles.textarea} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} rows={4} />
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Observacoes</label>
+            <label className={formStyles.fieldLabel}>Observações</label>
             <textarea className={formStyles.textarea} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} rows={2} />
           </div>
 
@@ -211,7 +214,7 @@ export default function EditarPregacaoPage() {
             <div className={formStyles.formActions}>
               <Link href={`/admin/comunicacao/pregacoes/${id}`} className={`${formStyles.btn} ${formStyles.btnSecondary}`}>Cancelar</Link>
               <button type="submit" className={`${formStyles.btn} ${formStyles.btnPrimary}`} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar Alteracoes'}
+                {saving ? 'Salvando...' : 'Salvar Alterações'}
               </button>
             </div>
           </div>

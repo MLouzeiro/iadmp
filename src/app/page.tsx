@@ -14,14 +14,32 @@ export default function Home() {
             Uma igreja para viver,<br />
             <span>servir e transformar</span>
           </h1>
-          <p>Comunidade de fe, amor e esperanca, onde cada pessoa e acolhida e transformada pelo poder de Deus.</p>
+          <p>Comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.</p>
           <div className="hero-buttons">
             <Link href="/sobre" className="btn btn-primary btn-lg">
-              Conheca Nossa Historia <ArrowRight size={16} />
+              Conheca Nossa História <ArrowRight size={16} />
             </Link>
             <Link href="/eventos" className="btn btn-outline btn-lg">
-              Proximas Programacoes
+              Próximas Programações
             </Link>
+          </div>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <span className="hero-stat-value">5</span>
+              <span className="hero-stat-label">Congregações</span>
+            </div>
+            <div className="hero-stat">
+              <span className="hero-stat-value">11</span>
+              <span className="hero-stat-label">Líderes</span>
+            </div>
+            <div className="hero-stat">
+              <span className="hero-stat-value">32</span>
+              <span className="hero-stat-label">Anos de História</span>
+            </div>
+            <div className="hero-stat">
+              <span className="hero-stat-value">6</span>
+              <span className="hero-stat-label">Ministérios</span>
+            </div>
           </div>
         </div>
       </section>
@@ -55,9 +73,9 @@ export default function Home() {
       <section style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-heading">
-            <span className="label">Nossas Congregacoes</span>
-            <h2>Encontre uma Congregacao</h2>
-            <p>Conheca nossas congregacoes e participe de uma perto de voce.</p>
+            <span className="label">Nossas Congregações</span>
+            <h2>Encontre uma Congregação</h2>
+            <p>Conheca nossas congregações e participe de uma perto de você.</p>
             <div className="divider" />
           </div>
           <div className="grid-3">
@@ -79,7 +97,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <span className="label">Nossos Valores</span>
-            <h2>Fundamentos da Nossa Fe</h2>
+            <h2>Fundamentos da Nossa Fé</h2>
             <p>Valores que guiam nossa caminhada espiritual.</p>
             <div className="divider" />
           </div>
@@ -104,7 +122,7 @@ export default function Home() {
       <section style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-heading">
-            <span className="label">Nossa Lideranca</span>
+            <span className="label">Nossa Liderança</span>
             <h2>Servos de Deus</h2>
             <p>Conheca aqueles que guiem nossa comunidade com amor e dedicao.</p>
             <div className="divider" />
@@ -126,7 +144,7 @@ export default function Home() {
           </div>
           <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
             <Link href="/lideranca" className="btn btn-outline">
-              Ver Toda Lideranca <ArrowRight size={16} />
+              Ver Toda Liderança <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -136,7 +154,7 @@ export default function Home() {
       <section className="cta-section">
         <div className="container">
           <h2>Venha fazer parte da nossa comunidade</h2>
-          <p>Somos uma familia de fe que te acolhe com amor. Venha nos conhecer!</p>
+          <p>Somos uma família de fé que te acolhe com amor. Venha nos conhecer!</p>
           <div className="cta-buttons">
             <Link href="/sobre" className="btn btn-dark btn-lg">
               Conheca Nossa Igreja

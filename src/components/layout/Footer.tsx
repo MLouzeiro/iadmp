@@ -45,12 +45,12 @@ export default function Footer() {
                 </Link>
               ))}
               <Link href="/galeria">Galeria</Link>
-              <Link href="/lideranca">Lideranca</Link>
+              <Link href="/lideranca">Liderança</Link>
             </div>
           </div>
 
           <div>
-            <h4>Congregacoes</h4>
+            <h4>Congregações</h4>
             <div className="footer-links">
               {['Cohabiano', 'Vila Sarney', 'Novo Renascer'].map((name) => (
                 <span key={name} style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const where: any = { ativo: true };
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     } else if (user.role !== 'SUPER_ADMIN') {
       const vinculos = await prisma.usuarioOrganizacao.findMany({
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ modelos });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('GET /api/liturgia/modelos error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -39,17 +39,17 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'liturgia', 'gerenciar_modelos');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para gerenciar modelos' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para gerenciar modelos' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, nome, descricao, tipoCulto, momentos } = body;
 
     if (!organizacaoId || !nome) {
-      return NextResponse.json({ error: 'organizacaoId e nome sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId e nome são obrigatórios' }, { status: 400 });
     }
 
     const podeCriar = await canManageOrganization(user.id, organizacaoId);
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const modelo = await prisma.liturgiaModelo.create({
       data: {
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ modelo }, { status: 201 });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/liturgia/modelos error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

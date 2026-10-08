@@ -18,14 +18,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
 
-    if (!liturgia) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+    if (!liturgia) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
 
     const podeVer = await canManageOrganization(user.id, liturgia.organizacaoId);
-    if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     return NextResponse.json({ liturgia });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('GET /api/liturgia/[id]/modo-culto error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

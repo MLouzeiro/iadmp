@@ -87,14 +87,14 @@ function Preview({ colors, tema }: { colors: ThemeColors; tema: string }) {
         <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: colors.corPrincipal }} />
         <span style={{ color: colors.corTexto, fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '0.9rem' }}>IADMP</span>
         <div style={{ flex: 1 }} />
-        {['Inicio', 'Eventos', 'Galeria'].map((item) => (
+        {['Início', 'Eventos', 'Galeria'].map((item) => (
           <span key={item} style={{ color: colors.corTextoSecundario, fontSize: '0.75rem' }}>{item}</span>
         ))}
       </div>
 
       {/* Content preview */}
       <div style={{ padding: '2rem 1.5rem' }}>
-        <h3 style={{ color: colors.corTexto, fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', marginBottom: '0.5rem' }}>Exemplo de Titulo</h3>
+        <h3 style={{ color: colors.corTexto, fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', marginBottom: '0.5rem' }}>Exemplo de Título</h3>
         <p style={{ color: colors.corTextoSecundario, fontSize: '0.8rem', marginBottom: '1rem' }}>Texto descritivo com a cor secundaria do tema.</p>
 
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -103,9 +103,9 @@ function Preview({ colors, tema }: { colors: ThemeColors; tema: string }) {
         </div>
 
         <div style={{ background: colors.corSuperficie, border: `1px solid ${colors.corBorda}`, borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-          <p style={{ color: colors.corPrincipal, fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Versiculo do Dia</p>
+          <p style={{ color: colors.corPrincipal, fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Versículo do Dia</p>
           <p style={{ color: colors.corTexto, fontSize: '0.85rem', fontStyle: 'italic' }}>&ldquo;O Senhor e a minha luz e a minha salvacao.&rdquo;</p>
-          <p style={{ color: colors.corTextoSecundario, fontSize: '0.75rem', marginTop: '0.5rem', borderTop: `1px solid ${colors.corBorda}`, paddingTop: '0.5rem' }}>Reflexao: Uma mensagem de esperanca...</p>
+          <p style={{ color: colors.corTextoSecundario, fontSize: '0.75rem', marginTop: '0.5rem', borderTop: `1px solid ${colors.corBorda}`, paddingTop: '0.5rem' }}>Reflexão: Uma mensagem de esperança...</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -114,7 +114,7 @@ function Preview({ colors, tema }: { colors: ThemeColors; tema: string }) {
             <p style={{ color: colors.corTexto, fontSize: '0.8rem' }}>Culto 18h30</p>
           </div>
           <div style={{ background: colors.corSuperficie, border: `1px solid ${colors.corBorda}`, borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
-            <p style={{ color: colors.corPrincipal, fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Terca</p>
+            <p style={{ color: colors.corPrincipal, fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Terça</p>
             <p style={{ color: colors.corTexto, fontSize: '0.8rem' }}>Doutrina 19h30</p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function AparenciaPage() {
       })
       .catch(() => {
         setConfig({
-          nomeIgreja: 'Igreja Assembleia de Deus Ministerio da Promessa',
+          nomeIgreja: 'Igreja Assembleia de Deus Ministério da Promessa',
           logoUrl: null,
           logoDarkUrl: null,
           faviconUrl: null,
@@ -195,22 +195,22 @@ export default function AparenciaPage() {
   };
 
   if (loading || !config) {
-    return <p style={{ color: 'var(--text-muted)' }}>Carregando configuracoes...</p>;
+    return <p style={{ color: 'var(--text-muted)' }}>Carregando configurações...</p>;
   }
 
   return (
     <div>
       <div className={styles.pageHeader}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Aparencia do Site</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Aparência do Site</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Personalize as cores e identidade visual do site.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <Button variant="secondary" icon={<RotateCcw size={14} />} onClick={restoreDefaults} size="sm">
-            Restaurar padrao
+            Restaurar padrão
           </Button>
           <Button icon={<Save size={14} />} onClick={handleSave} size="sm" disabled={saving}>
-            {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar alteracoes'}
+            {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar alterações'}
           </Button>
         </div>
       </div>
@@ -307,7 +307,7 @@ export default function AparenciaPage() {
         <div style={{ position: 'sticky', top: 'calc(var(--header-height) + 1rem)' }}>
           <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>
             <Eye size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.5rem' }} />
-            Pre-visualizacao
+            Pré-visualização
           </h3>
           <Preview colors={config} tema={config.tema} />
         </div>

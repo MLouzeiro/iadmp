@@ -1,0 +1,2518 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IADMP — Mockup Interativo do Sistema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="dark"]{
+  --color-primary:#c9a84c;--color-primary-variant:#e0c068;--color-secondary:#d4a843;--color-accent:#b8922e;
+  --color-danger:#c4453f;--color-success:#4a9d6e;--color-warning:#c98a2e;
+  --bg-primary:#0a1628;--bg-secondary:#0d1f35;--bg-card:rgba(13,31,53,.82);--bg-card-hover:rgba(20,45,75,.92);
+  --bg-nav:rgba(10,22,40,.96);--bg-hero:#070e1a;--bg-input:rgba(255,255,255,.05);
+  --border-color:rgba(201,168,76,.14);--border-hover:rgba(201,168,76,.38);
+  --text-primary:#f0ece2;--text-secondary:#c8c2b6;--text-muted:#8a8578;--text-accent:#c9a84c;
+  --shadow-card:0 4px 24px rgba(0,0,0,.4);--shadow-glow:0 0 34px rgba(201,168,76,.1);
+  --overlay-dark:rgba(7,14,26,.88);
+  --gradient-gold:linear-gradient(135deg,#c9a84c,#a67c1a);
+  --gradient-gold-soft:linear-gradient(135deg,rgba(201,168,76,.16),rgba(166,124,26,.05));
+  --gradient-dark:linear-gradient(180deg,#0a1628 0%,#0d1f35 100%);
+  --radius-xl:1.5rem;--radius-lg:1rem;--radius-md:.75rem;--radius-sm:.5rem;
+  --transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --color-primary:#8b6914;--color-primary-variant:#a67c1a;--color-secondary:#c9a84c;--color-accent:#d4a843;
+  --bg-primary:#faf8f4;--bg-secondary:#f0ece2;--bg-card:rgba(255,255,255,.92);--bg-card-hover:#fff;
+  --bg-nav:rgba(255,255,255,.95);--bg-hero:#1a2438;--bg-input:rgba(10,22,40,.05);
+  --border-color:rgba(139,105,20,.18);--border-hover:rgba(139,105,20,.42);
+  --text-primary:#1a1a1a;--text-secondary:#3d3d3d;--text-muted:#6b6b6b;
+  --shadow-card:0 4px 20px rgba(26,26,26,.08);--shadow-glow:0 0 30px rgba(139,105,20,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Playfair Display',serif;font-weight:700;line-height:1.2}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none;cursor:pointer}
+img{max-width:100%;display:block}
+::selection{background:var(--color-primary);color:#0a1628}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.28);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--color-primary)}
+code{background:rgba(201,168,76,.12);padding:.12rem .38rem;border-radius:4px;font-size:.82em}
+
+.btn{display:inline-flex;align-items:center;gap:.55rem;padding:.78rem 1.75rem;border-radius:var(--radius-sm);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:var(--transition);white-space:nowrap}
+.btn-primary{background:var(--gradient-gold);color:#12202e;box-shadow:0 6px 18px rgba(201,168,76,.28)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(201,168,76,.42)}
+.btn-secondary{background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border-color)}
+.btn-secondary:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
+.btn-danger{background:rgba(196,69,63,.16);color:#e8756f;border:1px solid rgba(196,69,63,.35)}
+.btn-ghost{color:var(--text-secondary);padding:.55rem 1rem}
+.btn-ghost:hover{color:var(--color-primary)}
+.btn-sm{padding:.5rem 1.05rem;font-size:.7rem}
+
+.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .75rem;border-radius:999px;font-size:.65rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.badge-gold{background:rgba(201,168,76,.16);color:var(--color-primary);border:1px solid rgba(201,168,76,.3)}
+.badge-green{background:rgba(74,157,110,.16);color:#6cc494;border:1px solid rgba(74,157,110,.32)}
+.badge-red{background:rgba(196,69,63,.16);color:#e8756f;border:1px solid rgba(196,69,63,.32)}
+.badge-blue{background:rgba(74,127,196,.16);color:#7cb3e8;border:1px solid rgba(74,127,196,.32)}
+.badge-gray{background:var(--bg-input);color:var(--text-muted);border:1px solid var(--border-color)}
+
+.label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
+.input,.select,.textarea{width:100%;background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:.78rem 1rem;font-size:.88rem;color:var(--text-primary);transition:var(--transition);outline:none}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(201,168,76,.14)}
+.textarea{resize:vertical;min-height:110px}
+.field{margin-bottom:1.15rem}
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.6rem;box-shadow:var(--shadow-card);transition:var(--transition)}
+.card:hover{border-color:var(--border-hover)}
+.kicker{font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--color-primary);margin-bottom:.85rem;display:inline-flex;align-items:center;gap:.6rem}
+.kicker::before{content:'';width:26px;height:1px;background:var(--color-primary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.55rem);margin-bottom:.65rem}
+.section-sub{color:var(--text-secondary);max-width:640px;font-size:.95rem}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1.5rem;margin-bottom:2.1rem;flex-wrap:wrap}
+.container{width:min(1280px,92%);margin:0 auto}
+.table-wrap{overflow-x:auto;border:1px solid var(--border-color);border-radius:var(--radius-lg);background:var(--bg-card)}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{text-align:left;padding:1rem 1.25rem;font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text-muted);font-weight:700;border-bottom:1px solid var(--border-color);background:rgba(201,168,76,.045);white-space:nowrap}
+td{padding:1rem 1.25rem;border-bottom:1px solid var(--border-color);color:var(--text-secondary);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:var(--transition)}
+tbody tr:hover{background:rgba(201,168,76,.055)}
+.empty{text-align:center;padding:3.2rem 1.5rem;color:var(--text-muted)}
+.empty-icon{width:62px;height:62px;margin:0 auto 1.1rem;border-radius:50%;background:var(--gradient-gold-soft);display:grid;place-items:center;font-size:1.55rem;border:1px solid var(--border-color)}
+
+.toast{position:fixed;right:26px;bottom:26px;z-index:300;display:flex;align-items:center;gap:.8rem;background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-hover);border-left:4px solid var(--color-primary);padding:1.05rem 1.5rem;border-radius:var(--radius-md);box-shadow:var(--shadow-card);transform:translateY(120%);opacity:0;transition:all .45s cubic-bezier(.22,1,.36,1);max-width:380px}
+.toast.show{transform:none;opacity:1}
+.toast .t-title{font-weight:700;font-size:.88rem}
+.toast .t-desc{font-size:.78rem;color:var(--text-secondary)}
+
+#publicChrome{display:none}
+body[data-mode="public"] #publicChrome{display:block}
+body[data-mode="public"] #adminChrome,body[data-mode="public"] #loginChrome{display:none}
+body[data-mode="admin"] #adminChrome{display:grid}
+body[data-mode="admin"] #publicChrome,body[data-mode="admin"] #loginChrome{display:none}
+body[data-mode="login"] #loginChrome{display:block}
+body[data-mode="login"] #publicChrome,body[data-mode="login"] #adminChrome{display:none}
+
+.navbar{position:sticky;top:0;z-index:100;background:var(--bg-nav);backdrop-filter:blur(18px);border-bottom:1px solid var(--border-color)}
+.navbar-inner{width:min(1380px,95%);margin:0 auto;height:74px;display:flex;align-items:center;justify-content:space-between;gap:1.4rem}
+.brand{display:flex;align-items:center;gap:.85rem;cursor:pointer}
+.brand-mark{width:44px;height:44px;border-radius:50%;background:var(--gradient-gold);display:grid;place-items:center;font-family:'Playfair Display',serif;font-weight:800;color:#0a1628;font-size:.95rem;box-shadow:0 0 22px rgba(201,168,76,.35)}
+.brand-name{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;letter-spacing:.02em}
+.brand-name span{color:var(--color-primary)}
+.nav-links{display:flex;align-items:center;gap:.35rem}
+.nav-link{padding:.55rem 1.05rem;border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;color:var(--text-secondary);transition:var(--transition);cursor:pointer}
+.nav-link:hover{color:var(--color-primary);background:rgba(201,168,76,.08)}
+.nav-link.active{color:var(--color-primary);background:rgba(201,168,76,.13)}
+.nav-actions{display:flex;align-items:center;gap:.75rem}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border-color);color:var(--text-secondary);transition:var(--transition);font-size:1.05rem}
+.icon-btn:hover{border-color:var(--border-hover);color:var(--color-primary);transform:rotate(18deg)}
+.social-dot{width:34px;height:34px;border-radius:50%;border:1px solid var(--border-color);display:grid;place-items:center;font-size:.78rem;color:var(--text-muted);transition:var(--transition)}
+.social-dot:hover{color:var(--color-primary);border-color:var(--border-hover)}
+
+.hero{position:relative;min-height:640px;display:flex;align-items:center;background:radial-gradient(ellipse 80% 70% at 22% 30%,rgba(201,168,76,.12),transparent 60%),var(--bg-hero);overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 46px,rgba(201,168,76,.028) 46px 47px);pointer-events:none}
+.hero-orn{position:absolute;right:-130px;top:-130px;width:560px;height:560px;border:1px solid rgba(201,168,76,.16);border-radius:50%;pointer-events:none}
+.hero-orn::before,.hero-orn::after{content:'';position:absolute;inset:60px;border:1px solid rgba(201,168,76,.12);border-radius:50%}
+.hero-orn::after{inset:130px;border-color:rgba(201,168,76,.1)}
+.hero-inner{position:relative;z-index:2;width:min(1280px,92%);margin:0 auto;padding:6.5rem 0 5.5rem}
+.hero-title{font-size:clamp(2.9rem,6.4vw,5.35rem);font-weight:800;letter-spacing:-.015em;max-width:830px;margin:1.25rem 0 1.55rem}
+.hero-title em{font-style:italic;font-weight:600;background:var(--gradient-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-desc{font-size:1.12rem;color:var(--text-secondary);max-width:610px;margin-bottom:2.45rem}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.hero-stats{display:flex;gap:3.2rem;margin-top:4.2rem;flex-wrap:wrap}
+.hero-stat .num{font-family:'Playfair Display',serif;font-size:2.45rem;font-weight:700;color:var(--color-primary)}
+.hero-stat .lbl{font-size:.7rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text-muted);margin-top:.25rem}
+
+.verse-band{background:var(--gradient-gold-soft);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color);padding:3.3rem 0;position:relative;overflow:hidden}
+.verse-band::before{content:'\201C';position:absolute;left:4%;top:-24px;font-family:'Playfair Display',serif;font-size:11rem;color:rgba(201,168,76,.13);line-height:1}
+.verse-text{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.35rem,2.6vw,1.95rem);color:var(--text-primary);max-width:880px;margin:0 auto;text-align:center;line-height:1.55}
+.verse-ref{text-align:center;margin-top:1.25rem;color:var(--color-primary);font-size:.74rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.55rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.35rem}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.55rem}
+
+.feature-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:2.15rem 1.85rem;transition:var(--transition);position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-gold);transform:scaleX(0);transform-origin:left;transition:transform .45s ease}
+.feature-card:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-icon{width:54px;height:54px;border-radius:var(--radius-md);background:var(--gradient-gold-soft);display:grid;place-items:center;font-size:1.45rem;margin-bottom:1.35rem;border:1px solid var(--border-color)}
+.feature-card h3{font-size:1.22rem;margin-bottom:.62rem}
+.feature-card p{color:var(--text-secondary);font-size:.89rem}
+.feature-card .verse{margin-top:1.15rem;padding-top:1.05rem;border-top:1px dashed var(--border-color);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--color-primary);font-weight:700}
+
+.page-hero{background:radial-gradient(ellipse 65% 90% at 80% 10%,rgba(201,168,76,.1),transparent 55%),var(--bg-hero);padding:5.25rem 0 4.15rem;border-bottom:1px solid var(--border-color)}
+.page-hero h1{font-size:clamp(2.3rem,4.6vw,3.65rem);margin:.95rem 0 1.05rem}
+.page-hero p{color:var(--text-secondary);max-width:620px;font-size:1.02rem}
+.section{padding:5.25rem 0}
+.section-alt{background:var(--gradient-dark);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color)}
+
+.timeline{position:relative;padding-left:2.35rem}
+.timeline::before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--color-primary),transparent)}
+.tl-item{position:relative;padding-bottom:2.15rem}
+.tl-item::before{content:'';position:absolute;left:-2.35rem;top:7px;width:17px;height:17px;border-radius:50%;background:var(--bg-primary);border:2px solid var(--color-primary)}
+.tl-item h4{font-size:1.18rem;margin-bottom:.38rem}
+.tl-item p{color:var(--text-secondary);font-size:.9rem}
+
+.info-row{display:flex;gap:1.15rem;align-items:flex-start;padding:1.35rem 0;border-bottom:1px solid var(--border-color)}
+.info-row:last-child{border-bottom:none}
+.info-ic{width:46px;height:46px;flex:none;border-radius:var(--radius-md);background:var(--gradient-gold-soft);display:grid;place-items:center;border:1px solid var(--border-color);font-size:1.15rem}
+.info-row .t{font-weight:700;font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.22rem}
+.info-row .v{color:var(--text-primary);font-size:.98rem}
+
+.leader-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);text-align:center}
+.leader-card:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.leader-photo{height:218px;background:var(--gradient-gold-soft);display:grid;place-items:center;position:relative}
+.leader-photo .avatar{width:108px;height:108px;border-radius:50%;background:var(--gradient-gold);display:grid;place-items:center;font-family:'Playfair Display',serif;font-size:2.15rem;font-weight:700;color:#0a1628;box-shadow:0 0 0 5px rgba(201,168,76,.2),0 12px 28px rgba(0,0,0,.35)}
+.leader-info{padding:1.45rem 1.25rem 1.85rem}
+.leader-info h3{font-size:1.15rem;margin-bottom:.35rem}
+.leader-info .role{color:var(--color-primary);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+
+.event-card{display:flex;gap:1.55rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.55rem;transition:var(--transition);cursor:pointer}
+.event-card:hover{border-color:var(--border-hover);transform:translateX(6px);box-shadow:var(--shadow-glow)}
+.event-date{width:88px;flex:none;text-align:center;border-radius:var(--radius-md);background:var(--gradient-gold-soft);border:1px solid var(--border-color);padding:.95rem .5rem}
+.event-date .d{font-family:'Playfair Display',serif;font-size:1.95rem;font-weight:700;color:var(--color-primary);line-height:1}
+.event-date .m{font-size:.64rem;letter-spacing:.19em;text-transform:uppercase;color:var(--text-muted);margin-top:.32rem}
+.event-card h3{font-size:1.22rem;margin-bottom:.38rem}
+.event-meta{display:flex;flex-wrap:wrap;gap:1.15rem;color:var(--text-muted);font-size:.8rem;margin:.62rem 0 .85rem}
+
+.preg-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);cursor:pointer}
+.preg-card:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.preg-thumb{height:176px;background:radial-gradient(ellipse 70% 90% at 30% 20%,rgba(201,168,76,.22),transparent 60%),linear-gradient(135deg,#10233c,#0a1628);display:grid;place-items:center;position:relative}
+.play-btn{width:58px;height:58px;border-radius:50%;background:rgba(201,168,76,.92);display:grid;place-items:center;color:#0a1628;font-size:1.35rem;box-shadow:0 8px 26px rgba(201,168,76,.4);transition:var(--transition)}
+.preg-card:hover .play-btn{transform:scale(1.12)}
+.preg-body{padding:1.35rem 1.45rem 1.65rem}
+.preg-body h3{font-size:1.13rem;margin:.55rem 0 .48rem}
+.preg-body p{color:var(--text-secondary);font-size:.86rem}
+
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.15rem}
+.gallery-item{aspect-ratio:1;border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;position:relative;border:1px solid var(--border-color);transition:var(--transition);background:radial-gradient(circle at 30% 30%,rgba(201,168,76,.24),transparent 55%),linear-gradient(140deg,#16294a,#0a1628)}
+.gallery-item:nth-child(3n){background:radial-gradient(circle at 70% 60%,rgba(201,168,76,.18),transparent 55%),linear-gradient(140deg,#1c3050,#0d1f35)}
+.gallery-item:hover{transform:scale(1.045);border-color:var(--border-hover);box-shadow:var(--shadow-glow)}
+.gallery-item .cap{position:absolute;inset:auto 0 0 0;padding:1.45rem 1.15rem .95rem;background:linear-gradient(180deg,transparent,rgba(7,14,26,.92));font-size:.78rem;font-weight:600;color:var(--text-primary)}
+
+.footer{background:var(--bg-hero);border-top:1px solid var(--border-color);padding:4.15rem 0 2.25rem}
+.footer-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1.35fr;gap:2.65rem}
+.footer h4{font-size:.78rem;letter-spacing:.19em;text-transform:uppercase;color:var(--color-primary);margin-bottom:1.35rem;font-family:'Montserrat',sans-serif;font-weight:700}
+.footer p,.footer a{color:var(--text-muted);font-size:.87rem;display:block;margin-bottom:.62rem;transition:var(--transition)}
+.footer a:hover{color:var(--color-primary);padding-left:5px}
+.footer-bottom{margin-top:3.15rem;padding-top:1.85rem;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;gap:1.25rem;flex-wrap:wrap;color:var(--text-muted);font-size:.78rem}
+.footer-motto{font-family:'Playfair Display',serif;font-style:italic;font-size:1.12rem;color:var(--text-secondary);margin:1.15rem 0 1.55rem;max-width:320px}
+
+.login-wrap{min-height:100vh;display:grid;grid-template-columns:1.12fr 1fr;background:var(--bg-primary)}
+.login-brand{position:relative;overflow:hidden;padding:4.25rem 4.5rem;background:radial-gradient(ellipse 80% 70% at 20% 25%,rgba(201,168,76,.14),transparent 60%),var(--bg-hero);display:flex;flex-direction:column;justify-content:space-between}
+.login-brand .hero-orn{right:-180px;top:auto;bottom:-180px}
+.login-form-side{display:flex;align-items:center;justify-content:center;padding:3.25rem}
+.login-card{width:100%;max-width:445px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2.95rem 2.65rem;box-shadow:var(--shadow-card)}
+.login-logo{width:62px;height:62px;border-radius:var(--radius-lg);background:var(--gradient-gold-soft);display:grid;place-items:center;font-size:1.65rem;margin-bottom:1.45rem;border:1px solid var(--border-color)}
+.benefit{display:flex;align-items:center;gap:.85rem;padding:.82rem 0;color:var(--text-secondary);font-size:.92rem}
+.benefit .bi{width:36px;height:36px;flex:none;border-radius:50%;background:rgba(201,168,76,.13);display:grid;place-items:center;border:1px solid rgba(201,168,76,.24);font-size:.92rem}
+.pwd-wrap{position:relative}
+.pwd-wrap .input{padding-right:3.15rem}
+.pwd-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1.05rem}
+.alert{display:flex;gap:.75rem;align-items:center;padding:.92rem 1.15rem;border-radius:var(--radius-md);font-size:.84rem;margin-bottom:1.35rem}
+.alert-error{background:rgba(196,69,63,.12);border:1px solid rgba(196,69,63,.32);color:#e8756f}
+.alert-info{background:rgba(74,127,196,.12);border:1px solid rgba(74,127,196,.32);color:#7cb3e8}
+
+#adminChrome{display:none;min-height:100vh;grid-template-columns:272px 1fr}
+.sidebar{background:var(--bg-secondary);border-right:1px solid var(--border-color);padding:1.45rem 1.05rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:5px}
+.side-brand{display:flex;align-items:center;gap:.82rem;padding:.55rem .72rem 1.45rem;border-bottom:1px solid var(--border-color);margin-bottom:1.35rem;cursor:pointer}
+.side-brand .brand-mark{width:40px;height:40px;font-size:.85rem}
+.side-brand .n{font-family:'Playfair Display',serif;font-size:1.18rem;font-weight:700}
+.side-brand .n span{color:var(--color-primary)}
+.side-brand .sub{font-size:.62rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text-muted)}
+.side-group{margin-bottom:1.55rem}
+.side-group-label{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-muted);font-weight:700;padding:0 .85rem;margin-bottom:.55rem}
+.side-item{display:flex;align-items:center;gap:.82rem;width:100%;padding:.68rem .85rem;border-radius:var(--radius-md);color:var(--text-secondary);font-size:.845rem;font-weight:500;transition:var(--transition);cursor:pointer;text-align:left}
+.side-item:hover{background:rgba(201,168,76,.08);color:var(--text-primary);padding-left:1.05rem}
+.side-item.active{background:rgba(201,168,76,.15);color:var(--color-primary);font-weight:700;box-shadow:inset 3px 0 0 var(--color-primary)}
+.side-item .ic{width:21px;text-align:center;font-size:1.02rem;opacity:.95}
+.side-sub{margin:.22rem 0 .55rem .95rem;border-left:1px solid var(--border-color)}
+.side-sub .side-item{padding:.5rem .82rem;font-size:.795rem}
+.admin-main{display:flex;flex-direction:column;min-width:0}
+.admin-top{height:74px;border-bottom:1px solid var(--border-color);background:var(--bg-nav);display:flex;align-items:center;justify-content:space-between;padding:0 2.15rem;position:sticky;top:0;z-index:90;backdrop-filter:blur(16px)}
+.admin-crumbs{display:flex;align-items:center;gap:.62rem;font-size:.82rem;color:var(--text-muted)}
+.admin-crumbs .cur{color:var(--text-primary);font-weight:700}
+.admin-user{display:flex;align-items:center;gap:.82rem;padding:.45rem .95rem .45rem .52rem;border:1px solid var(--border-color);border-radius:999px;cursor:pointer;transition:var(--transition)}
+.admin-user:hover{border-color:var(--border-hover)}
+.admin-user .av{width:34px;height:34px;border-radius:50%;background:var(--gradient-gold);display:grid;place-items:center;color:#0a1628;font-weight:800;font-size:.78rem}
+.admin-user .nm{font-size:.82rem;font-weight:700}
+.admin-user .rl{font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--color-primary)}
+.admin-body{padding:2.55rem 2.15rem 4.25rem;min-width:0}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.15rem;margin-bottom:2.25rem}
+.kpi{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.45rem 1.35rem;transition:var(--transition);position:relative;overflow:hidden}
+.kpi:hover{border-color:var(--border-hover);transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.kpi-ic{width:50px;height:50px;border-radius:var(--radius-md);background:var(--gradient-gold);display:grid;place-items:center;color:#0a1628;font-size:1.28rem;margin-bottom:1.05rem;box-shadow:0 6px 16px rgba(201,168,76,.3)}
+.kpi .lbl{font-size:.645rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;line-height:1.55}
+.kpi .num{font-family:'Playfair Display',serif;font-size:2.15rem;font-weight:700;margin:.28rem 0 .18rem}
+.kpi .delta{font-size:.72rem;font-weight:700;display:inline-flex;gap:.32rem;align-items:center}
+.delta.up{color:var(--color-success)}
+.delta.down{color:var(--color-danger)}
+.delta.flat{color:var(--text-muted)}
+.admin-grid-2{display:grid;grid-template-columns:1.45fr 1fr;gap:1.65rem;align-items:start}
+
+.panel{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:1.15rem;padding:1.35rem 1.65rem;border-bottom:1px solid var(--border-color);flex-wrap:wrap}
+.panel-head h3{font-size:1.18rem;display:flex;align-items:center;gap:.68rem}
+.panel-body{padding:1.55rem 1.65rem}
+.panel-body.flush{padding:0}
+.pend-item{display:flex;align-items:center;justify-content:space-between;gap:1.15rem;padding:1.12rem 1.65rem;border-bottom:1px solid var(--border-color);transition:var(--transition)}
+.pend-item:last-child{border-bottom:none}
+.pend-item:hover{background:rgba(201,168,76,.05)}
+.pend-item .txt{font-size:.92rem;font-weight:600}
+.pend-item .hint{font-size:.755rem;color:var(--text-muted);margin-top:.18rem}
+
+.tabs{display:flex;gap:.52rem;flex-wrap:wrap}
+.tab{padding:.62rem 1.28rem;border-radius:999px;font-size:.765rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--border-color);transition:var(--transition);cursor:pointer}
+.tab:hover{color:var(--text-primary);border-color:var(--border-hover)}
+.tab.active{background:var(--gradient-gold);color:#12202e;border-color:transparent;box-shadow:0 5px 16px rgba(201,168,76,.3)}
+
+.filter-bar{display:flex;gap:.92rem;flex-wrap:wrap;align-items:center;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.12rem 1.35rem;margin-bottom:1.65rem}
+.search-wrap{position:relative;flex:1;min-width:235px}
+.search-wrap .input{padding-left:2.75rem}
+.search-wrap .si{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+
+.form-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);overflow:hidden}
+.form-card-head{padding:1.65rem 1.95rem;border-bottom:1px solid var(--border-color);background:rgba(201,168,76,.04)}
+.form-card-head h3{font-size:1.32rem;margin-bottom:.32rem}
+.form-card-head p{color:var(--text-muted);font-size:.8rem;font-family:monospace}
+.form-card-body{padding:1.95rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 1.35rem}
+.form-grid .full{grid-column:1/-1}
+.form-actions{display:flex;gap:.92rem;justify-content:flex-end;padding:1.35rem 1.95rem;border-top:1px solid var(--border-color);background:rgba(201,168,76,.03);flex-wrap:wrap}
+.row-actions{display:flex;gap:.45rem}
+.mini-btn{width:33px;height:33px;border-radius:var(--radius-sm);display:grid;place-items:center;border:1px solid var(--border-color);color:var(--text-muted);transition:var(--transition);font-size:.88rem}
+.mini-btn:hover{color:var(--color-primary);border-color:var(--border-hover);background:rgba(201,168,76,.1)}
+.mini-btn.danger:hover{color:#e8756f;border-color:rgba(196,69,63,.4);background:rgba(196,69,63,.1)}
+.chip-row{display:flex;flex-wrap:wrap;gap:.52rem}
+.chip{padding:.45rem 1.02rem;border-radius:999px;font-size:.755rem;font-weight:600;border:1px solid var(--border-color);color:var(--text-secondary);transition:var(--transition);cursor:pointer}
+.chip:hover,.chip.active{border-color:var(--color-primary);color:var(--color-primary);background:rgba(201,168,76,.1)}
+
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1.05rem;margin-bottom:1.85rem}
+.stat-box{padding:1.28rem 1.35rem;border-radius:var(--radius-lg);border:1px solid var(--border-color);background:var(--gradient-gold-soft)}
+.stat-box .v{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700;color:var(--color-primary)}
+.stat-box .l{font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-top:.22rem}
+.bars{display:flex;flex-direction:column;gap:1.05rem}
+.bar-row .top{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.42rem;gap:1rem}
+.bar-row .top .pct{color:var(--color-primary);font-weight:700;white-space:nowrap}
+.bar-track{height:9px;border-radius:999px;background:var(--bg-input);overflow:hidden}
+.bar-fill{height:100%;border-radius:999px;background:var(--gradient-gold);animation:growBar 1.1s cubic-bezier(.22,1,.36,1) both}
+@keyframes growBar{from{width:0 !important}}
+
+.callout{border-radius:var(--radius-lg);padding:1.28rem 1.45rem;display:flex;gap:.95rem;align-items:flex-start;font-size:.875rem;margin-bottom:1.35rem}
+.callout-gold{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28)}
+.callout-blue{background:rgba(74,127,196,.1);border:1px solid rgba(74,127,196,.28)}
+
+.modo-culto{min-height:100vh;background:radial-gradient(ellipse 75% 65% at 50% 32%,rgba(201,168,76,.16),transparent 62%),var(--bg-hero);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4.5rem 2.55rem;text-align:center;position:relative}
+.culto-title{font-family:'Playfair Display',serif;font-size:clamp(2.45rem,5.2vw,4.05rem);font-weight:700;max-width:950px;line-height:1.22}
+.culto-verse{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.32rem,2.4vw,1.82rem);color:var(--text-secondary);max-width:830px;margin:2.15rem auto 1.05rem;line-height:1.65}
+.culto-ref{color:var(--color-primary);letter-spacing:.22em;text-transform:uppercase;font-size:.78rem;font-weight:700}
+.culto-progress{width:min(520px,84%);height:5px;border-radius:999px;background:rgba(201,168,76,.18);margin:3.15rem auto 1.05rem;overflow:hidden}
+.culto-progress .fill{height:100%;width:34%;background:var(--gradient-gold);border-radius:999px}
+.culto-nav{display:flex;gap:.92rem;margin-top:1.85rem;flex-wrap:wrap;justify-content:center}
+
+.print-sheet{background:#fff;color:#1a1a1a;border-radius:var(--radius-lg);padding:3.15rem 3.55rem;max-width:860px;margin:0 auto}
+.print-sheet h1{color:#12202e;font-size:2.05rem;margin-bottom:.32rem}
+.print-sheet .sub{color:#6b6b6b;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;margin-bottom:2.15rem}
+.print-item{display:flex;gap:1.35rem;padding:.92rem 0;border-bottom:1px dashed #d8d2c4}
+.print-item .n{width:34px;height:34px;flex:none;border-radius:50%;background:#c9a84c;color:#fff;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.print-item h4{color:#12202e;font-size:1.05rem}
+.print-item p{color:#5c5c5c;font-size:.85rem}
+
+.modal-backdrop{position:fixed;inset:0;background:var(--overlay-dark);z-index:200;display:none;align-items:center;justify-content:center;padding:1.65rem;backdrop-filter:blur(7px)}
+.modal-backdrop.show{display:flex;animation:fadeIn .28s ease}
+.modal{width:100%;max-width:660px;max-height:88vh;overflow-y:auto;background:var(--bg-secondary);border:1px solid var(--border-hover);border-radius:var(--radius-xl);box-shadow:0 32px 80px rgba(0,0,0,.55);animation:modalIn .34s cubic-bezier(.22,1,.36,1)}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes modalIn{from{opacity:0;transform:translateY(28px) scale(.97)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.55rem 1.95rem;border-bottom:1px solid var(--border-color)}
+.modal-head h3{font-size:1.32rem}
+.modal-close{width:38px;height:38px;border-radius:50%;border:1px solid var(--border-color);color:var(--text-muted);font-size:1.12rem;transition:var(--transition)}
+.modal-close:hover{color:var(--color-danger);border-color:rgba(196,69,63,.4);transform:rotate(90deg)}
+
+.switcher{position:fixed;left:26px;bottom:26px;z-index:180;display:flex;gap:.52rem;background:var(--bg-secondary);border:1px solid var(--border-hover);border-radius:999px;padding:.48rem;box-shadow:0 18px 46px rgba(0,0,0,.45)}
+.switcher button{padding:.68rem 1.35rem;border-radius:999px;font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--text-muted);transition:var(--transition)}
+.switcher button.active{background:var(--gradient-gold);color:#12202e;box-shadow:0 5px 16px rgba(201,168,76,.35)}
+.switcher button:hover:not(.active){color:var(--text-primary)}
+
+.map-overlay{position:fixed;inset:0;z-index:190;background:var(--overlay-dark);display:none;padding:3.25rem 2.55rem;overflow-y:auto;backdrop-filter:blur(13px)}
+.map-overlay.show{display:block;animation:fadeIn .3s ease}
+.map-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.35rem;flex-wrap:wrap;gap:1.15rem}
+.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:1.05rem}
+.map-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.18rem 1.28rem;cursor:pointer;transition:var(--transition)}
+.map-card:hover{border-color:var(--color-primary);transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.map-card .mtag{font-size:.58rem;letter-spacing:.17em;text-transform:uppercase;font-weight:800;color:var(--color-primary);margin-bottom:.48rem}
+.map-card .mname{font-family:'Playfair Display',serif;font-size:1.08rem;font-weight:700}
+.map-card .mpath{font-size:.68rem;color:var(--text-muted);font-family:monospace;margin-top:.28rem}
+
+.page{display:none;animation:pageIn .42s cubic-bezier(.22,1,.36,1)}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(15px)}}
+.stagger>*{animation:pageIn .55s cubic-bezier(.22,1,.36,1) both}
+.stagger>*:nth-child(1){animation-delay:.05s}
+.stagger>*:nth-child(2){animation-delay:.13s}
+.stagger>*:nth-child(3){animation-delay:.21s}
+.stagger>*:nth-child(4){animation-delay:.29s}
+.stagger>*:nth-child(5){animation-delay:.37s}
+.stagger>*:nth-child(6){animation-delay:.45s}
+
+@media(max-width:1120px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .admin-grid-2{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .gallery-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:900px){
+  #adminChrome{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:-290px;z-index:120;width:272px;transition:left .35s ease}
+  .sidebar.open{left:0;box-shadow:22px 0 60px rgba(0,0,0,.5)}
+  .login-wrap{grid-template-columns:1fr}
+  .login-brand{display:none}
+  .grid-3,.grid-4{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .stat-strip{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .grid-2,.grid-3,.grid-4,.form-grid,.kpi-grid,.stat-strip{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:1.85rem}
+  .switcher{left:12px;right:12px;bottom:12px;justify-content:center}
+}
+</style>
+</head>
+<body data-mode="public">
+
+<div class="switcher" id="switcher">
+  <button data-mode="public" class="active" onclick="setMode('public')">Site Público</button>
+  <button data-mode="admin" onclick="setMode('admin')">Painel Admin</button>
+  <button onclick="toggleMap()">Mapa</button>
+  <button onclick="toggleTheme()">Tema</button>
+</div>
+
+<div class="map-overlay" id="mapOverlay">
+  <div class="map-head">
+    <div>
+      <div class="kicker">Mapa do Sistema</div>
+      <h2 class="section-title">33 telas · 12 módulos</h2>
+    </div>
+    <button class="btn btn-secondary" onclick="toggleMap()">Fechar mapa</button>
+  </div>
+  <div class="map-grid" id="mapGrid"></div>
+</div>
+
+<div class="toast" id="toast">
+  <div style="font-size:1.3rem">✓</div>
+  <div>
+    <div class="t-title" id="toastTitle">Salvo</div>
+    <div class="t-desc" id="toastDesc">Operação concluída com sucesso.</div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Novo registro</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-card-body" id="modalBody"></div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="publicChrome">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="brand" onclick="go('home')">
+        <div class="brand-mark">IA</div>
+        <div><div class="brand-name">IADMP <span>ADMP</span></div></div>
+      </div>
+      <div class="nav-links" id="publicNav">
+        <a class="nav-link" data-page="home" onclick="go('home')">Início</a>
+        <a class="nav-link" data-page="sobre" onclick="go('sobre')">A Igreja</a>
+        <a class="nav-link" data-page="eventos" onclick="go('eventos')">Programações</a>
+        <a class="nav-link" data-page="pregacoes" onclick="go('pregacoes')">Pregações</a>
+        <a class="nav-link" data-page="galeria" onclick="go('galeria')">Galeria</a>
+        <a class="nav-link" data-page="lideranca" onclick="go('lideranca')">Liderança</a>
+        <a class="nav-link" data-page="contato" onclick="go('contato')">Contato</a>
+      </div>
+      <div class="nav-actions">
+        <a class="social-dot" title="YouTube">▶</a>
+        <a class="social-dot" title="Instagram">◎</a>
+        <button class="icon-btn" onclick="toggleTheme()" title="Alternar tema">◐</button>
+        <button class="btn btn-primary btn-sm" onclick="go('login')">Entrar</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-orn"></div>
+      <div class="hero-inner stagger">
+        <div class="kicker">Igreja Assembleia de Deus · Ministério da Promessa</div>
+        <h1 class="hero-title">Uma comunidade de <em>fé, amor</em> e esperança</h1>
+        <p class="hero-desc">Onde cada pessoa é acolhida e transformada pelo poder de Deus. Junte-se a nós no Maranhão — há um lugar preparado para você.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" onclick="go('eventos')">Ver programações →</button>
+          <button class="btn btn-secondary" onclick="go('contato')">Fale conosco</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num">14</div><div class="lbl">Líderes em ação</div></div>
+          <div class="hero-stat"><div class="num">5</div><div class="lbl">Cultos por semana</div></div>
+          <div class="hero-stat"><div class="num">3</div><div class="lbl">Congregações</div></div>
+          <div class="hero-stat"><div class="num">∞</div><div class="lbl">Vidas transformadas</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verse-band">
+      <p class="verse-text">"Exaltem o nome do Senhor em espírito e verdade, pois Deus é Espírito, e os que o adoram devem adorar em espírito e verdade."</p>
+      <div class="verse-ref">João 4:24 · Versículo do dia</div>
+    </div>
+
+    <div class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Nossos pilares</div>
+            <h2 class="section-title">Sobre o que acreditamos</h2>
+            <p class="section-sub">Quatro pilares que sustentam nossa comunidade e guiam cada culto, ensino e ministério.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="go('sobre')">Conhecer a igreja</button>
+        </div>
+        <div class="grid-4 stagger" id="homeValues"></div>
+      </div>
+    </div>
+
+    <div class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Agenda</div>
+            <h2 class="section-title">Próximas programações</h2>
+            <p class="section-sub">Cultos, consagrações e eventos especiais da nossa comunidade.</p>
+          </div>
+          <button class="btn btn-primary" onclick="go('eventos')">Ver agenda completa</button>
+        </div>
+        <div class="stagger" id="homeEvents" style="display:flex;flex-direction:column;gap:1.15rem"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Palavra</div>
+            <h2 class="section-title">Últimas pregações</h2>
+            <p class="section-sub">Ouça e assista as mensagens mais recentes da nossa comunidade.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="go('pregacoes')">Todas as pregações</button>
+        </div>
+        <div class="grid-3 stagger" id="homePregs"></div>
+      </div>
+    </div>
+
+    <div class="section section-alt">
+      <div class="container">
+        <div class="grid-2" style="align-items:center;gap:3.55rem">
+          <div>
+            <div class="kicker">Visite-nos</div>
+            <h2 class="section-title">Há um lugar para você</h2>
+            <p class="section-sub" style="margin-bottom:1.85rem">Nossas portas estão abertas. Venha como está — você será recebido com amor.</p>
+            <div class="info-row"><div class="info-ic">📍</div><div><div class="t">Endereço</div><div class="v">Maranhão, Brasil</div></div></div>
+            <div class="info-row"><div class="info-ic">📞</div><div><div class="t">Telefone</div><div class="v">+55 98 98803-5646</div></div></div>
+            <div class="info-row"><div class="info-ic">✉</div><div><div class="t">E-mail</div><div class="v">marcio@codemed.com.br</div></div></div>
+          </div>
+          <div class="card" style="padding:2.35rem">
+            <h3 style="font-size:1.42rem;margin-bottom:1.55rem">Horários dos cultos</h3>
+            <div id="homePrograms"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-sobre">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">A Igreja</div>
+        <h1>Nossa história, <em style="color:var(--color-primary);font-style:italic">nossa fé</em></h1>
+        <p>Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="grid-2" style="gap:3.55rem;align-items:start">
+          <div>
+            <div class="kicker">Nossa jornada</div>
+            <h2 class="section-title">Uma trajetória de propósito</h2>
+            <p class="section-sub" style="margin-bottom:2.25rem">O Ministério da Promessa nasceu do desejo de servir a Deus e às pessoas. Hoje somos uma família que cultua, serve e transforma vidas no Maranhão.</p>
+            <div class="timeline">
+              <div class="tl-item"><h4>O início</h4><p>Um pequeno grupo de oração reunido em torno da Palavra, com fome de Deus.</p></div>
+              <div class="tl-item"><h4>Consolidação</h4><p>O crescimento da congregação e o nascimento de novos ministérios e trabalhos.</p></div>
+              <div class="tl-item"><h4>Expansão</h4><p>Novas congregações: Cohabiano, Res. Tiradentes e Vila Sarney, alcançando novas famílias.</p></div>
+              <div class="tl-item"><h4>Hoje</h4><p>Uma comunidade viva, com escola de louvor, círculo de oração e trabalhos sociais.</p></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:1.55rem">
+              <h3 style="font-size:1.38rem;margin-bottom:1.05rem">Nossa missão</h3>
+              <p style="color:var(--text-secondary)">Levar o evangelho de Jesus Cristo a todas as pessoas, formando discípulos que adoram em espírito e verdade, servem com excelência e transformam a sociedade.</p>
+            </div>
+            <div class="card">
+              <h3 style="font-size:1.38rem;margin-bottom:1.35rem">Congregações</h3>
+              <div class="info-row"><div class="info-ic">⛪</div><div><div class="t">Matriz</div><div class="v">Templo Sede — Maranhão</div></div></div>
+              <div class="info-row"><div class="info-ic">⛪</div><div><div class="t">Cohabiano</div><div class="v">Congregação Cohabiano</div></div></div>
+              <div class="info-row"><div class="info-ic">⛪</div><div><div class="t">Res. Tiradentes</div><div class="v">Culto às quartas, 19h30</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section section-alt">
+      <div class="container">
+        <div class="kicker">Valores</div>
+        <h2 class="section-title">O que nos move</h2>
+        <div class="grid-4 stagger" id="sobreValues" style="margin-top:2.15rem"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-eventos">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">Programações</div>
+        <h1>Agenda da <em style="color:var(--color-primary);font-style:italic">comunidade</em></h1>
+        <p>Cultos semanais, consagrações, eventos especiais e encontros que fortalecem nossa fé.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="si">⌕</span>
+            <input class="input" placeholder="Buscar evento..." oninput="filterEvents(this.value)">
+          </div>
+          <div class="chip-row">
+            <span class="chip active">Todos</span><span class="chip">Cultos</span><span class="chip">Consagrações</span><span class="chip">Especiais</span>
+          </div>
+        </div>
+        <div class="stagger" id="publicEventsList" style="display:flex;flex-direction:column;gap:1.15rem"></div>
+      </div>
+    </div>
+    <div class="section section-alt">
+      <div class="container">
+        <div class="kicker">Rotina</div>
+        <h2 class="section-title">Programação semanal</h2>
+        <div class="grid-2 stagger" id="weeklyPrograms" style="margin-top:2.15rem"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-evento-detalhe">
+    <div class="page-hero">
+      <div class="container">
+        <button class="btn btn-ghost" onclick="go('eventos')" style="margin-bottom:1.15rem">← Voltar para programações</button>
+        <div class="badge badge-gold" style="margin-bottom:1.05rem">Planejado</div>
+        <h1>Santa Ceia</h1>
+        <p>Celebração especial com Santa Ceia, comunhão e adoração. Traga sua família e venha celebrar a fidelidade do Senhor.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="grid-2" style="gap:2.55rem;align-items:start">
+          <div>
+            <div class="card" style="margin-bottom:1.35rem">
+              <h3 style="margin-bottom:1.35rem;font-size:1.32rem">Detalhes do evento</h3>
+              <div class="info-row"><div class="info-ic">📅</div><div><div class="t">Data</div><div class="v">12 de outubro de 2026 · 18h30</div></div></div>
+              <div class="info-row"><div class="info-ic">📍</div><div><div class="t">Local</div><div class="v">Templo Sede</div></div></div>
+              <div class="info-row"><div class="info-ic">👥</div><div><div class="t">Inscrições</div><div class="v">28 confirmadas · vagas ilimitadas</div></div></div>
+              <div class="info-row"><div class="info-ic">💰</div><div><div class="t">Orçamento previsto</div><div class="v">R$ 2.500,00</div></div></div>
+            </div>
+            <div class="callout callout-gold">
+              <span style="font-size:1.25rem">✦</span>
+              <div><strong>Inscrição pública aberta.</strong> Preencha o formulário ao lado para confirmar sua participação. Confirmação enviada por WhatsApp.</div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-card-head">
+              <h3>Confirmar presença</h3>
+              <p>POST /api/public/eventos/[id] · inscricaoPublicaSchema</p>
+            </div>
+            <div class="form-card-body">
+              <div class="field"><label class="label">Nome completo</label><input class="input" placeholder="Seu nome"></div>
+              <div class="field"><label class="label">E-mail</label><input class="input" placeholder="voce@email.com"></div>
+              <div class="field"><label class="label">Telefone / WhatsApp</label><input class="input" placeholder="(98) 99999-0000"></div>
+              <div class="field"><label class="label">Observações</label><textarea class="textarea" placeholder="Alguma necessidade especial?"></textarea></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="toast('Inscrição enviada!','Você receberá a confirmação em breve.')">Confirmar presença</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-pregacoes">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">Pregações</div>
+        <h1>Palavra que <em style="color:var(--color-primary);font-style:italic">transforma</em></h1>
+        <p>Ouça e assista as mensagens mais recentes pregadas na nossa comunidade.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="si">⌕</span>
+            <input class="input" placeholder="Buscar pregação por título, pregador ou série...">
+          </div>
+          <div class="chip-row">
+            <span class="chip active">Todas</span><span class="chip">Publicadas</span><span class="chip">Série: Fé</span>
+          </div>
+        </div>
+        <div class="grid-3 stagger" id="publicPregsList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-pregacao-detalhe">
+    <div class="page-hero">
+      <div class="container">
+        <button class="btn btn-ghost" onclick="go('pregacoes')" style="margin-bottom:1.15rem">← Voltar para pregações</button>
+        <div class="badge badge-gold" style="margin-bottom:1.05rem">Série: Fé que Vence</div>
+        <h1>Uma Fé Que Não Recua</h1>
+        <p>Pr. Cleiginaldo Barros · 05 de outubro de 2026 · 48 min</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="grid-2" style="gap:2.55rem;align-items:start">
+          <div>
+            <div class="preg-thumb" style="height:320px;border-radius:var(--radius-lg);margin-bottom:1.35rem">
+              <div class="play-btn" style="width:78px;height:78px;font-size:1.85rem">▶</div>
+            </div>
+            <div class="card">
+              <h3 style="margin-bottom:.85rem;font-size:1.28rem">Sobre esta mensagem</h3>
+              <p style="color:var(--text-secondary)">Uma reflexão profunda sobre Hebreus 11 e a fé que permanece mesmo diante das adversidades. Uma palavra para quem precisa de ânimo para continuar caminhando.</p>
+              <div class="chip-row" style="margin-top:1.35rem">
+                <span class="chip">Fé</span><span class="chip">Perseverança</span><span class="chip">Hebreus 11</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:1.35rem">
+              <h3 style="margin-bottom:1.15rem;font-size:1.22rem">Capítulos</h3>
+              <div class="pend-item" style="padding-left:0;padding-right:0"><div><div class="txt">Introdução</div><div class="hint">00:00</div></div></div>
+              <div class="pend-item" style="padding-left:0;padding-right:0"><div><div class="txt">O que é fé?</div><div class="hint">05:12</div></div></div>
+              <div class="pend-item" style="padding-left:0;padding-right:0"><div><div class="txt">Heróis da fé</div><div class="hint">18:40</div></div></div>
+              <div class="pend-item" style="padding-left:0;padding-right:0"><div><div class="txt">Aplicação prática</div><div class="hint">36:05</div></div></div>
+            </div>
+            <div class="callout callout-blue">
+              <span style="font-size:1.25rem">▶</span>
+              <div><strong>Áudio disponível.</strong> Baixe ou ouça online. Também disponível no nosso canal do YouTube.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-galeria">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">Galeria</div>
+        <h1>Momentos que <em style="color:var(--color-primary);font-style:italic">ficam</em></h1>
+        <p>Registros dos nossos cultos, eventos e da vida comunitária da IADMP.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="si">⌕</span>
+            <input class="input" placeholder="Buscar na galeria...">
+          </div>
+          <div class="chip-row">
+            <span class="chip active">Todas</span><span class="chip">Cultos</span><span class="chip">Eventos</span><span class="chip">Ministérios</span>
+          </div>
+        </div>
+        <div class="gallery-grid stagger" id="galleryGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-lideranca">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">Liderança</div>
+        <h1>Quem <em style="color:var(--color-primary);font-style:italic">serve</em> com amor</h1>
+        <p>Conheça os líderes que pastoreiam, ensinam e servem a nossa comunidade com dedicação.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="grid-4 stagger" id="leadersGrid"></div>
+      </div>
+    </div>
+    <div class="section section-alt">
+      <div class="container" style="text-align:center">
+        <div class="kicker" style="justify-content:center">Faça parte</div>
+        <h2 class="section-title">Há um ministério para você</h2>
+        <p class="section-sub" style="margin:0 auto 2.15rem">Louvor, som, mídia, crianças, intercessão e mais. Encontre sua área de atuação.</p>
+        <button class="btn btn-primary" onclick="go('contato')">Quero servir</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-contato">
+    <div class="page-hero">
+      <div class="container">
+        <div class="kicker">Contato</div>
+        <h1>Fale <em style="color:var(--color-primary);font-style:italic">conosco</em></h1>
+        <p>Estamos prontos para ouvir você. Envie sua mensagem ou nos chame no WhatsApp.</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="container">
+        <div class="grid-2" style="gap:2.55rem;align-items:start">
+          <div class="form-card">
+            <div class="form-card-head">
+              <h3>Envie sua mensagem</h3>
+              <p>POST /api/public/contato · validação Zod</p>
+            </div>
+            <div class="form-card-body">
+              <div class="form-grid">
+                <div class="field"><label class="label">Nome</label><input class="input" placeholder="Seu nome"></div>
+                <div class="field"><label class="label">E-mail</label><input class="input" placeholder="voce@email.com"></div>
+                <div class="field full"><label class="label">Assunto</label>
+                  <select class="select"><option>Informações gerais</option><option>Oração</option><option>Ministérios</option><option>Eventos</option><option>Outros</option></select>
+                </div>
+                <div class="field full"><label class="label">Mensagem</label><textarea class="textarea" placeholder="Escreva sua mensagem..."></textarea></div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="toast('Mensagem enviada!','Retornaremos em breve. Deus abençoe!')">Enviar mensagem</button>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:1.35rem">
+              <h3 style="margin-bottom:.65rem;font-size:1.32rem">Informações</h3>
+              <div class="info-row"><div class="info-ic">📍</div><div><div class="t">Endereço</div><div class="v">Maranhão, Brasil</div></div></div>
+              <div class="info-row"><div class="info-ic">📞</div><div><div class="t">Telefone</div><div class="v">+55 98 98803-5646</div></div></div>
+              <div class="info-row"><div class="info-ic">💬</div><div><div class="t">WhatsApp</div><div class="v">wa.me/+5598988035646</div></div></div>
+              <div class="info-row"><div class="info-ic">✉</div><div><div class="t">E-mail</div><div class="v">marcio@codemed.com.br</div></div></div>
+            </div>
+            <div class="callout callout-gold">
+              <span style="font-size:1.25rem">🕐</span>
+              <div><strong>Horário de atendimento</strong><br>Segunda a sexta, 8h às 18h. Cultos: terça, quarta, sexta e domingo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="publicFooter">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand" style="cursor:default">
+            <div class="brand-mark">IA</div>
+            <div><div class="brand-name">IADMP <span>ADMP</span></div></div>
+          </div>
+          <p class="footer-motto">"Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus."</p>
+          <div style="display:flex;gap:.62rem">
+            <span class="social-dot">▶</span><span class="social-dot">◎</span><span class="social-dot">✆</span>
+          </div>
+        </div>
+        <div>
+          <h4>Navegação</h4>
+          <a onclick="go('home')">Início</a>
+          <a onclick="go('sobre')">A Igreja</a>
+          <a onclick="go('eventos')">Programações</a>
+          <a onclick="go('pregacoes')">Pregações</a>
+          <a onclick="go('galeria')">Galeria</a>
+        </div>
+        <div>
+          <h4>Comunidade</h4>
+          <a onclick="go('lideranca')">Liderança</a>
+          <a onclick="go('contato')">Contato</a>
+          <a onclick="go('login')">Área do membro</a>
+          <a onclick="toggleMap()">Mapa do sistema</a>
+        </div>
+        <div>
+          <h4>Contato</h4>
+          <p>📍 Maranhão, Brasil</p>
+          <p>📞 +55 98 98803-5646</p>
+          <p>✉ marcio@codemed.com.br</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:.85rem" onclick="go('contato')">Enviar mensagem</button>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 IADMP — Igreja Assembleia de Deus Ministério da Promessa. Todos os direitos reservados.</span>
+        <span>Sistema de Gestão · Next.js · Prisma · NextAuth</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="loginChrome" style="display:none">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="hero-orn"></div>
+      <div style="position:relative;z-index:2">
+        <div class="brand" onclick="go('home')">
+          <div class="brand-mark">IA</div>
+          <div><div class="brand-name">IADMP <span>ADMP</span></div></div>
+        </div>
+        <h1 style="font-size:clamp(2.35rem,4vw,3.45rem);margin:2.85rem 0 1.35rem">
+          Organize seu<br>ministério com<br><em style="color:var(--color-primary);font-style:italic">excelência</em>
+        </h1>
+        <p style="color:var(--text-secondary);max-width:430px">
+          Gerencie escalas, repertórios, membros, finanças e comunicação do seu ministério em um só lugar.
+        </p>
+        <div style="margin-top:2.25rem">
+          <div class="benefit"><div class="bi">👥</div> Gestão completa de membros</div>
+          <div class="benefit"><div class="bi">📅</div> Escalas e liturgias inteligentes</div>
+          <div class="benefit"><div class="bi">♪</div> Repertório e pregações</div>
+          <div class="benefit"><div class="bi">🛡</div> Seguro, com RBAC e multi-organização</div>
+        </div>
+      </div>
+      <div style="position:relative;z-index:2;color:var(--text-muted);font-size:.82rem">
+        © 2026 IADMP. Todos os direitos reservados.
+      </div>
+    </div>
+    <div class="login-form-side">
+      <div class="login-card">
+        <div class="login-logo">⛪</div>
+        <h2 style="font-size:1.78rem;margin-bottom:.42rem">Bem-vindo de volta</h2>
+        <p style="color:var(--text-muted);font-size:.92rem;margin-bottom:1.75rem">Entre na sua conta para continuar</p>
+        <div class="alert alert-info"><span>✦</span> Credenciais de demonstração já preenchidas — clique em Entrar.</div>
+        <div class="field">
+          <label class="label">E-mail</label>
+          <input class="input" id="loginEmail" value="admin@iadmp.com.br" placeholder="seu@email.com">
+        </div>
+        <div class="field">
+          <label class="label">Senha</label>
+          <div class="pwd-wrap">
+            <input class="input" type="password" id="loginPass" value="admin123" placeholder="Sua senha">
+            <button class="pwd-toggle" onclick="togglePwd()">👁</button>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.55rem" onclick="doLogin()">Entrar →</button>
+        <p style="text-align:center;color:var(--text-muted);font-size:.82rem;margin-top:1.65rem">
+          Problemas com acesso? <span style="color:var(--color-primary);font-weight:700">Fale com o administrador</span>
+        </p>
+        <div class="callout callout-gold" style="margin-top:1.55rem;margin-bottom:0">
+          <span style="font-size:1.15rem">🔐</span>
+          <div style="font-size:.8rem"><strong>NextAuth v5</strong> · Credentials + JWT em cookie <code>authjs.session-token</code> · middleware protege <code>/admin/*</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="adminChrome">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-brand" onclick="go('admin-dashboard')">
+      <div class="brand-mark">IA</div>
+      <div>
+        <div class="n">IADMP <span>ADMP</span></div>
+        <div class="sub">Painel administrativo</div>
+      </div>
+    </div>
+    <div id="sideNav"></div>
+    <div style="margin-top:1.85rem;padding:1.15rem;border:1px solid var(--border-color);border-radius:var(--radius-lg);background:var(--gradient-gold-soft)">
+      <div style="font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--color-primary);font-weight:800;margin-bottom:.48rem">Precisa de ajuda?</div>
+      <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:.85rem">Documentação e suporte do sistema.</div>
+      <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center" onclick="toggleMap()">Ver mapa do sistema</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-top">
+      <div style="display:flex;align-items:center;gap:1.15rem">
+        <div class="admin-crumbs">
+          <span>Admin</span><span style="opacity:.5">/</span>
+          <span class="cur" id="crumbCurrent">Dashboard</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.92rem">
+        <button class="icon-btn" onclick="toast('Notificações','Você tem 3 pendências críticas.')">🔔</button>
+        <button class="icon-btn" onclick="toggleTheme()">◐</button>
+        <div class="admin-user" onclick="go('admin-usuarios')">
+          <div class="av">SA</div>
+          <div>
+            <div class="nm">Super Admin</div>
+            <div class="rl">SUPER_ADMIN</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-body">
+
+      <section class="page active" id="page-admin-dashboard">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Dashboard</h2>
+            <p class="section-sub">Visão geral da igreja · indicadores consolidados</p>
+          </div>
+          <button class="btn btn-primary" onclick="go('admin-gestao')">📊 Abrir Centro de Gestão</button>
+        </div>
+        <div class="kpi-grid stagger">
+          <div class="kpi"><div class="kpi-ic">👥</div><div class="lbl">Total de membros</div><div class="num">248</div><div class="delta up">↑ 12% no período</div></div>
+          <div class="kpi"><div class="kpi-ic">🤝</div><div class="lbl">Líderes</div><div class="num">14</div><div class="delta flat">→ estável</div></div>
+          <div class="kpi"><div class="kpi-ic">✓</div><div class="lbl">Eventos realizados</div><div class="num">36</div><div class="delta up">↑ 8% no período</div></div>
+          <div class="kpi"><div class="kpi-ic">📅</div><div class="lbl">Eventos futuros</div><div class="num">7</div><div class="delta up">↑ 2 novos</div></div>
+          <div class="kpi"><div class="kpi-ic">📢</div><div class="lbl">Avisos ativos</div><div class="num">3</div><div class="delta down">↓ 1 expirado</div></div>
+        </div>
+        <div class="kpi-grid stagger" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><div class="kpi-ic">💰</div><div class="lbl">Saldo do período</div><div class="num" style="color:var(--color-success)">R$ 8.420</div><div class="delta up">↑ receitas acima da média</div></div>
+          <div class="kpi"><div class="kpi-ic">🎵</div><div class="lbl">Músicas no repertório</div><div class="num">87</div><div class="delta up">↑ 5 novas</div></div>
+          <div class="kpi"><div class="kpi-ic">🎤</div><div class="lbl">Pregações publicadas</div><div class="num">42</div><div class="delta up">↑ 3 neste mês</div></div>
+        </div>
+        <div class="admin-grid-2" style="margin-top:.65rem">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>📅 Últimos eventos</h3>
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-eventos')">Ver todos</button>
+            </div>
+            <div class="panel-body flush">
+              <table>
+                <thead><tr><th>Evento</th><th>Data</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><strong style="color:var(--text-primary)">Santa Ceia</strong><div style="font-size:.78rem;color:var(--text-muted)">Templo Sede</div></td><td>12/10/2026</td><td><span class="badge badge-gold">Planejado</span></td></tr>
+                  <tr><td><strong style="color:var(--text-primary)">Consagração</strong><div style="font-size:.78rem;color:var(--text-muted)">Sede</div></td><td>27/09/2026</td><td><span class="badge badge-blue">Em andamento</span></td></tr>
+                  <tr><td><strong style="color:var(--text-primary)">Culto de Adoração</strong><div style="font-size:.78rem;color:var(--text-muted)">Templo Sede</div></td><td>21/09/2026</td><td><span class="badge badge-green">Concluído</span></td></tr>
+                  <tr><td><strong style="color:var(--text-primary)">Congresso de Jovens</strong><div style="font-size:.78rem;color:var(--text-muted)">Auditório</div></td><td>14/09/2026</td><td><span class="badge badge-green">Concluído</span></td></tr>
+                  <tr><td><strong style="color:var(--text-primary)">Círculo de Oração</strong><div style="font-size:.78rem;color:var(--text-muted)">Sala de oração</div></td><td>12/09/2026</td><td><span class="badge badge-gray">Cancelado</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>⚠ Pendências críticas</h3>
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-gestao')">Ver todas</button>
+            </div>
+            <div class="panel-body flush">
+              <div class="pend-item"><div><div class="txt">Membros sem congregação definida</div><div class="hint">Cadastro incompleto · 12 registros</div></div><span class="badge badge-red">Alta</span></div>
+              <div class="pend-item"><div><div class="txt">Eventos sem orçamento registrado</div><div class="hint">Financeiro · 4 eventos</div></div><span class="badge badge-gold">Normal</span></div>
+              <div class="pend-item"><div><div class="txt">Pregações em rascunho</div><div class="hint">Comunicação · 5 itens</div></div><span class="badge badge-blue">Baixa</span></div>
+              <div class="pend-item"><div><div class="txt">Liturgias aguardando aprovação</div><div class="hint">Liturgia · 2 programações</div></div><span class="badge badge-gold">Normal</span></div>
+              <div class="pend-item"><div><div class="txt">Usuários sem permissão revisada</div><div class="hint">Segurança · 3 contas</div></div><span class="badge badge-red">Alta</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-gestao">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Centro de Gestão</h2>
+            <p class="section-sub">Indicadores consolidados, pendências e auditoria em um só lugar</p>
+          </div>
+          <div class="tabs">
+            <button class="tab active" onclick="gestaoTab(this,'visao')">Visão executiva</button>
+            <button class="tab" onclick="gestaoTab(this,'pendencias')">Pendências</button>
+            <button class="tab" onclick="gestaoTab(this,'auditoria')">Auditoria</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div><label class="label">Período</label>
+            <select class="select" style="width:175px"><option>Últimos 7 dias</option><option selected>Últimos 30 dias</option><option>Últimos 90 dias</option><option>Personalizado</option></select>
+          </div>
+          <div><label class="label">Organização</label>
+            <select class="select" style="width:205px"><option>Todas as organizações</option><option>Matriz</option><option>Cohabiano</option><option>Res. Tiradentes</option></select>
+          </div>
+          <div><label class="label">Congregação</label>
+            <select class="select" style="width:185px"><option>Todas</option><option>Matriz</option><option>Cohabiano</option></select>
+          </div>
+          <div style="margin-left:auto;align-self:flex-end">
+            <button class="btn btn-primary" onclick="toast('Filtros aplicados','Indicadores recalculados.')">Aplicar filtros</button>
+          </div>
+        </div>
+
+        <div id="gestao-visao">
+          <div class="stat-strip stagger">
+            <div class="stat-box"><div class="v">248</div><div class="l">Membros ativos</div></div>
+            <div class="stat-box"><div class="v">92%</div><div class="l">Taxa de presença</div></div>
+            <div class="stat-box"><div class="v">R$ 24,5k</div><div class="l">Receita no período</div></div>
+            <div class="stat-box"><div class="v">43</div><div class="l">Ações realizadas</div></div>
+          </div>
+          <div class="admin-grid-2">
+            <div class="panel">
+              <div class="panel-head"><h3>📈 Indicadores por módulo</h3><span class="badge badge-gray">vs. período anterior</span></div>
+              <div class="panel-body">
+                <div class="bars">
+                  <div class="bar-row"><div class="top"><span>Membros · novos cadastros</span><span class="pct">86%</span></div><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div></div>
+                  <div class="bar-row"><div class="top"><span>Eventos · taxa de conclusão</span><span class="pct">72%</span></div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div></div>
+                  <div class="bar-row"><div class="top"><span>Financeiro · meta de receita</span><span class="pct">94%</span></div><div class="bar-track"><div class="bar-fill" style="width:94%"></div></div></div>
+                  <div class="bar-row"><div class="top"><span>Comunicação · pregações publicadas</span><span class="pct">58%</span></div><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div></div>
+                  <div class="bar-row"><div class="top"><span>Liturgia · programações concluídas</span><span class="pct">81%</span></div><div class="bar-track"><div class="bar-fill" style="width:81%"></div></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>🏆 Destaques do período</h3></div>
+              <div class="panel-body flush">
+                <div class="pend-item"><div><div class="txt">Maior presença</div><div class="hint">Culto de Adoração · 312 pessoas</div></div><span class="badge badge-gold">1º</span></div>
+                <div class="pend-item"><div><div class="txt">Membro mais ativo</div><div class="hint">Ana Caroline · 18 ações</div></div><span class="badge badge-blue">Top</span></div>
+                <div class="pend-item"><div><div class="txt">Melhor campanha</div><div class="hint">Campanha de Natal · 112% da meta</div></div><span class="badge badge-green">Meta</span></div>
+                <div class="pend-item"><div><div class="txt">Ministério em destaque</div><div class="hint">Louvor · 24 escalas cumpridas</div></div><span class="badge badge-gold">Ativo</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gestao-pendencias" style="display:none">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>⚠ Todas as pendências</h3>
+              <div class="chip-row"><span class="chip active">Todas</span><span class="chip">Alta</span><span class="chip">Normal</span><span class="chip">Baixa</span></div>
+            </div>
+            <div class="panel-body flush">
+              <div class="pend-item"><div><div class="txt">Membros sem congregação definida</div><div class="hint">12 registros · Pessoas</div></div><div class="row-actions"><span class="badge badge-red">Alta</span><button class="mini-btn" onclick="go('admin-membros')">→</button></div></div>
+              <div class="pend-item"><div><div class="txt">Usuários sem permissão revisada</div><div class="hint">3 contas · Segurança</div></div><div class="row-actions"><span class="badge badge-red">Alta</span><button class="mini-btn" onclick="go('admin-usuarios')">→</button></div></div>
+              <div class="pend-item"><div><div class="txt">Eventos sem orçamento registrado</div><div class="hint">4 eventos · Financeiro</div></div><div class="row-actions"><span class="badge badge-gold">Normal</span><button class="mini-btn" onclick="go('admin-eventos')">→</button></div></div>
+              <div class="pend-item"><div><div class="txt">Liturgias aguardando aprovação</div><div class="hint">2 programações · Liturgia</div></div><div class="row-actions"><span class="badge badge-gold">Normal</span><button class="mini-btn" onclick="go('admin-liturgia')">→</button></div></div>
+              <div class="pend-item"><div><div class="txt">Pregações em rascunho</div><div class="hint">5 itens · Comunicação</div></div><div class="row-actions"><span class="badge badge-blue">Baixa</span><button class="mini-btn" onclick="go('admin-com-pregacoes')">→</button></div></div>
+              <div class="pend-item"><div><div class="txt">Galeria sem categorias</div><div class="hint">8 imagens · Galeria</div></div><div class="row-actions"><span class="badge badge-blue">Baixa</span><button class="mini-btn" onclick="go('admin-galeria')">→</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gestao-auditoria" style="display:none">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>📋 Trilha de auditoria</h3>
+              <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+                <input class="input" placeholder="Filtrar por usuário ou ação..." style="width:260px">
+                <button class="btn btn-secondary btn-sm" onclick="toast('Exportação iniciada','CSV gerado com 142 registros.')">Exportar CSV</button>
+              </div>
+            </div>
+            <div class="panel-body flush">
+              <table>
+                <thead><tr><th>Quando</th><th>Usuário</th><th>Ação</th><th>Recurso</th><th>Detalhes</th></tr></thead>
+                <tbody>
+                  <tr><td>07/10/2026 14:32</td><td><strong style="color:var(--text-primary)">Super Admin</strong></td><td><span class="badge badge-green">CREATE</span></td><td>Usuario</td><td>Criou conta p/ João Silva (MUSICO)</td></tr>
+                  <tr><td>07/10/2026 13:18</td><td><strong style="color:var(--text-primary)">Pr. Cleiginaldo</strong></td><td><span class="badge badge-blue">UPDATE</span></td><td>Evento</td><td>Alterou orçamento de Santa Ceia</td></tr>
+                  <tr><td>07/10/2026 11:05</td><td><strong style="color:var(--text-primary)">Marcio Louzeiro</strong></td><td><span class="badge badge-blue">UPDATE</span></td><td>Liturgia</td><td>Editou programação do culto dominical</td></tr>
+                  <tr><td>06/10/2026 19:44</td><td><strong style="color:var(--text-primary)">Super Admin</strong></td><td><span class="badge badge-red">DELETE</span></td><td>Aviso</td><td>Removeu aviso expirado</td></tr>
+                  <tr><td>06/10/2026 16:20</td><td><strong style="color:var(--text-primary)">Dc. Thiane</strong></td><td><span class="badge badge-green">CREATE</span></td><td>Musica</td><td>Adicionou 3 músicas ao repertório</td></tr>
+                  <tr><td>06/10/2026 09:12</td><td><strong style="color:var(--text-primary)">Super Admin</strong></td><td><span class="badge badge-gold">LOGIN</span></td><td>Auth</td><td>Sessão iniciada · JWT emitido</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-membros">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Gestão de Membros</h2>
+            <p class="section-sub">Escopo por organização e congregação · validação Zod · soft delete por status</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('membro')">+ Novo membro</button>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">248</div><div class="l">Total</div></div>
+          <div class="stat-box"><div class="v">231</div><div class="l">Ativos</div></div>
+          <div class="stat-box"><div class="v">12</div><div class="l">Sem congregação</div></div>
+          <div class="stat-box"><div class="v">5</div><div class="l">Inativos</div></div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar por nome, e-mail ou telefone..." oninput="filterTable('membrosBody',this.value)"></div>
+          <select class="select" style="width:185px"><option>Todas as congregações</option><option>Matriz</option><option>Cohabiano</option><option>Res. Tiradentes</option></select>
+          <select class="select" style="width:145px"><option>Todos os status</option><option>Ativo</option><option>Inativo</option></select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Membro</th><th>Congregação</th><th>Telefone</th><th>Entrada</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="membrosBody"></tbody>
+          </table>
+        </div>
+        <div class="callout callout-gold" style="margin-top:1.35rem">
+          <span>🛡</span>
+          <div><strong>Boas práticas aplicadas:</strong> senha nunca exposta em responses · validação Zod antes do Prisma · soft delete via flag <code>status</code> · escopo por <code>UsuarioOrganizacao</code>.</div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-lideranca">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Liderança</h2>
+            <p class="section-sub">Pastores, dirigentes e líderes de ministérios · ordenação e visibilidade pública</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('lider')">+ Novo líder</button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar líder..."></div>
+          <div class="chip-row"><span class="chip active">Todos</span><span class="chip">Pastores</span><span class="chip">Dirigentes</span><span class="chip">Líderes de ministério</span></div>
+          <label style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:var(--text-secondary);margin-left:auto">
+            <input type="checkbox" checked> Exibir no site público
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ordem</th><th>Líder</th><th>Cargo</th><th>Congregação</th><th>Visível</th><th>Ações</th></tr></thead>
+            <tbody id="lideresBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-usuarios">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Usuários & Permissões</h2>
+            <p class="section-sub">RBAC com hierarquia de perfis · canAssignRole impede escalada de privilégios</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('usuario')">+ Novo usuário</button>
+        </div>
+        <div class="callout callout-blue">
+          <span>🔐</span>
+          <div><strong>Regras de segurança:</strong> usuário só atribui roles de nível inferior · <code>passwordHash</code> nunca exposto · ações sensíveis registradas em auditoria · inativar em vez de deletar.</div>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">9</div><div class="l">Usuários</div></div>
+          <div class="stat-box"><div class="v">1</div><div class="l">SUPER_ADMIN</div></div>
+          <div class="stat-box"><div class="v">4</div><div class="l">Perfis ativos</div></div>
+          <div class="stat-box"><div class="v">3</div><div class="l">Pendentes revisão</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Usuário</th><th>Perfil</th><th>Organizações</th><th>Último acesso</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="usuariosBody"></tbody>
+          </table>
+        </div>
+        <div class="panel" style="margin-top:1.65rem">
+          <div class="panel-head"><h3>🎭 Hierarquia de papéis</h3><span class="badge badge-gray">canAssignRole: só atribui nível inferior</span></div>
+          <div class="panel-body">
+            <div class="bars">
+              <div class="bar-row"><div class="top"><span>SUPER_ADMIN</span><span class="pct">nível 100 · acesso total</span></div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>ADMIN</span><span class="pct">nível 90</span></div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>PASTOR</span><span class="pct">nível 85</span></div><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>ADMIN_IGREJA</span><span class="pct">nível 80</span></div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>LIDER · LIDER_MINISTERIO</span><span class="pct">nível 60</span></div><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>SECRETARIA · FINANCEIRO · EDITOR_SITE</span><span class="pct">nível 50</span></div><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>MUSICO</span><span class="pct">nível 20</span></div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div></div>
+              <div class="bar-row"><div class="top"><span>MEMBER</span><span class="pct">nível 10</span></div><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Liturgia · Programações</h2>
+            <p class="section-sub">Ordem de culto, repertório e impressão · escopo por organização</p>
+          </div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="go('admin-liturgia-musicas')">♪ Músicas</button>
+            <button class="btn btn-secondary" onclick="go('admin-liturgia-modelos')">⧉ Modelos</button>
+            <button class="btn btn-primary" onclick="go('admin-liturgia-editar')">+ Nova programação</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar programação..."></div>
+          <select class="select" style="width:165px"><option>Todos os status</option><option>Rascunho</option><option>Aprovada</option><option>Concluída</option></select>
+          <input class="input" type="date" style="width:175px">
+        </div>
+        <div class="grid-2">
+          <div class="card" style="cursor:pointer" onclick="go('admin-liturgia-detalhe')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-gold">Aprovada</div>
+              <div style="color:var(--text-muted);font-size:.78rem">12/10/2026</div>
+            </div>
+            <h3 style="font-size:1.28rem;margin-bottom:.52rem">Culto de Adoração — Domingo</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Templo Sede · 18h30 · 9 itens na ordem</p>
+            <div class="chip-row" style="margin-top:1.15rem">
+              <span class="chip">Louvor</span><span class="chip">Oração</span><span class="chip">Oferta</span><span class="chip">Palavra</span>
+            </div>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();go('admin-liturgia-imprimir')">Imprimir</button>
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();go('admin-liturgia-culto')">Modo culto</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-blue">Rascunho</div>
+              <div style="color:var(--text-muted);font-size:.78rem">15/10/2026</div>
+            </div>
+            <h3 style="font-size:1.28rem;margin-bottom:.52rem">Culto de Doutrina — Terça</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Templo Sede · 19h30 · 6 itens na ordem</p>
+            <div class="chip-row" style="margin-top:1.15rem">
+              <span class="chip">Louvor</span><span class="chip">Estudo</span><span class="chip">Oração</span>
+            </div>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-secondary btn-sm" onclick="toast('Programação duplicada','Cópia criada como rascunho.')">Duplicar</button>
+              <button class="btn btn-primary btn-sm" onclick="go('admin-liturgia-culto')">Modo culto</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-green">Concluída</div>
+              <div style="color:var(--text-muted);font-size:.78rem">08/10/2026</div>
+            </div>
+            <h3 style="font-size:1.28rem;margin-bottom:.52rem">Círculo de Oração — Sexta</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Sala de oração · 19h30 · 5 itens</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-detalhe')">Ver resumo</button>
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-imprimir')">Imprimir</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-gold">Aprovada</div>
+              <div style="color:var(--text-muted);font-size:.78rem">19/10/2026</div>
+            </div>
+            <h3 style="font-size:1.28rem;margin-bottom:.52rem">Santa Ceia — Domingo especial</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Templo Sede · 18h30 · 12 itens na ordem</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-primary btn-sm" onclick="go('admin-liturgia-culto')">Modo culto</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-editar">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-liturgia')" style="margin-bottom:.75rem">← Voltar para programações</button>
+            <h2 class="section-title" style="font-size:2.15rem">Editar programação</h2>
+            <p class="section-sub">liturgiaSchema + liturgiaItemSchema · arraste para reordenar os itens</p>
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-secondary" onclick="go('admin-liturgia-imprimir')">Pré-visualizar</button>
+            <button class="btn btn-primary" onclick="toast('Programação salva!','Liturgia atualizada com sucesso.')">Salvar programação</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-head">
+            <h3>Dados da programação</h3>
+            <p>PATCH /api/liturgia/[id] · params: Promise&lt;{ id: string }&gt;</p>
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid">
+              <div class="field"><label class="label">Título</label><input class="input" value="Culto de Adoração — Domingo"></div>
+              <div class="field"><label class="label">Data do culto</label><input class="input" type="date" value="2026-10-12"></div>
+              <div class="field"><label class="label">Horário</label><input class="input" value="18:30"></div>
+              <div class="field"><label class="label">Local</label><input class="input" value="Templo Sede"></div>
+              <div class="field"><label class="label">Status</label>
+                <select class="select"><option>Rascunho</option><option selected>Aprovada</option><option>Concluída</option></select>
+              </div>
+              <div class="field"><label class="label">Modelo base</label>
+                <select class="select"><option>Culto de Adoração (padrão)</option><option>Santa Ceia</option><option>Culto de Doutrina</option></select>
+              </div>
+              <div class="field full"><label class="label">Observações</label><textarea class="textarea">Culto com a participação do coral. Trazer a ceia preparada.</textarea></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:1.65rem">
+          <div class="panel-head">
+            <h3>📋 Ordem do culto</h3>
+            <button class="btn btn-secondary btn-sm" onclick="toast('Item adicionado','Novo item incluído na ordem.')">+ Adicionar item</button>
+          </div>
+          <div class="panel-body flush">
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">1. Corinho de abertura</div><div class="hint">Louvor · "Grandioso é o Senhor" · 5 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">2. Louvor congregacional</div><div class="hint">3 músicas · Ministério de Louvor · 15 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">3. Oração e bem-vindas</div><div class="hint">Dirigente · 5 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">4. Oferta e dízimos</div><div class="hint">Tesouraria · 8 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">5. Palavra — "Uma fé que não recua"</div><div class="hint">Pr. Cleiginaldo Barros · 40 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">6. Santa Ceia</div><div class="hint">Celebração · 15 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+            <div class="pend-item"><div style="display:flex;gap:1.15rem;align-items:center"><span class="badge badge-gray">⠿</span><div><div class="txt">7. Avisos e despedida</div><div class="hint">Secretaria · 5 min</div></div></div><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-detalhe">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-liturgia')" style="margin-bottom:.75rem">← Voltar</button>
+            <h2 class="section-title" style="font-size:2.15rem">Culto de Adoração — Domingo</h2>
+            <p class="section-sub">12/10/2026 · 18h30 · Templo Sede · 9 itens</p>
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-secondary" onclick="go('admin-liturgia-imprimir')">Imprimir</button>
+            <button class="btn btn-secondary" onclick="toast('Programação duplicada','Cópia criada como rascunho.')">Duplicar</button>
+            <button class="btn btn-primary" onclick="go('admin-liturgia-culto')">▶ Modo culto</button>
+          </div>
+        </div>
+        <div class="admin-grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>Ordem do culto</h3><span class="badge badge-gold">Aprovada</span></div>
+            <div class="panel-body flush">
+              <div class="pend-item"><div><div class="txt">1. Corinho de abertura</div><div class="hint">Louvor · 5 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">2. Louvor congregacional</div><div class="hint">3 músicas · 15 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">3. Oração e bem-vindas</div><div class="hint">5 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">4. Oferta e dízimos</div><div class="hint">8 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">5. Palavra</div><div class="hint">Pr. Cleiginaldo · 40 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">6. Santa Ceia</div><div class="hint">15 min</div></div></div>
+              <div class="pend-item"><div><div class="txt">7. Avisos e despedida</div><div class="hint">5 min</div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel" style="margin-bottom:1.35rem">
+              <div class="panel-head"><h3>🎵 Repertório</h3></div>
+              <div class="panel-body flush">
+                <div class="pend-item"><div><div class="txt">Grandioso é o Senhor</div><div class="hint">Tom: G · 72 BPM</div></div></div>
+                <div class="pend-item"><div><div class="txt">Bondade de Deus</div><div class="hint">Tom: D · 68 BPM</div></div></div>
+                <div class="pend-item"><div><div class="txt">Ousado Amor</div><div class="hint">Tom: A · 74 BPM</div></div></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>👥 Escala</h3></div>
+              <div class="panel-body flush">
+                <div class="pend-item"><div><div class="txt">Regência</div><div class="hint">Dc. Thiane Louzeiro</div></div><span class="badge badge-green">Confirmada</span></div>
+                <div class="pend-item"><div><div class="txt">Som & Mídia</div><div class="hint">Jannes</div></div><span class="badge badge-green">Confirmada</span></div>
+                <div class="pend-item"><div><div class="txt">Palavra</div><div class="hint">Pr. Cleiginaldo Barros</div></div><span class="badge badge-gold">Pendente</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-imprimir">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-liturgia-detalhe')" style="margin-bottom:.75rem">← Voltar</button>
+            <h2 class="section-title" style="font-size:2.15rem">Pré-visualização de impressão</h2>
+            <p class="section-sub">Layout otimizado para A4 · cabeçalho institucional</p>
+          </div>
+          <button class="btn btn-primary" onclick="toast('Enviado para impressão','1 cópia · A4 retrato.')">🖨 Imprimir</button>
+        </div>
+        <div class="print-sheet">
+          <h1>Culto de Adoração — Domingo</h1>
+          <div class="sub">IADMP · 12 de outubro de 2026 · 18h30 · Templo Sede</div>
+          <div class="print-item"><div class="n">1</div><div><h4>Corinho de abertura</h4><p>"Grandioso é o Senhor" · Ministério de Louvor · 5 min</p></div></div>
+          <div class="print-item"><div class="n">2</div><div><h4>Louvor congregacional</h4><p>Bondade de Deus · Ousado Amor · Grande Eu Sou · 15 min</p></div></div>
+          <div class="print-item"><div class="n">3</div><div><h4>Oração e bem-vindas</h4><p>Dirigente · 5 min</p></div></div>
+          <div class="print-item"><div class="n">4</div><div><h4>Oferta e dízimos</h4><p>Tesouraria · 8 min</p></div></div>
+          <div class="print-item"><div class="n">5</div><div><h4>Palavra — "Uma fé que não recua"</h4><p>Pr. Cleiginaldo Barros · Hebreus 11 · 40 min</p></div></div>
+          <div class="print-item"><div class="n">6</div><div><h4>Santa Ceia</h4><p>Celebração · 15 min</p></div></div>
+          <div class="print-item"><div class="n">7</div><div><h4>Avisos e despedida</h4><p>Secretaria · Bênção apostólica · 5 min</p></div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-culto" style="margin:-2.55rem -2.15rem -4.25rem">
+        <div class="modo-culto">
+          <div class="kicker" style="justify-content:center">Item 5 de 7 · Palavra</div>
+          <h1 class="culto-title">"Uma fé que não recua"</h1>
+          <p class="culto-verse">"Ora, a fé é o firme fundamento das coisas que se esperam, e a prova das coisas que se não veem."</p>
+          <div class="culto-ref">Hebreus 11:1</div>
+          <div class="culto-progress"><div class="fill"></div></div>
+          <div style="color:var(--text-muted);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase">Pr. Cleiginaldo Barros · 34:12 / 48:00</div>
+          <div class="culto-nav">
+            <button class="btn btn-secondary" onclick="toast('Item anterior','Voltando para: Oferta e dízimos.')">← Anterior</button>
+            <button class="btn btn-secondary" onclick="go('admin-liturgia-detalhe')">Sair do modo culto</button>
+            <button class="btn btn-primary" onclick="toast('Próximo item','Indo para: Santa Ceia.')">Próximo →</button>
+          </div>
+          <div style="margin-top:3.15rem;display:flex;gap:1.55rem;flex-wrap:wrap;justify-content:center">
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.65rem;color:var(--color-primary)">1</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)">Corinho</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.65rem;color:var(--color-primary)">2</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)">Louvor</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.65rem;color:var(--color-primary)">3</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)">Oração</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.65rem;color:var(--color-primary)">4</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)">Oferta</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.65rem;color:#fff">5</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--color-primary)">Palavra</div></div>
+            <div style="text-align:center;opacity:.45"><div style="font-family:'Playfair Display',serif;font-size:1.65rem">6</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase">Ceia</div></div>
+            <div style="text-align:center;opacity:.45"><div style="font-family:'Playfair Display',serif;font-size:1.65rem">7</div><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase">Avisos</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-musicas">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-liturgia')" style="margin-bottom:.75rem">← Liturgia</button>
+            <h2 class="section-title" style="font-size:2.15rem">Repertório de músicas</h2>
+            <p class="section-sub">Acervo de músicas com cifra, tom, BPM e vídeo · usado nas escalas</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('musica')">+ Nova música</button>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">87</div><div class="l">Músicas</div></div>
+          <div class="stat-box"><div class="v">12</div><div class="l">Ministérios</div></div>
+          <div class="stat-box"><div class="v">34</div><div class="l">Com cifra</div></div>
+          <div class="stat-box"><div class="v">56</div><div class="l">Com vídeo</div></div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar por título, autor ou ministério..." oninput="filterTable('musicasBody',this.value)"></div>
+          <select class="select" style="width:175px"><option>Todos os ministérios</option><option>Louvor</option><option>Coral</option><option>Jovens</option></select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Música</th><th>Autor</th><th>Tom</th><th>BPM</th><th>Ministério</th><th>Ações</th></tr></thead>
+            <tbody id="musicasBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-liturgia-modelos">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-liturgia')" style="margin-bottom:.75rem">← Liturgia</button>
+            <h2 class="section-title" style="font-size:2.15rem">Modelos de liturgia</h2>
+            <p class="section-sub">Templates reutilizáveis para agilizar a criação de programações</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modelo')">+ Novo modelo</button>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="badge badge-gold" style="margin-bottom:.85rem">Mais usado</div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Culto de Adoração</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">7 itens · louvor, oração, oferta, palavra, despedida</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-primary btn-sm" onclick="toast('Programação criada','A partir do modelo Culto de Adoração.')">Usar modelo</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="badge badge-red" style="margin-bottom:.85rem">Especial</div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Santa Ceia</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">12 itens · inclui celebração da ceia e preparação</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-primary btn-sm" onclick="toast('Programação criada','A partir do modelo Santa Ceia.')">Usar modelo</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="badge badge-blue" style="margin-bottom:.85rem">Ensino</div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Culto de Doutrina</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">6 itens · estudo aprofundado da Palavra</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="go('admin-liturgia-editar')">Editar</button>
+              <button class="btn btn-primary btn-sm" onclick="toast('Programação criada','A partir do modelo Culto de Doutrina.')">Usar modelo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-eventos">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Eventos</h2>
+            <p class="section-sub">Inscrições, pagamentos, check-in, campanhas e conciliação · eventoSchema</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('evento')">+ Novo evento</button>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">43</div><div class="l">Total no ano</div></div>
+          <div class="stat-box"><div class="v">7</div><div class="l">Futuros</div></div>
+          <div class="stat-box"><div class="v">284</div><div class="l">Inscrições</div></div>
+          <div class="stat-box"><div class="v">R$ 12,3k</div><div class="l">Orçamento previsto</div></div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar evento..." oninput="filterTable('eventosBody',this.value)"></div>
+          <select class="select" style="width:155px"><option>Todos os status</option><option>Planejado</option><option>Em andamento</option><option>Concluído</option><option>Cancelado</option></select>
+          <button class="btn btn-secondary btn-sm" onclick="go('evento-detalhe')">Ver inscrições da Santa Ceia</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Evento</th><th>Data</th><th>Local</th><th>Inscrições</th><th>Orçamento</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="eventosBody"></tbody>
+          </table>
+        </div>
+        <div class="callout callout-blue" style="margin-top:1.35rem">
+          <span>🎫</span>
+          <div><strong>Fluxo de inscrição:</strong> inscrição pública com validação Zod + rate limit (429) · gestão admin via <code>InscricoesManager</code> · check-in no dia do evento · status PENDENTE → CONFIRMADA.</div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-evento-inscricoes">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-eventos')" style="margin-bottom:.75rem">← Eventos</button>
+            <h2 class="section-title" style="font-size:2.15rem">Inscrições · Santa Ceia</h2>
+            <p class="section-sub">12/10/2026 · 28 confirmadas · 4 pendentes</p>
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-secondary" onclick="toast('Lista exportada','32 inscrições em CSV.')">Exportar CSV</button>
+            <button class="btn btn-primary" onclick="openModal('inscricao')">+ Inscrição manual</button>
+          </div>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">32</div><div class="l">Total</div></div>
+          <div class="stat-box"><div class="v">28</div><div class="l">Confirmadas</div></div>
+          <div class="stat-box"><div class="v">4</div><div class="l">Pendentes</div></div>
+          <div class="stat-box"><div class="v">18</div><div class="l">Check-in feito</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Contato</th><th>Data inscrição</th><th>Status</th><th>Check-in</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--text-primary)">Maria das Graças</strong></td><td>maria@email.com</td><td>02/10/2026</td><td><span class="badge badge-green">Confirmada</span></td><td><span class="badge badge-green">Feito</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">João Batista</strong></td><td>(98) 99123-4567</td><td>03/10/2026</td><td><span class="badge badge-green">Confirmada</span></td><td><span class="badge badge-green">Feito</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">Ana Carolina</strong></td><td>ana@email.com</td><td>04/10/2026</td><td><span class="badge badge-gold">Pendente</span></td><td><span class="badge badge-gray">—</span></td><td><div class="row-actions"><button class="mini-btn">✓</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">Pedro Henrique</strong></td><td>pedro@email.com</td><td>05/10/2026</td><td><span class="badge badge-green">Confirmada</span></td><td><span class="badge badge-gray">—</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-financeiro">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Financeiro</h2>
+            <p class="section-sub">Livro-razão (EventoFinanceiro) com categoria · dízimo, oferta, doação, inscrição e despesa</p>
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-secondary" onclick="openModal('categoria')">Categorias</button>
+            <button class="btn btn-primary" onclick="openModal('lancamento')">+ Novo lançamento</button>
+          </div>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v" style="color:var(--color-success)">R$ 24,5k</div><div class="l">Entradas no período</div></div>
+          <div class="stat-box"><div class="v" style="color:var(--color-danger)">R$ 16,1k</div><div class="l">Saídas no período</div></div>
+          <div class="stat-box"><div class="v">R$ 8,4k</div><div class="l">Saldo</div></div>
+          <div class="stat-box"><div class="v">142</div><div class="l">Lançamentos</div></div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar lançamento..." oninput="filterTable('financeiroBody',this.value)"></div>
+          <select class="select" style="width:165px"><option>Todos os tipos</option><option>Dízimo</option><option>Oferta</option><option>Doação</option><option>Inscrição</option><option>Despesa</option></select>
+          <select class="select" style="width:175px"><option>Todas as categorias</option><option>Mensal</option><option>Eventos</option><option>Manutenção</option></select>
+          <input class="input" type="month" style="width:165px" value="2026-10">
+        </div>
+        <div class="admin-grid-2">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Descrição</th><th>Tipo</th><th>Valor</th><th>Data</th><th>Responsável</th></tr></thead>
+              <tbody id="financeiroBody"></tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>📊 Por categoria</h3></div>
+            <div class="panel-body">
+              <div class="bars">
+                <div class="bar-row"><div class="top"><span>Dízimos</span><span class="pct">R$ 14,2k</span></div><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div></div>
+                <div class="bar-row"><div class="top"><span>Ofertas</span><span class="pct">R$ 6,8k</span></div><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div></div>
+                <div class="bar-row"><div class="top"><span>Doações</span><span class="pct">R$ 2,1k</span></div><div class="bar-track"><div class="bar-fill" style="width:24%"></div></div></div>
+                <div class="bar-row"><div class="top"><span>Inscrições</span><span class="pct">R$ 1,4k</span></div><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div></div>
+                <div class="bar-row"><div class="top"><span>Despesas</span><span class="pct">R$ 16,1k</span></div><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-avisos">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Avisos</h2>
+            <p class="section-sub">Comunicados internos e publicação no site · urgência · validade · situacaoAviso</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('aviso')">+ Novo aviso</button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar aviso..."></div>
+          <div class="chip-row"><span class="chip active">Todos</span><span class="chip">Ativos</span><span class="chip">Expirados</span><span class="chip">Rascunhos</span></div>
+          <label style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:var(--text-secondary);margin-left:auto">
+            <input type="checkbox" checked> Publicar no site
+          </label>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-red">Urgente</div>
+              <div style="color:var(--text-muted);font-size:.78rem">válido até 20/10/2026</div>
+            </div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Jejum e oração de 21 dias</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Iniciaremos nosso jejum anual. Material disponível na secretaria. Público-alvo: toda a igreja.</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="openModal('aviso')">Editar</button>
+              <button class="btn btn-secondary btn-sm">Exibir no site</button>
+              <button class="mini-btn danger" onclick="toast('Aviso excluído','Registro removido com sucesso.')">✕</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-gold">Normal</div>
+              <div style="color:var(--text-muted);font-size:.78rem">válido até 30/10/2026</div>
+            </div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Ensaio do coral</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Ensaio especial às sextas às 19h no salão. Presença obrigatória para o coral. Público-alvo: Coral.</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="openModal('aviso')">Editar</button>
+              <button class="btn btn-secondary btn-sm">Exibir no site</button>
+              <button class="mini-btn danger" onclick="toast('Aviso excluído','Registro removido com sucesso.')">✕</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-galeria">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Galeria</h2>
+            <p class="section-sub">Upload de imagens com categorias e legendas · exibição no site público</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('imagem')">+ Enviar imagens</button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar por legenda ou categoria..."></div>
+          <select class="select" style="width:175px"><option>Todas as categorias</option><option>Cultos</option><option>Eventos</option><option>Ministérios</option></select>
+        </div>
+        <div class="gallery-grid" id="adminGalleryGrid"></div>
+      </section>
+
+      <section class="page" id="page-admin-oportunidades">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Oportunidades</h2>
+            <p class="section-sub">Vagas de voluntariado e ministérios · prazos · responsáveis</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('oportunidade')">+ Nova oportunidade</button>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-green">Aberta</div>
+              <div class="badge badge-gray">Ministério</div>
+            </div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Músico(a) · Violão e Teclado</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Procuramos músicos comprometidos para o ministério de louvor. Ensaios às quartas. Responsável: Dc. Thiane.</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="openModal('oportunidade')">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="toast('Oportunidade encerrada','Vaga marcada como encerrada.')">Encerrar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem">
+              <div class="badge badge-green">Aberta</div>
+              <div class="badge badge-gray">Som & Mídia</div>
+            </div>
+            <h3 style="font-size:1.22rem;margin-bottom:.52rem">Operador(a) de som</h3>
+            <p style="color:var(--text-secondary);font-size:.88rem">Apoio técnico nos cultos e eventos. Treinamento oferecido. Responsável: Jannes.</p>
+            <div style="display:flex;gap:.55rem;margin-top:1.35rem">
+              <button class="btn btn-secondary btn-sm" onclick="openModal('oportunidade')">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="toast('Oportunidade encerrada','Vaga marcada como encerrada.')">Encerrar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-comunicacao">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Comunicação · Dashboard</h2>
+            <p class="section-sub">Canais oficiais, pregações e versículos do dia · publicação no site</p>
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-secondary" onclick="go('admin-com-canais')">Canais</button>
+            <button class="btn btn-secondary" onclick="go('admin-com-versiculos')">Versículos</button>
+            <button class="btn btn-primary" onclick="go('admin-com-pregacoes')">Pregações</button>
+          </div>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="v">42</div><div class="l">Pregações publicadas</div></div>
+          <div class="stat-box"><div class="v">5</div><div class="l">Em rascunho</div></div>
+          <div class="stat-box"><div class="v">3</div><div class="l">Canais oficiais</div></div>
+          <div class="stat-box"><div class="v">21</div><div class="l">Versículos programados</div></div>
+        </div>
+        <div class="admin-grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>🎤 Últimas pregações</h3><button class="btn btn-secondary btn-sm" onclick="go('admin-com-pregacoes')">Ver todas</button></div>
+            <div class="panel-body flush">
+              <div class="pend-item"><div><div class="txt">Uma Fé Que Não Recua</div><div class="hint">Pr. Cleiginaldo · Série: Fé que Vence</div></div><span class="badge badge-green">Publicada</span></div>
+              <div class="pend-item"><div><div class="txt">O Poder da Oração</div><div class="hint">Pr. Walmorio · Série: Vida de Oração</div></div><span class="badge badge-green">Publicada</span></div>
+              <div class="pend-item"><div><div class="txt">Coração Adorador</div><div class="hint">Pb. Marcio · Série: Adoração</div></div><span class="badge badge-blue">Rascunho</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>📡 Canais oficiais</h3><button class="btn btn-secondary btn-sm" onclick="go('admin-com-canais')">Gerenciar</button></div>
+            <div class="panel-body flush">
+              <div class="pend-item"><div><div class="txt">YouTube</div><div class="hint">@iadmpma · 1.240 inscritos</div></div><span class="badge badge-green">Ativo</span></div>
+              <div class="pend-item"><div><div class="txt">Instagram</div><div class="hint">@iadmpma · 890 seguidores</div></div><span class="badge badge-green">Ativo</span></div>
+              <div class="pend-item"><div><div class="txt">Facebook</div><div class="hint">m.me/ernest_achiever</div></div><span class="badge badge-gray">Pausado</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-com-canais">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-comunicacao')" style="margin-bottom:.75rem">← Comunicação</button>
+            <h2 class="section-title" style="font-size:2.15rem">Canais oficiais</h2>
+            <p class="section-sub">Redes sociais e plataformas exibidas no site público · CanalOficial</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('canal')">+ Novo canal</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Canal</th><th>URL</th><th>Seguidores</th><th>Visível no site</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--text-primary)">▶ YouTube</strong></td><td>youtube.com/@iadmpma</td><td>1.240</td><td><span class="badge badge-green">Sim</span></td><td><span class="badge badge-green">Ativo</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">◎ Instagram</strong></td><td>instagram.com/iadmpma</td><td>890</td><td><span class="badge badge-green">Sim</span></td><td><span class="badge badge-green">Ativo</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">✆ WhatsApp</strong></td><td>wa.me/+5598988035646</td><td>—</td><td><span class="badge badge-green">Sim</span></td><td><span class="badge badge-green">Ativo</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-com-pregacoes">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-comunicacao')" style="margin-bottom:.75rem">← Comunicação</button>
+            <h2 class="section-title" style="font-size:2.15rem">Pregações</h2>
+            <p class="section-sub">Publicação com slug, série, tags e mídia · status RASCUNHO → PUBLICADA</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('pregacao')">+ Nova pregação</button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap"><span class="si">⌕</span><input class="input" placeholder="Buscar pregação..."></div>
+          <div class="chip-row"><span class="chip active">Todas</span><span class="chip">Publicadas</span><span class="chip">Rascunhos</span></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pregação</th><th>Pregador</th><th>Série</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--text-primary)">Uma Fé Que Não Recua</strong><div style="font-size:.78rem;color:var(--text-muted)">/pregacoes/uma-fe-que-nao-recua</div></td><td>Pr. Cleiginaldo</td><td>Fé que Vence</td><td>05/10/2026</td><td><span class="badge badge-green">Publicada</span></td><td><div class="row-actions"><button class="mini-btn">👁</button><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">O Poder da Oração</strong><div style="font-size:.78rem;color:var(--text-muted)">/pregacoes/o-poder-da-oracao</div></td><td>Pr. Walmorio</td><td>Vida de Oração</td><td>28/09/2026</td><td><span class="badge badge-green">Publicada</span></td><td><div class="row-actions"><button class="mini-btn">👁</button><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><strong style="color:var(--text-primary)">Coração Adorador</strong><div style="font-size:.78rem;color:var(--text-muted)">—</div></td><td>Pb. Marcio</td><td>Adoração</td><td>—</td><td><span class="badge badge-blue">Rascunho</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn">↑</button><button class="mini-btn danger">✕</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-com-versiculos">
+        <div class="section-head">
+          <div>
+            <button class="btn btn-ghost" onclick="go('admin-comunicacao')" style="margin-bottom:.75rem">← Comunicação</button>
+            <h2 class="section-title" style="font-size:2.15rem">Versículos do dia</h2>
+            <p class="section-sub">Rotação automática por slot · exibidos na home do site público</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('versiculo')">+ Novo versículo</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Slot</th><th>Referência</th><th>Texto</th><th>Ativo</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-gold">Manhã</span></td><td><strong style="color:var(--text-primary)">João 4:24</strong></td><td style="max-width:380px">"Exaltem o nome do Senhor em espírito e verdade..."</td><td><span class="badge badge-green">Sim</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><span class="badge badge-blue">Tarde</span></td><td><strong style="color:var(--text-primary)">Salmos 27:4</strong></td><td style="max-width:380px">"Uma coisa pedi ao Senhor, e a buscarei..."</td><td><span class="badge badge-green">Sim</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+              <tr><td><span class="badge badge-gray">Noite</span></td><td><strong style="color:var(--text-primary)">Romanos 12:2</strong></td><td style="max-width:380px">"Não vos conformeis com este século..."</td><td><span class="badge badge-green">Sim</span></td><td><div class="row-actions"><button class="mini-btn">✎</button><button class="mini-btn danger">✕</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-configuracoes">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Configurações · Geral</h2>
+            <p class="section-sub">Dados institucionais, contatos e integrações · ConfiguracoesIgreja</p>
+          </div>
+          <button class="btn btn-primary" onclick="toast('Configurações salvas!','Dados institucionais atualizados.')">Salvar alterações</button>
+        </div>
+        <div class="form-card">
+          <div class="form-card-head">
+            <h3>Identidade da igreja</h3>
+            <p>PATCH /api/configuracoes · requere permissão configuracoes:editar</p>
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid">
+              <div class="field"><label class="label">Nome</label><input class="input" value="IADMP"></div>
+              <div class="field"><label class="label">Nome completo</label><input class="input" value="Igreja Assembleia de Deus Ministério da Promessa"></div>
+              <div class="field"><label class="label">Telefone</label><input class="input" value="+55 98 98803-5646"></div>
+              <div class="field"><label class="label">E-mail</label><input class="input" value="marcio@codemed.com.br"></div>
+              <div class="field"><label class="label">Endereço</label><input class="input" value="Maranhão, Brasil"></div>
+              <div class="field"><label class="label">WhatsApp</label><input class="input" value="https://wa.me/+5598988035646"></div>
+              <div class="field full"><label class="label">Descrição</label><textarea class="textarea">Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.</textarea></div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary" onclick="toast('Configurações salvas!','Dados institucionais atualizados.')">Salvar</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin-aparencia">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:2.15rem">Configurações · Aparência</h2>
+            <p class="section-sub">Paletas de cores, tipografia e tema · aplicados pelo ThemeProvider</p>
+          </div>
+          <button class="btn btn-primary" onclick="toast('Tema aplicado!','Variáveis CSS atualizadas em tempo real.')">Aplicar tema</button>
+        </div>
+        <div class="callout callout-gold">
+          <span>🎨</span>
+          <div><strong>Como funciona:</strong> o <code>ThemeProvider</code> busca <code>/api/configuracoes</code> e injeta as variáveis CSS no <code>:root</code>. Paletas em <code>src/lib/theme-palettes.ts</code> · tipografia Playfair Display + Montserrat.</div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="font-size:1.22rem;margin-bottom:1.15rem">Paletas predefinidas</h3>
+            <div class="pend-item" style="padding-left:0;padding-right:0"><div style="display:flex;gap:.82rem;align-items:center"><div style="display:flex"><span style="width:28px;height:28px;border-radius:50%;background:#C8960C;border:2px solid var(--border-color)"></span><span style="width:28px;height:28px;border-radius:50%;background:#C41E1E;border:2px solid var(--border-color);margin-left:-8px"></span><span style="width:28px;height:28px;border-radius:50%;background:#0A1628;border:2px solid var(--border-color);margin-left:-8px"></span></div><div><div class="txt">Original</div><div class="hint">Ouro + vermelho + navy</div></div></div><span class="badge badge-gold">Ativa</span></div>
+            <div class="pend-item" style="padding-left:0;padding-right:0"><div style="display:flex;gap:.82rem;align-items:center"><div style="display:flex"><span style="width:28px;height:28px;border-radius:50%;background:#B8860B;border:2px solid var(--border-color)"></span><span style="width:28px;height:28px;border-radius:50%;background:#8B0000;border:2px solid var(--border-color);margin-left:-8px"></span><span style="width:28px;height:28px;border-radius:50%;background:#111827;border:2px solid var(--border-color);margin-left:-8px"></span></div><div><div class="txt">Elegante</div><div class="hint">Dark goldenrod + bordô</div></div></div></div>
+            <div class="pend-item" style="padding-left:0;padding-right:0"><div style="display:flex;gap:.82rem;align-items:center"><div style="display:flex"><span style="width:28px;height:28px;border-radius:50%;background:#D97706;border:2px solid var(--border-color)"></span><span style="width:28px;height:28px;border-radius:50%;background:#DC2626;border:2px solid var(--border-color);margin-left:-8px"></span><span style="width:28px;height:28px;border-radius:50%;background:#0F172A;border:2px solid var(--border-color);margin-left:-8px"></span></div><div><div class="txt">Moderna</div><div class="hint">Âmbar + vermelho vivo</div></div></div></div>
+            <div class="pend-item" style="padding-left:0;padding-right:0"><div style="display:flex;gap:.82rem;align-items:center"><div style="display:flex"><span style="width:28px;height:28px;border-radius:50%;background:#92700C;border:2px solid var(--border-color)"></span><span style="width:28px;height:28px;border-radius:50%;background:#B91C1C;border:2px solid var(--border-color);margin-left:-8px"></span><span style="width:28px;height:28px;border-radius:50%;background:#FFFBEB;border:2px solid var(--border-color);margin-left:-8px"></span></div><div><div class="txt">Clara</div><div class="hint">Tema claro · fundo creme</div></div></div></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1.22rem;margin-bottom:1.15rem">Tipografia</h3>
+            <div style="padding:1.35rem;border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:1.15rem">
+              <div class="label">Títulos — Playfair Display</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700">Organize seu ministério</div>
+            </div>
+            <div style="padding:1.35rem;border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:1.15rem">
+              <div class="label">Corpo — Montserrat</div>
+              <div style="font-family:'Montserrat',sans-serif;font-size:.95rem;color:var(--text-secondary)">Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida.</div>
+            </div>
+            <div style="padding:1.35rem;border:1px solid var(--border-color);border-radius:var(--radius-md)">
+              <div class="label">Botões — Montserrat 600 · uppercase</div>
+              <button class="btn btn-primary btn-sm">Ação primária</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════ DADOS DO SISTEMA ══════════ */
+const VALUES = [
+  { icon: '🙏', title: 'Adoração', desc: 'Exaltem o nome do Senhor em espírito e verdade.', verse: '1 Crônicas 16:29' },
+  { icon: '🤝', title: 'Comunhão', desc: 'Unidos em Cristo, fortalecemos a fé juntos.', verse: 'Salmo 27:4' },
+  { icon: '📖', title: 'Obediência', desc: 'Seguindo a Palavra de Deus em todas as coisas.', verse: 'Deuteronômio 11:1' },
+  { icon: '✨', title: 'Transformação', desc: 'Renovados pela renovação da mente.', verse: 'Romanos 12:2' },
+];
+
+const PROGRAMS = [
+  { day: 'Quarta e Domingo', title: 'Consagrações', time: '06:00', desc: 'Tempo de oração e consagração diante do Senhor.' },
+  { day: 'Terça-Feira', title: 'Culto de Doutrina', time: '19:30', desc: 'Estudo aprofundado da Palavra de Deus.' },
+  { day: 'Quarta-Feira', title: 'Culto no Res. Tiradentes', time: '19:30', desc: 'Culto na congregação do Res. Tiradentes.' },
+  { day: 'Sexta-Feira', title: 'Círculo de Oração', time: '19:30', desc: 'Momento de intercessão e busca por Deus.' },
+  { day: 'Domingo', title: 'Culto de Adoração', time: '18:30', desc: 'Adoração, palavra e comunhão.' },
+];
+
+const EVENTS = [
+  { d: '12', m: 'Out', title: 'Santa Ceia', local: 'Templo Sede', time: '18h30', status: 'Planejado', badge: 'badge-gold', desc: 'Celebração especial com Santa Ceia, comunhão e adoração.' },
+  { d: '15', m: 'Out', title: 'Culto de Doutrina', local: 'Templo Sede', time: '19h30', status: 'Planejado', badge: 'badge-gold', desc: 'Estudo aprofundado da Palavra de Deus.' },
+  { d: '19', m: 'Out', title: 'Consagração de 21 dias', local: 'Templo Sede', time: '05h00', status: 'Planejado', badge: 'badge-gold', desc: 'Jejum e oração de início de ano espiritual.' },
+  { d: '27', m: 'Set', title: 'Consagração', local: 'Sede', time: '05h00', status: 'Em andamento', badge: 'badge-blue', desc: 'Tempo de consagração e busca da face de Deus.' },
+  { d: '21', m: 'Set', title: 'Culto de Adoração', local: 'Templo Sede', time: '18h30', status: 'Concluído', badge: 'badge-green', desc: 'Adoração, palavra e comunhão.' },
+  { d: '14', m: 'Set', title: 'Congresso de Jovens', local: 'Auditório', time: '19h00', status: 'Concluído', badge: 'badge-green', desc: 'Encontro de jovens com louvor e palavra.' },
+];
+
+const PREGS = [
+  { title: 'Uma Fé Que Não Recua', preacher: 'Pr. Cleiginaldo Barros', serie: 'Fé que Vence', date: '05/10/2026', time: '48 min', desc: 'Uma reflexão sobre Hebreus 11 e a fé que permanece.' },
+  { title: 'O Poder da Oração', preacher: 'Pr. Walmorio', serie: 'Vida de Oração', date: '28/09/2026', time: '42 min', desc: 'Como desenvolver uma vida de oração consistente.' },
+  { title: 'Coração Adorador', preacher: 'Pb. Marcio Louzeiro', serie: 'Adoração', date: '21/09/2026', time: '51 min', desc: 'A essência da adoração em espírito e verdade.' },
+];
+
+const LEADERS = [
+  { name: 'Pr. Cleiginaldo Barros', role: 'Pastor Presidente', init: 'CB' },
+  { name: 'Pr. Walmorio', role: 'Pastor da Vila Sarney', init: 'PW' },
+  { name: 'Pr. Melquesedeque', role: 'Pastor', init: 'PM' },
+  { name: 'Pb. Marcio Louzeiro', role: '1º Dirigente', init: 'ML' },
+  { name: 'Missionário Cristiano', role: '2º Dirigente', init: 'MC' },
+  { name: 'Ayton Sena', role: 'Líder de Jovens', init: 'AS' },
+  { name: 'Ana Caroline', role: 'Líder de Jovens', init: 'AC' },
+  { name: 'Miss. Suenne Barros', role: '1ª Dirigente · Círculo de Oração', init: 'SB' },
+  { name: 'Dc. Thiane Louzeiro', role: 'Regente · Heróis da Fé', init: 'TL' },
+  { name: 'Dc. Dayane', role: 'Regente · Heróis da Fé', init: 'DD' },
+  { name: 'Jannes', role: 'Tesoureiro', init: 'JA' },
+  { name: 'Dc. Janaina Freitas', role: 'Dep. de Crianças', init: 'JF' },
+];
+
+const MEMBROS = [
+  { nome: 'Maria das Graças Silva', email: 'maria@email.com', cong: 'Matriz', tel: '(98) 99123-4567', entrada: '12/03/2022', status: 'Ativo' },
+  { nome: 'João Batista Souza', email: 'joao@email.com', cong: 'Cohabiano', tel: '(98) 99234-5678', entrada: '05/06/2021', status: 'Ativo' },
+  { nome: 'Ana Carolina Lima', email: 'ana@email.com', cong: 'Matriz', tel: '(98) 99345-6789', entrada: '20/09/2023', status: 'Ativo' },
+  { nome: 'Pedro Henrique Alves', email: 'pedro@email.com', cong: 'Res. Tiradentes', tel: '(98) 99456-7890', entrada: '14/01/2024', status: 'Ativo' },
+  { nome: 'Rosa Maria Ferreira', email: 'rosa@email.com', cong: 'Matriz', tel: '(98) 99567-8901', entrada: '30/11/2020', status: 'Ativo' },
+  { nome: 'Carlos Eduardo Nunes', email: 'carlos@email.com', cong: '—', tel: '(98) 99678-9012', entrada: '08/07/2025', status: 'Ativo' },
+  { nome: 'Luciana Castro', email: 'luciana@email.com', cong: 'Cohabiano', tel: '(98) 99789-0123', entrada: '22/04/2022', status: 'Inativo' },
+  { nome: 'Roberto Santos', email: 'roberto@email.com', cong: 'Matriz', tel: '(98) 99890-1234', entrada: '17/02/2021', status: 'Ativo' },
+];
+
+const LIDERES = [
+  { ordem: 1, nome: 'Pr. Cleiginaldo Barros', cargo: 'Pastor Presidente', cong: 'Matriz', visivel: true },
+  { ordem: 2, nome: 'Pr. Walmorio', cargo: 'Pastor', cong: 'Vila Sarney', visivel: true },
+  { ordem: 3, nome: 'Pr. Melquesedeque', cargo: 'Pastor', cong: 'Matriz', visivel: true },
+  { ordem: 4, nome: 'Pb. Marcio Louzeiro', cargo: '1º Dirigente', cong: 'Matriz', visivel: true },
+  { ordem: 5, nome: 'Dc. Thiane Louzeiro', cargo: 'Regente', cong: 'Matriz', visivel: true },
+  { ordem: 6, nome: 'Jannes', cargo: 'Tesoureiro', cong: 'Matriz', visivel: false },
+];
+
+const USUARIOS = [
+  { nome: 'Super Admin', email: 'admin@iadmp.com.br', perfil: 'SUPER_ADMIN', orgs: 'Todas', acesso: 'hoje 14:32', status: 'Ativo' },
+  { nome: 'Pr. Cleiginaldo Barros', email: 'cleiginaldo@iadmp.com.br', perfil: 'PASTOR', orgs: 'Matriz', acesso: 'hoje 13:18', status: 'Ativo' },
+  { nome: 'Pb. Marcio Louzeiro', email: 'marcio@codemed.com.br', perfil: 'ADMIN_IGREJA', orgs: 'Matriz, Cohabiano', acesso: 'hoje 11:05', status: 'Ativo' },
+  { nome: 'Dc. Thiane Louzeiro', email: 'thiane@iadmp.com.br', perfil: 'MUSICO', orgs: 'Matriz', acesso: 'ontem 19:40', status: 'Ativo' },
+  { nome: 'Jannes', email: 'jannes@iadmp.com.br', perfil: 'FINANCEIRO', orgs: 'Matriz', acesso: 'ontem 16:22', status: 'Ativo' },
+  { nome: 'Ana Caroline', email: 'ana@iadmp.com.br', perfil: 'LIDER', orgs: 'Matriz', acesso: '05/10/2026', status: 'Ativo' },
+  { nome: 'João Silva', email: 'joao@email.com', perfil: 'MUSICO', orgs: 'Matriz', acesso: '—', status: 'Pendente' },
+  { nome: 'Luciana Castro', email: 'luciana@email.com', perfil: 'MEMBER', orgs: 'Cohabiano', acesso: '20/08/2026', status: 'Inativo' },
+];
+
+const MUSICAS = [
+  { titulo: 'Grandioso é o Senhor', autor: 'Adhemar de Campos', tom: 'G', bpm: 72, minist: 'Louvor' },
+  { titulo: 'Bondade de Deus', autor: 'Beth Music', tom: 'D', bpm: 68, minist: 'Louvor' },
+  { titulo: 'Ousado Amor', autor: 'Isaias Saad', tom: 'A', bpm: 74, minist: 'Louvor' },
+  { titulo: 'Grande Eu Sou', autor: 'Michael W. Smith', tom: 'C', bpm: 65, minist: 'Coral' },
+  { titulo: 'Águas Profundas', autor: 'Fernandinho', tom: 'E', bpm: 78, minist: 'Jovens' },
+  { titulo: 'Teu Amor Não Falha', autor: 'Aline Barros', tom: 'F', bpm: 70, minist: 'Louvor' },
+];
+
+const EVENTOS_ADMIN = [
+  { titulo: 'Santa Ceia', data: '12/10/2026', local: 'Templo Sede', insc: '32', orc: 'R$ 2.500', status: 'Planejado', badge: 'badge-gold' },
+  { titulo: 'Culto de Doutrina', data: '15/10/2026', local: 'Templo Sede', insc: '—', orc: '—', status: 'Planejado', badge: 'badge-gold' },
+  { titulo: 'Consagração', data: '27/09/2026', local: 'Sede', insc: '180', orc: 'R$ 800', status: 'Em andamento', badge: 'badge-blue' },
+  { titulo: 'Culto de Adoração', data: '21/09/2026', local: 'Templo Sede', insc: '—', orc: 'R$ 450', status: 'Concluído', badge: 'badge-green' },
+  { titulo: 'Congresso de Jovens', data: '14/09/2026', local: 'Auditório', insc: '72', orc: 'R$ 3.200', status: 'Concluído', badge: 'badge-green' },
+  { titulo: 'Círculo de Oração', data: '12/09/2026', local: 'Sala de oração', insc: '—', orc: '—', status: 'Cancelado', badge: 'badge-gray' },
+];
+
+const FINANCEIRO = [
+  { desc: 'Dízimo — Maria das Graças', tipo: 'Dízimo', valor: '+ R$ 450,00', data: '06/10/2026', resp: 'Jannes', entrada: true },
+  { desc: 'Oferta dominical', tipo: 'Oferta', valor: '+ R$ 1.280,00', data: '05/10/2026', resp: 'Jannes', entrada: true },
+  { desc: 'Conta de luz — Templo', tipo: 'Despesa', valor: '− R$ 620,00', data: '04/10/2026', resp: 'Jannes', entrada: false },
+  { desc: 'Doação — Campanha Natal', tipo: 'Doação', valor: '+ R$ 2.000,00', data: '03/10/2026', resp: 'Marcio', entrada: true },
+  { desc: 'Inscrições — Congresso Jovens', tipo: 'Inscrição', valor: '+ R$ 1.440,00', data: '02/10/2026', resp: 'Ana', entrada: true },
+  { desc: 'Material de limpeza', tipo: 'Despesa', valor: '− R$ 285,00', data: '01/10/2026', resp: 'Thiane', entrada: false },
+];
+
+const GALLERY = [
+  'Culto de Adoração · Set/2026', 'Congresso de Jovens · Set/2026', 'Círculo de Oração · Set/2026',
+  'Ensaio do Coral · Ago/2026', 'Batismo · Ago/2026', 'Santa Ceia · Jul/2026',
+  'Confraternização · Jul/2026', 'Missões · Jun/2026',
+];
+
+const MODAL_FORMS = {
+  membro: {
+    title: 'Novo membro',
+    fields: [
+      { label: 'Nome completo', type: 'text', ph: 'Nome do membro', full: true },
+      { label: 'E-mail', type: 'email', ph: 'email@exemplo.com' },
+      { label: 'Telefone', type: 'text', ph: '(98) 99999-0000' },
+      { label: 'Congregação', type: 'select', opts: ['Matriz', 'Cohabiano', 'Res. Tiradentes'] },
+      { label: 'Data de entrada', type: 'date' },
+      { label: 'Observações', type: 'textarea', ph: 'Informações adicionais...', full: true },
+    ],
+  },
+  lider: {
+    title: 'Novo líder',
+    fields: [
+      { label: 'Nome completo', type: 'text', ph: 'Nome do líder', full: true },
+      { label: 'Cargo', type: 'text', ph: 'Ex: Pastor, Dirigente, Regente' },
+      { label: 'Congregação', type: 'select', opts: ['Matriz', 'Cohabiano', 'Res. Tiradentes'] },
+      { label: 'Ordem de exibição', type: 'number', ph: '1' },
+      { label: 'Exibir no site', type: 'select', opts: ['Sim', 'Não'] },
+    ],
+  },
+  usuario: {
+    title: 'Novo usuário',
+    fields: [
+      { label: 'Nome', type: 'text', ph: 'Nome completo', full: true },
+      { label: 'E-mail', type: 'email', ph: 'email@exemplo.com' },
+      { label: 'Senha', type: 'password', ph: 'Mínimo 8 caracteres' },
+      { label: 'Perfil (role)', type: 'select', opts: ['MEMBER', 'MUSICO', 'LIDER', 'SECRETARIA', 'FINANCEIRO', 'EDITOR_SITE', 'PASTOR', 'ADMIN_IGREJA'] },
+      { label: 'Organização', type: 'select', opts: ['Matriz', 'Cohabiano', 'Res. Tiradentes'] },
+    ],
+  },
+  musica: {
+    title: 'Nova música',
+    fields: [
+      { label: 'Título', type: 'text', ph: 'Nome da música', full: true },
+      { label: 'Autor', type: 'text', ph: 'Autor/Intérprete' },
+      { label: 'Tom', type: 'text', ph: 'Ex: G' },
+      { label: 'BPM', type: 'number', ph: '72' },
+      { label: 'Ministério', type: 'select', opts: ['Louvor', 'Coral', 'Jovens'] },
+    ],
+  },
+  modelo: { title: 'Novo modelo de liturgia', fields: [{ label: 'Nome do modelo', type: 'text', ph: 'Ex: Culto de Adoração', full: true }, { label: 'Descrição', type: 'textarea', ph: 'Itens e estrutura...', full: true }] },
+  evento: {
+    title: 'Novo evento',
+    fields: [
+      { label: 'Título', type: 'text', ph: 'Nome do evento', full: true },
+      { label: 'Data de início', type: 'date' },
+      { label: 'Data de término', type: 'date' },
+      { label: 'Local', type: 'text', ph: 'Templo Sede' },
+      { label: 'Orçamento previsto (R$)', type: 'number', ph: '0,00' },
+      { label: 'Descrição', type: 'textarea', ph: 'Detalhes do evento...', full: true },
+    ],
+  },
+  inscricao: { title: 'Inscrição manual', fields: [{ label: 'Nome', type: 'text', ph: 'Nome do participante', full: true }, { label: 'E-mail', type: 'email', ph: 'email@exemplo.com' }, { label: 'Telefone', type: 'text', ph: '(98) 99999-0000' }] },
+  lancamento: {
+    title: 'Novo lançamento',
+    fields: [
+      { label: 'Descrição', type: 'text', ph: 'Descrição do lançamento', full: true },
+      { label: 'Tipo', type: 'select', opts: ['Dízimo', 'Oferta', 'Doação', 'Inscrição', 'Despesa'] },
+      { label: 'Categoria', type: 'select', opts: ['Mensal', 'Eventos', 'Manutenção', 'Missões'] },
+      { label: 'Valor (R$)', type: 'number', ph: '0,00' },
+      { label: 'Data', type: 'date' },
+    ],
+  },
+  categoria: { title: 'Nova categoria', fields: [{ label: 'Nome da categoria', type: 'text', ph: 'Ex: Missões', full: true }, { label: 'Tipo', type: 'select', opts: ['Entrada', 'Saída'] }] },
+  aviso: {
+    title: 'Novo aviso',
+    fields: [
+      { label: 'Título', type: 'text', ph: 'Título do aviso', full: true },
+      { label: 'Urgência', type: 'select', opts: ['Alta', 'Normal', 'Baixa'] },
+      { label: 'Válido até', type: 'date' },
+      { label: 'Público-alvo', type: 'text', ph: 'Ex: Jovens, Líderes...' },
+      { label: 'Descrição', type: 'textarea', ph: 'Conteúdo do aviso...', full: true },
+    ],
+  },
+  imagem: { title: 'Enviar imagens', fields: [{ label: 'Categoria', type: 'select', opts: ['Cultos', 'Eventos', 'Ministérios', 'Confraternizações'], full: true }, { label: 'Legenda', type: 'text', ph: 'Descrição da imagem', full: true }] },
+  oportunidade: {
+    title: 'Nova oportunidade',
+    fields: [
+      { label: 'Título', type: 'text', ph: 'Ex: Músico(a) · Violão', full: true },
+      { label: 'Área/Ministério', type: 'select', opts: ['Ministério', 'Som & Mídia', 'Crianças', 'Social'] },
+      { label: 'Responsável', type: 'text', ph: 'Nome do responsável' },
+      { label: 'Descrição', type: 'textarea', ph: 'Detalhes da vaga...', full: true },
+    ],
+  },
+  canal: { title: 'Novo canal', fields: [{ label: 'Nome do canal', type: 'text', ph: 'Ex: YouTube', full: true }, { label: 'URL', type: 'text', ph: 'https://...' }, { label: 'Exibir no site', type: 'select', opts: ['Sim', 'Não'] }] },
+  pregacao: {
+    title: 'Nova pregação',
+    fields: [
+      { label: 'Título', type: 'text', ph: 'Título da pregação', full: true },
+      { label: 'Pregador', type: 'select', opts: ['Pr. Cleiginaldo Barros', 'Pr. Walmorio', 'Pr. Melquesedeque', 'Pb. Marcio Louzeiro'] },
+      { label: 'Série', type: 'text', ph: 'Ex: Fé que Vence' },
+      { label: 'Descrição', type: 'textarea', ph: 'Resumo da mensagem...', full: true },
+    ],
+  },
+  versiculo: {
+    title: 'Novo versículo',
+    fields: [
+      { label: 'Referência', type: 'text', ph: 'Ex: João 4:24', full: true },
+      { label: 'Slot', type: 'select', opts: ['Manhã', 'Tarde', 'Noite'] },
+      { label: 'Texto', type: 'textarea', ph: 'Texto do versículo...', full: true },
+    ],
+  },
+};
+
+const MAP_ITEMS = [
+  { cat: 'Público', name: 'Home', path: '/', id: 'home' },
+  { cat: 'Público', name: 'A Igreja', path: '/sobre', id: 'sobre' },
+  { cat: 'Público', name: 'Programações', path: '/eventos', id: 'eventos' },
+  { cat: 'Público', name: 'Evento · detalhe', path: '/eventos/[id]', id: 'evento-detalhe' },
+  { cat: 'Público', name: 'Pregações', path: '/pregacoes', id: 'pregacoes' },
+  { cat: 'Público', name: 'Pregação · detalhe', path: '/pregacoes/[slug]', id: 'pregacao-detalhe' },
+  { cat: 'Público', name: 'Galeria', path: '/galeria', id: 'galeria' },
+  { cat: 'Público', name: 'Liderança', path: '/lideranca', id: 'lideranca' },
+  { cat: 'Público', name: 'Contato', path: '/contato', id: 'contato' },
+  { cat: 'Auth', name: 'Login', path: '/admin/login', id: 'login' },
+  { cat: 'Visão', name: 'Dashboard', path: '/admin', id: 'admin-dashboard' },
+  { cat: 'Visão', name: 'Centro de Gestão', path: '/admin/gestao', id: 'admin-gestao' },
+  { cat: 'Pessoas', name: 'Membros', path: '/admin/membros', id: 'admin-membros' },
+  { cat: 'Pessoas', name: 'Liderança', path: '/admin/lideranca', id: 'admin-lideranca' },
+  { cat: 'Pessoas', name: 'Usuários & Permissões', path: '/admin/usuarios', id: 'admin-usuarios' },
+  { cat: 'Liturgia', name: 'Programações', path: '/admin/liturgia', id: 'admin-liturgia' },
+  { cat: 'Liturgia', name: 'Editar programação', path: '/admin/liturgia/[id]/editar', id: 'admin-liturgia-editar' },
+  { cat: 'Liturgia', name: 'Detalhe', path: '/admin/liturgia/[id]', id: 'admin-liturgia-detalhe' },
+  { cat: 'Liturgia', name: 'Imprimir', path: '/admin/liturgia/[id]/imprimir', id: 'admin-liturgia-imprimir' },
+  { cat: 'Liturgia', name: 'Modo culto', path: '/admin/liturgia/[id]/modo-culto', id: 'admin-liturgia-culto' },
+  { cat: 'Liturgia', name: 'Músicas', path: '/admin/liturgia/musicas', id: 'admin-liturgia-musicas' },
+  { cat: 'Liturgia', name: 'Modelos', path: '/admin/liturgia/modelos', id: 'admin-liturgia-modelos' },
+  { cat: 'Operação', name: 'Eventos', path: '/admin/eventos', id: 'admin-eventos' },
+  { cat: 'Operação', name: 'Inscrições do evento', path: '/admin/eventos/[id]/inscricoes', id: 'admin-evento-inscricoes' },
+  { cat: 'Operação', name: 'Financeiro', path: '/admin/financeiro', id: 'admin-financeiro' },
+  { cat: 'Operação', name: 'Avisos', path: '/admin/avisos', id: 'admin-avisos' },
+  { cat: 'Operação', name: 'Galeria', path: '/admin/galeria', id: 'admin-galeria' },
+  { cat: 'Operação', name: 'Oportunidades', path: '/admin/oportunidades', id: 'admin-oportunidades' },
+  { cat: 'Comunicação', name: 'Dashboard', path: '/admin/comunicacao', id: 'admin-comunicacao' },
+  { cat: 'Comunicação', name: 'Canais', path: '/admin/comunicacao/canais', id: 'admin-com-canais' },
+  { cat: 'Comunicação', name: 'Pregações', path: '/admin/comunicacao/pregacoes', id: 'admin-com-pregacoes' },
+  { cat: 'Comunicação', name: 'Versículos', path: '/admin/comunicacao/versiculos', id: 'admin-com-versiculos' },
+  { cat: 'Configurações', name: 'Geral', path: '/admin/configuracoes', id: 'admin-configuracoes' },
+  { cat: 'Configurações', name: 'Aparência', path: '/admin/configuracoes/aparencia', id: 'admin-aparencia' },
+];
+
+/* ══════════ NAVEGAÇÃO ══════════ */
+const PUBLIC_PAGES = ['home', 'sobre', 'eventos', 'evento-detalhe', 'pregacoes', 'pregacao-detalhe', 'galeria', 'lideranca', 'contato'];
+const ADMIN_PAGES = ['admin-dashboard', 'admin-gestao', 'admin-membros', 'admin-lideranca', 'admin-usuarios', 'admin-liturgia', 'admin-liturgia-editar', 'admin-liturgia-detalhe', 'admin-liturgia-imprimir', 'admin-liturgia-culto', 'admin-liturgia-musicas', 'admin-liturgia-modelos', 'admin-eventos', 'admin-evento-inscricoes', 'admin-financeiro', 'admin-avisos', 'admin-galeria', 'admin-oportunidades', 'admin-comunicacao', 'admin-com-canais', 'admin-com-pregacoes', 'admin-com-versiculos', 'admin-configuracoes', 'admin-aparencia'];
+
+function go(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+
+  if (id === 'login') {
+    document.body.dataset.mode = 'login';
+  } else if (ADMIN_PAGES.includes(id)) {
+    document.body.dataset.mode = 'admin';
+    document.querySelectorAll('.side-item').forEach(s => s.classList.remove('active'));
+    const item = document.querySelector(`.side-item[data-page="${id}"]`);
+    if (item) item.classList.add('active');
+    const map = MAP_ITEMS.find(m => m.id === id);
+    document.getElementById('crumbCurrent').textContent = map ? map.name : 'Admin';
+  } else {
+    document.body.dataset.mode = 'public';
+    document.querySelectorAll('#publicNav .nav-link').forEach(a => a.classList.remove('active'));
+    const navId = id === 'evento-detalhe' ? 'eventos' : id === 'pregacao-detalhe' ? 'pregacoes' : id;
+    const link = document.querySelector(`#publicNav .nav-link[data-page="${navId}"]`);
+    if (link) link.classList.add('active');
+    document.getElementById('publicFooter').style.display = id === 'home' ? '' : '';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('sidebar').classList.remove('open');
+  updateSwitcher();
+}
+
+function setMode(mode) {
+  if (mode === 'admin') {
+    go('admin-dashboard');
+  } else {
+    go('home');
+  }
+}
+
+function updateSwitcher() {
+  const mode = document.body.dataset.mode;
+  document.querySelectorAll('.switcher button[data-mode]').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === (mode === 'login' ? 'admin' : mode));
+  });
+}
+
+function toggleMap() {
+  document.getElementById('mapOverlay').classList.toggle('show');
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  toast('Tema alterado', next === 'dark' ? 'Modo escuro ativado.' : 'Modo claro ativado.');
+}
+
+function togglePwd() {
+  const inp = document.getElementById('loginPass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function doLogin() {
+  toast('Login realizado!', 'Sessão JWT criada. Bem-vindo, Super Admin.');
+  setTimeout(() => go('admin-dashboard'), 650);
+}
+
+/* ══════════ TOAST / MODAL ══════════ */
+let toastTimer;
+function toast(title, desc) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastDesc').textContent = desc;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+let currentModal = null;
+function openModal(key) {
+  const cfg = MODAL_FORMS[key];
+  if (!cfg) return;
+  currentModal = key;
+  document.getElementById('modalTitle').textContent = cfg.title;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-grid">
+      ${cfg.fields.map(f => `
+        <div class="field ${f.full ? 'full' : ''}">
+          <label class="label">${f.label}</label>
+          ${f.type === 'select' ? `<select class="select">${f.opts.map(o => `<option>${o}</option>`).join('')}</select>` :
+            f.type === 'textarea' ? `<textarea class="textarea" placeholder="${f.ph || ''}"></textarea>` :
+            `<input class="input" type="${f.type || 'text'}" placeholder="${f.ph || ''}">`}
+        </div>`).join('')}
+    </div>`;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  currentModal = null;
+}
+
+function saveModal() {
+  const cfg = MODAL_FORMS[currentModal];
+  closeModal();
+  toast('Salvo com sucesso!', cfg ? cfg.title + ' registrado via API (mock).' : 'Registro salvo.');
+}
+
+/* ══════════ RENDERIZAÇÃO ══════════ */
+function renderValues(el) {
+  el.innerHTML = VALUES.map(v => `
+    <div class="feature-card">
+      <div class="feature-icon">${v.icon}</div>
+      <h3>${v.title}</h3>
+      <p>${v.desc}</p>
+      <div class="verse">${v.verse}</div>
+    </div>`).join('');
+}
+
+function eventCard(e, onclick) {
+  return `
+    <div class="event-card" ${onclick ? `onclick="${onclick}"` : ''}>
+      <div class="event-date"><div class="d">${e.d}</div><div class="m">${e.m}</div></div>
+      <div style="flex:1">
+        <div class="badge ${e.badge}">${e.status}</div>
+        <h3 style="margin-top:.55rem">${e.title}</h3>
+        <div class="event-meta">
+          <span>📍 ${e.local}</span><span>🕐 ${e.time}</span>
+        </div>
+        <p style="color:var(--text-secondary);font-size:.88rem">${e.desc}</p>
+      </div>
+    </div>`;
+}
+
+function pregCard(p, onclick) {
+  return `
+    <div class="preg-card" ${onclick ? `onclick="${onclick}"` : ''}>
+      <div class="preg-thumb"><div class="play-btn">▶</div></div>
+      <div class="preg-body">
+        <div class="badge badge-gold">${p.serie}</div>
+        <h3>${p.title}</h3>
+        <p>${p.desc}</p>
+        <div class="event-meta" style="margin-top:.85rem;margin-bottom:0">
+          <span>🎤 ${p.preacher}</span><span>⏱ ${p.time}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderAll() {
+  renderValues(document.getElementById('homeValues'));
+  renderValues(document.getElementById('sobreValues'));
+
+  document.getElementById('homeEvents').innerHTML = EVENTS.slice(0, 3).map(e => eventCard(e, "go('evento-detalhe')")).join('');
+  document.getElementById('publicEventsList').innerHTML = EVENTS.map(e => eventCard(e, "go('evento-detalhe')")).join('');
+  document.getElementById('homePregs').innerHTML = PREGS.map(p => pregCard(p, "go('pregacao-detalhe')")).join('');
+  document.getElementById('publicPregsList').innerHTML = PREGS.concat(PREGS).map(p => pregCard(p, "go('pregacao-detalhe')")).join('');
+
+  document.getElementById('homePrograms').innerHTML = PROGRAMS.map(p => `
+    <div class="pend-item" style="padding-left:0;padding-right:0">
+      <div><div class="txt">${p.title}</div><div class="hint">${p.day} · ${p.desc}</div></div>
+      <span class="badge badge-gold">${p.time}</span>
+    </div>`).join('');
+
+  document.getElementById('weeklyPrograms').innerHTML = PROGRAMS.map(p => `
+    <div class="card">
+      <div class="badge badge-gold" style="margin-bottom:.85rem">${p.day} · ${p.time}</div>
+      <h3 style="font-size:1.22rem;margin-bottom:.52rem">${p.title}</h3>
+      <p style="color:var(--text-secondary);font-size:.88rem">${p.desc}</p>
+    </div>`).join('');
+
+  document.getElementById('galleryGrid').innerHTML = GALLERY.map(g => `
+    <div class="gallery-item" onclick="toast('Galeria','Visualização de: ${g}')"><div class="cap">${g}</div></div>`).join('');
+  document.getElementById('adminGalleryGrid').innerHTML = GALLERY.map(g => `
+    <div class="gallery-item" onclick="toast('Imagem','Editando: ${g}')"><div class="cap">${g}</div></div>`).join('');
+
+  document.getElementById('leadersGrid').innerHTML = LEADERS.map(l => `
+    <div class="leader-card">
+      <div class="leader-photo"><div class="avatar">${l.init}</div></div>
+      <div class="leader-info">
+        <h3>${l.name}</h3>
+        <div class="role">${l.role}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('membrosBody').innerHTML = MEMBROS.map(m => `
+    <tr>
+      <td><strong style="color:var(--text-primary)">${m.nome}</strong><div style="font-size:.78rem;color:var(--text-muted)">${m.email}</div></td>
+      <td>${m.cong}</td>
+      <td>${m.tel}</td>
+      <td>${m.entrada}</td>
+      <td><span class="badge ${m.status === 'Ativo' ? 'badge-green' : 'badge-gray'}">${m.status}</span></td>
+      <td><div class="row-actions">
+        <button class="mini-btn" onclick="openModal('membro')">✎</button>
+        <button class="mini-btn" onclick="toast('Membro','Abrindo detalhes de ${m.nome}.')">👁</button>
+        <button class="mini-btn danger" onclick="toast('Membro desativado','Soft delete aplicado em ${m.nome}.')">✕</button>
+      </div></td>
+    </tr>`).join('');
+
+  document.getElementById('lideresBody').innerHTML = LIDERES.map(l => `
+    <tr>
+      <td><span class="badge badge-gray">#${l.ordem}</span></td>
+      <td><strong style="color:var(--text-primary)">${l.nome}</strong></td>
+      <td>${l.cargo}</td>
+      <td>${l.cong}</td>
+      <td><span class="badge ${l.visivel ? 'badge-green' : 'badge-gray'}">${l.visivel ? 'Sim' : 'Não'}</span></td>
+      <td><div class="row-actions">
+        <button class="mini-btn" onclick="openModal('lider')">✎</button>
+        <button class="mini-btn danger" onclick="toast('Líder removido','Registro desativado.')">✕</button>
+      </div></td>
+    </tr>`).join('');
+
+  const perfilBadge = { SUPER_ADMIN: 'badge-red', PASTOR: 'badge-gold', ADMIN_IGREJA: 'badge-gold', LIDER: 'badge-blue', MUSICO: 'badge-blue', FINANCEIRO: 'badge-blue', MEMBER: 'badge-gray' };
+  document.getElementById('usuariosBody').innerHTML = USUARIOS.map(u => `
+    <tr>
+      <td><strong style="color:var(--text-primary)">${u.nome}</strong><div style="font-size:.78rem;color:var(--text-muted)">${u.email}</div></td>
+      <td><span class="badge ${perfilBadge[u.perfil] || 'badge-gray'}">${u.perfil}</span></td>
+      <td>${u.orgs}</td>
+      <td>${u.acesso}</td>
+      <td><span class="badge ${u.status === 'Ativo' ? 'badge-green' : u.status === 'Pendente' ? 'badge-gold' : 'badge-gray'}">${u.status}</span></td>
+      <td><div class="row-actions">
+        <button class="mini-btn" onclick="openModal('usuario')">✎</button>
+        <button class="mini-btn" onclick="toast('Permissões','Revisando permissões de ${u.nome}.')">🔑</button>
+        <button class="mini-btn danger" onclick="toast('Usuário inativado','Soft delete aplicado.')">✕</button>
+      </div></td>
+    </tr>`).join('');
+
+  document.getElementById('musicasBody').innerHTML = MUSICAS.map(m => `
+    <tr>
+      <td><strong style="color:var(--text-primary)">${m.titulo}</strong></td>
+      <td>${m.autor}</td>
+      <td><span class="badge badge-gold">${m.tom}</span></td>
+      <td>${m.bpm}</td>
+      <td>${m.minist}</td>
+      <td><div class="row-actions">
+        <button class="mini-btn" onclick="openModal('musica')">✎</button>
+        <button class="mini-btn" onclick="toast('Música','Tocando: ${m.titulo}')">▶</button>
+        <button class="mini-btn danger" onclick="toast('Música removida','Registro deletado.')">✕</button>
+      </div></td>
+    </tr>`).join('');
+
+  document.getElementById('eventosBody').innerHTML = EVENTOS_ADMIN.map(e => `
+    <tr>
+      <td><strong style="color:var(--text-primary)">${e.titulo}</strong></td>
+      <td>${e.data}</td>
+      <td>${e.local}</td>
+      <td>${e.insc}</td>
+      <td>${e.orc}</td>
+      <td><span class="badge ${e.badge}">${e.status}</span></td>
+      <td><div class="row-actions">
+        <button class="mini-btn" onclick="go('admin-evento-inscricoes')">👥</button>
+        <button class="mini-btn" onclick="openModal('evento')">✎</button>
+        <button class="mini-btn danger" onclick="toast('Evento cancelado','Status atualizado.')">✕</button>
+      </div></td>
+    </tr>`).join('');
+
+  document.getElementById('financeiroBody').innerHTML = FINANCEIRO.map(f => `
+    <tr>
+      <td><strong style="color:var(--text-primary)">${f.desc}</strong></td>
+      <td><span class="badge ${f.tipo === 'Despesa' ? 'badge-red' : 'badge-green'}">${f.tipo}</span></td>
+      <td style="color:${f.entrada ? 'var(--color-success)' : 'var(--color-danger)'};font-weight:700">${f.valor}</td>
+      <td>${f.data}</td>
+      <td>${f.resp}</td>
+    </tr>`).join('');
+
+  document.getElementById('mapGrid').innerHTML = MAP_ITEMS.map(m => `
+    <div class="map-card" onclick="toggleMap();go('${m.id}')">
+      <div class="mtag">${m.cat}</div>
+      <div class="mname">${m.name}</div>
+      <div class="mpath">${m.path}</div>
+    </div>`).join('');
+
+  // Sidebar
+  const NAV = [
+    {
+      label: 'Visão', items: [
+        { name: 'Dashboard', icon: '▦', id: 'admin-dashboard' },
+        { name: 'Centro de Gestão', icon: '📊', id: 'admin-gestao' },
+        { name: 'Auditoria', icon: '📋', id: 'admin-gestao', tab: 'auditoria' },
+      ]
+    },
+    {
+      label: 'Pessoas', items: [
+        { name: 'Membros', icon: '👥', id: 'admin-membros' },
+        { name: 'Liderança', icon: '🤝', id: 'admin-lideranca' },
+        { name: 'Usuários', icon: '🛡', id: 'admin-usuarios' },
+      ]
+    },
+    {
+      label: 'Operação', items: [
+        {
+          name: 'Liturgia', icon: '📖', id: 'admin-liturgia', sub: [
+            { name: 'Programações', id: 'admin-liturgia' },
+            { name: 'Músicas', id: 'admin-liturgia-musicas' },
+            { name: 'Modelos', id: 'admin-liturgia-modelos' },
+          ]
+        },
+        { name: 'Eventos', icon: '📅', id: 'admin-eventos' },
+        { name: 'Financeiro', icon: '💰', id: 'admin-financeiro' },
+        { name: 'Avisos', icon: '🔔', id: 'admin-avisos' },
+        { name: 'Galeria', icon: '🖼', id: 'admin-galeria' },
+        { name: 'Oportunidades', icon: '💡', id: 'admin-oportunidades' },
+      ]
+    },
+    {
+      label: 'Comunicação', items: [
+        {
+          name: 'Comunicação', icon: '📡', id: 'admin-comunicacao', sub: [
+            { name: 'Dashboard', id: 'admin-comunicacao' },
+            { name: 'Canais', id: 'admin-com-canais' },
+            { name: 'Pregações', id: 'admin-com-pregacoes' },
+            { name: 'Versículos', id: 'admin-com-versiculos' },
+          ]
+        },
+        {
+          name: 'Configurações', icon: '⚙', id: 'admin-configuracoes', sub: [
+            { name: 'Geral', id: 'admin-configuracoes' },
+            { name: 'Aparência', id: 'admin-aparencia' },
+          ]
+        },
+      ]
+    },
+  ];
+
+  document.getElementById('sideNav').innerHTML = NAV.map(g => `
+    <div class="side-group">
+      <div class="side-group-label">${g.label}</div>
+      ${g.items.map(it => `
+        <div class="side-item ${it.id === 'admin-dashboard' ? 'active' : ''}" data-page="${it.id}" onclick="${it.tab ? `go('admin-gestao');setTimeout(()=>{const t=document.querySelectorAll('#page-admin-gestao .tab');t.forEach(x=>x.classList.remove('active'));const map={auditoria:2,pendencias:1,visao:0};t[map['${it.tab}']]?.classList.click?.();gestaoTab(t[map['${it.tab}']],'${it.tab}')},50)` : `go('${it.id}')`}">
+          <span class="ic">${it.icon}</span>${it.name}
+        </div>
+        ${it.sub ? `<div class="side-sub">${it.sub.map(s => `
+          <div class="side-item" data-page="${s.id}" onclick="go('${s.id}')">
+            <span class="ic">·</span>${s.name}
+          </div>`).join('')}</div>` : ''}
+      `).join('')}
+    </div>`).join('');
+}
+
+/* ══════════ INTERAÇÕES ══════════ */
+function gestaoTab(btn, key) {
+  document.querySelectorAll('#page-admin-gestao .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['visao', 'pendencias', 'auditoria'].forEach(k => {
+    const el = document.getElementById('gestao-' + k);
+    if (el) el.style.display = k === key ? '' : 'none';
+  });
+}
+
+function filterTable(tbodyId, q) {
+  const rows = document.querySelectorAll('#' + tbodyId + ' tr');
+  const term = q.toLowerCase();
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
+function filterEvents(q) {
+  const cards = document.querySelectorAll('#publicEventsList .event-card');
+  const term = q.toLowerCase();
+  cards.forEach(c => {
+    c.style.display = c.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    document.getElementById('mapOverlay').classList.remove('show');
+  }
+});
+
+renderAll();
+updateSwitcher();
+</script>
+</body>
+</html>

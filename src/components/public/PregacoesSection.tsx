@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatarDataCurta } from '@/lib/datas';
 import Link from 'next/link';
 import { Play, Calendar } from 'lucide-react';
 
@@ -22,11 +23,7 @@ interface Pregacao {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatarDataCurta(dateStr);
 }
 
 function getReference(p: Pregacao): string | null {
@@ -56,7 +53,7 @@ export default function PregacoesSection({ organizacaoId }: { organizacaoId: str
           setPregacoes(data.pregacoes);
         }
       } catch (err) {
-        console.error('Erro ao buscar pregacoes:', err);
+        console.error('Erro ao buscar pregações:', err);
       } finally {
         setLoading(false);
       }
@@ -69,7 +66,7 @@ export default function PregacoesSection({ organizacaoId }: { organizacaoId: str
       <section>
         <div className="container">
           <div className="section-heading">
-            <span className="label">Ultimas Pregacoes</span>
+            <span className="label">Últimas Pregações</span>
             <h2>Palavra de Deus</h2>
             <div className="divider" />
           </div>
@@ -85,9 +82,9 @@ export default function PregacoesSection({ organizacaoId }: { organizacaoId: str
     <section>
       <div className="container">
         <div className="section-heading">
-          <span className="label">Ultimas Pregacoes</span>
+          <span className="label">Últimas Pregações</span>
           <h2>Palavra de Deus</h2>
-          <p>Ouça as ultimas mensagens pregadas na nossa comunidade.</p>
+          <p>Ouça as últimas mensagens pregadas na nossa comunidade.</p>
           <div className="divider" />
         </div>
         <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
@@ -125,7 +122,7 @@ export default function PregacoesSection({ organizacaoId }: { organizacaoId: str
         </div>
         <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
           <Link href="/pregacoes" className="btn btn-outline">
-            Ver todas as pregacoes
+            Ver todas as pregações
           </Link>
         </div>
       </div>

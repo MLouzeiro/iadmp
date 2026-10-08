@@ -1,110 +1,197 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
-import SectionHead from '@/components/ui/SectionHead';
-import Input from '@/components/ui/Input';
-import Checkbox from '@/components/ui/Checkbox';
+import { useEffect, useState, useCallback } from 'react';
+import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
+import PageHead from '@/components/ui/PageHead';
 import Button from '@/components/ui/Button';
-import FormCard from '@/components/ui/FormCard';
-import FormGrid from '@/components/ui/FormGrid';
+import Badge, { statusBadgeVariant } from '@/components/ui/Badge';
+import Avatar from '@/components/ui/Avatar';
+import Modal, { ModalField } from '@/components/ui/Modal';
+import EmptyState from '@/components/ui/EmptyState';
+import SearchBar from '@/components/ui/SearchBar';
+import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
 
 interface Lider {
   id: string;
   nome: string;
   cargo: string;
+  biografia: string | null;
   publico: boolean;
   ativo: boolean;
   ordemExibicao: number;
+  congregacao?: { id: string; nome: string } | null;
   ministerio: { nome: string } | null;
 }
 
 export default function LiderancaPage() {
+  const { toast, confirm } = useToast();
   const [lideres, setLideres] = useState<Lider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ nome: '', cargo: '', biografia: '', publico: true, ativo: true, ordemExibicao: 0 });
+  const [search, setSearch] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editando, setEditando] = useState<Lider | null>(null);
+  const [form, setForm] = useState({
+    nome: '',
+    cargo: '',
+    congregacao: '',
+    biografia: '',
+    publico: true,
+    ativo: true,
+    ordemExibicao: '',
+  });
 
-  const fetchLideres = () => {
+  const fetchLideres = useCallback(() => {
     fetch('/api/lideranca')
-      .then((res) => res.json())
-      .then((d) => { setLideres(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((r) => r.json())
+      .then((d) => setLideres(Array.isArray(d) ? d : d.lideres || []))
+      .catch(() => setLideres([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { fetchLideres(); }, [fetchLideres]);
+
+  const openNovo = () => {
+    setEditando(null);
+    setForm({ nome: '', cargo: '', congregacao: '', biografia: '', publico: true, ativo: true, ordemExibicao: '' });
+    setModalOpen(true);
   };
 
-  useEffect(() => { fetchLideres(); }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch('/api/lideranca', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+  const openEditar = (l: Lider) => {
+    setEditando(l);
+    setForm({
+      nome: l.nome,
+      cargo: l.cargo,
+      congregacao: l.congregacao?.nome || '',
+      biografia: l.biografia || '',
+      publico: l.publico,
+      ativo: l.ativo,
+      ordemExibicao: String(l.ordemExibicao),
     });
+    setModalOpen(true);
+  };
+
+  const salvar = async () => {
+    if (!form.nome.trim() || !form.cargo.trim()) {
+      toast('Preencha nome e cargo.', 'warn');
+      return;
+    }
+    const payload = {
+      nome: form.nome,
+      cargo: form.cargo,
+      congregacao: form.congregacao || undefined,
+      biografia: form.biografia || undefined,
+      publico: form.publico,
+      ativo: form.ativo,
+      ordemExibicao: form.ordemExibicao ? parseInt(form.ordemExibicao) : 0,
+    };
+
+    const res = await fetch(editando ? `/api/lideranca/${editando.id}` : '/api/lideranca', {
+      method: editando ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
     if (res.ok) {
-      setShowForm(false);
-      setForm({ nome: '', cargo: '', biografia: '', publico: true, ativo: true, ordemExibicao: 0 });
+      toast(editando ? 'Líder atualizado.' : 'Líder criado.', 'ok');
+      setModalOpen(false);
       fetchLideres();
+    } else {
+      const d = await res.json().catch(() => ({}));
+      toast(d.error || 'Erro ao salvar líder.', 'err');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este lider?')) return;
-    await fetch(`/api/lideranca/${id}`, { method: 'DELETE' });
-    fetchLideres();
+  const excluir = (l: Lider) => {
+    confirm(`Excluir o líder "${l.nome}"?`, async () => {
+      const res = await fetch(`/api/lideranca/${l.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast('Líder excluído.', 'ok');
+        fetchLideres();
+      } else {
+        toast('Erro ao excluir líder.', 'err');
+      }
+    }, { title: 'Excluir líder', danger: true });
   };
+
+  const campos: ModalField[] = [
+    { name: 'nome', label: 'Nome', value: form.nome, required: true },
+    { name: 'cargo', label: 'Cargo', value: form.cargo, required: true },
+    { name: 'congregacao', label: 'Congregação', value: form.congregacao, placeholder: 'Ex: Matriz' },
+    { name: 'ordemExibicao', label: 'Ordem de exibição', type: 'number', value: form.ordemExibicao, min: 0 },
+    { name: 'biografia', label: 'Biografia', type: 'textarea', value: form.biografia, full: true },
+    { name: 'publico', label: 'Público no site', type: 'checkbox', value: form.publico, placeholder: 'Exibir no site público' },
+    { name: 'ativo', label: 'Ativo', type: 'checkbox', value: form.ativo, placeholder: 'Líder ativo' },
+  ];
+
+  const onChange = (name: string, value: string | number | boolean) => {
+    setForm((p) => ({ ...p, [name]: value }));
+  };
+
+  const filtrados = lideres.filter((l) =>
+    !search ||
+    l.nome.toLowerCase().includes(search.toLowerCase()) ||
+    l.cargo.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div>
-      <div className={styles.pageHeader}>
-        <SectionHead icon={<span>👤</span>} title="Gestao de Lideranca" />
-        <Button icon={<Plus size={16} />} onClick={() => setShowForm(true)} size="sm">
-          Novo Lider
-        </Button>
+      <PageHead
+        title="Liderança"
+        subtitle="Ordem de exibição no site público · vinculação com membro e ministério"
+        actions={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Novo Líder</Button>}
+      />
+
+      <div className={styles.toolbar}>
+        <SearchBar value={search} onChange={setSearch} placeholder="Buscar líder..." />
       </div>
 
-      {showForm && (
-        <FormCard title="Novo Lider" onClose={() => setShowForm(false)}>
-          <FormGrid onSubmit={handleSubmit}>
-            <Input label="Nome" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-            <Input label="Cargo" required value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} />
-            <Input label="Ordem de Exibicao" type="number" value={form.ordemExibicao} onChange={(e) => setForm({ ...form, ordemExibicao: parseInt(e.target.value) || 0 })} />
-            <Checkbox label="Publico no site" checked={form.publico} onChange={(checked) => setForm({ ...form, publico: checked })} />
-            <div className={styles.formActionsFull}>
-              <Button type="submit">Salvar Lider</Button>
-            </div>
-          </FormGrid>
-        </FormCard>
-      )}
-
-      <div style={{ marginTop: '1rem' }}>
-        {loading ? (
-          <p className={styles.loadingState}>Carregando...</p>
-        ) : lideres.length === 0 ? (
-          <p className={styles.emptyState}>Nenhum lider encontrado.</p>
-        ) : (
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {lideres.map((lider) => (
-              <div key={lider.id} className={styles.listItem}>
+      {loading ? (
+        <div className={styles.loadingState}>Carregando liderança...</div>
+      ) : filtrados.length === 0 ? (
+        <EmptyState
+          icon={<UserCheck size={30} />}
+          title="Nenhum líder encontrado"
+          message={search ? 'Tente outro termo de busca.' : 'Cadastre os servos da comunidade.'}
+          action={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Novo Líder</Button>}
+        />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {filtrados.map((l) => (
+            <div key={l.id} className={styles.listItem}>
+              <div className={styles.listItemAvatar}>
+                <Avatar name={l.nome} />
                 <div className={styles.listItemInfo}>
-                  <h4>{lider.nome}</h4>
+                  <h4>{l.nome}</h4>
                   <p>
-                    {lider.cargo} | Ordem: {lider.ordemExibicao}
-                    {lider.ministerio && ` | ${lider.ministerio.nome}`}
+                    {l.cargo}
+                    {l.congregacao && ` · ${l.congregacao.nome}`}
+                    {l.ministerio && ` · ${l.ministerio.nome}`}
                   </p>
                 </div>
-                <div className={styles.listItemActions}>
-                  <span className={styles.badge} style={{ background: lider.publico ? '#4caf50' : '#9e9e9e', color: '#fff' }}>
-                    {lider.publico ? 'Publico' : 'Privado'}
-                  </span>
-                  <Button variant="ghost" icon={<Trash2 size={16} />} onClick={() => handleDelete(lider.id)} />
-                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <div className={styles.listItemActions}>
+                <Badge variant={statusBadgeVariant(l.ativo ? 'ATIVO' : 'INATIVO')}>{l.ativo ? 'ATIVO' : 'INATIVO'}</Badge>
+                <Badge variant={l.publico ? 'gold' : 'mut'}>{l.publico ? 'PÚBLICO' : 'PRIVADO'}</Badge>
+                <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => openEditar(l)}>Editar</Button>
+                <Button size="sm" variant="danger" icon={<Trash2 size={14} />} onClick={() => excluir(l)}>Excluir</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Modal
+        open={modalOpen}
+        title={editando ? 'Editar Líder' : 'Novo Líder'}
+        description="POST /api/lideranca · schema Zod liderancaSchema"
+        fields={campos}
+        values={form as unknown as Record<string, string | number | boolean>}
+        onChange={onChange}
+        onClose={() => setModalOpen(false)}
+        onSave={salvar}
+        saveLabel={editando ? 'Salvar alterações' : 'Criar líder'}
+      />
     </div>
   );
 }

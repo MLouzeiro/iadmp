@@ -6,6 +6,7 @@ import SectionHead from '@/components/ui/SectionHead';
 import Button from '@/components/ui/Button';
 import SearchBar from '@/components/ui/SearchBar';
 import Select from '@/components/ui/Select';
+import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
 
 interface Usuario {
@@ -23,7 +24,7 @@ interface Usuario {
 const roleLabels: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
   ADMIN_IGREJA: 'Admin Igreja',
-  LIDER: 'Lider',
+  LIDER: 'Líder',
   COORDENADOR: 'Coordenador',
   MUSICO: 'Musico',
   MEMBER: 'Membro',
@@ -31,7 +32,7 @@ const roleLabels: Record<string, string> = {
   PASTOR: 'Pastor',
   SECRETARIA: 'Secretaria',
   FINANCEIRO: 'Financeiro',
-  LIDER_MINISTERIO: 'Lider Ministerio',
+  LIDER_MINISTERIO: 'Líder Ministério',
   EDITOR_SITE: 'Editor Site',
 };
 
@@ -45,6 +46,7 @@ const roleColors: Record<string, string> = {
 };
 
 export default function UsuariosPage() {
+  const { toast, confirm } = useToast();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -81,13 +83,16 @@ export default function UsuariosPage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o usuario "${name}"?`)) return;
-    const res = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
-    if (res.ok) fetchUsuarios();
-    else {
-      const data = await res.json();
-      alert(data.error || 'Erro ao excluir');
-    }
+    confirm(`Tem certeza que deseja excluir o usuario "${name}"?`, async () => {
+      const res = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast('Usuário excluído.', 'ok');
+        fetchUsuarios();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Erro ao excluir', 'err');
+      }
+    }, { title: 'Excluir usuário', danger: true });
   };
 
   const roleOptions = Object.entries(roleLabels).map(([value, label]) => ({ value, label }));
@@ -102,9 +107,9 @@ export default function UsuariosPage() {
   return (
     <div>
       <div className={styles.pageHeader}>
-        <SectionHead icon={<Shield size={24} />} title="Gestao de Usuarios" />
+        <SectionHead icon={<Shield size={24} />} title="Gestão de Usuários" />
         <Button icon={<Plus size={16} />} onClick={() => window.location.href = '/admin/usuarios/novo'} size="sm">
-          Novo Usuario
+          Novo Usuário
         </Button>
       </div>
 
@@ -118,7 +123,7 @@ export default function UsuariosPage() {
         {loading ? (
           <p className={styles.loadingState}>Carregando...</p>
         ) : usuarios.length === 0 ? (
-          <p className={styles.emptyState}>Nenhum usuario encontrado.</p>
+          <p className={styles.emptyState}>Nenhum usuário encontrado.</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {usuarios.map((usuario) => (
@@ -156,7 +161,7 @@ export default function UsuariosPage() {
           <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Pagina {page} de {totalPages}
           </span>
-          <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Proximo</Button>
+          <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Próximo</Button>
         </div>
       )}
     </div>

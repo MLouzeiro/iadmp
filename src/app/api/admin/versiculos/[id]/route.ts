@@ -16,16 +16,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     if (!versiculo) {
-      return NextResponse.json({ error: 'Versiculo nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Versículo não encontrado' }, { status: 404 });
     }
 
     const podeVer = await canManageOrganization(user.id, versiculo.organizacaoId);
-    if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     return NextResponse.json({ versiculo });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('GET /api/admin/versiculos/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'editar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para editar versiculos' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para editar versículos' }, { status: 403 });
 
     const { id } = await params;
     const body = await request.json();
@@ -43,11 +43,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const existing = await prisma.versiculoDiario.findUnique({ where: { id } });
     if (!existing) {
-      return NextResponse.json({ error: 'Versiculo nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Versículo não encontrado' }, { status: 404 });
     }
 
     const canManage = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const updated = await prisma.versiculoDiario.update({
       where: { id },
@@ -65,8 +65,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ versiculo: updated });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('PUT /api/admin/versiculos/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -76,17 +76,17 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'excluir');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para excluir versiculos' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para excluir versículos' }, { status: 403 });
 
     const { id } = await params;
 
     const existing = await prisma.versiculoDiario.findUnique({ where: { id } });
     if (!existing) {
-      return NextResponse.json({ error: 'Versiculo nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Versículo não encontrado' }, { status: 404 });
     }
 
     const canManage = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     await prisma.versiculoHistorico.deleteMany({ where: { versiculoId: id } });
     await prisma.versiculoDiario.delete({ where: { id } });
@@ -94,8 +94,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('DELETE /api/admin/versiculos/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

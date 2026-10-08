@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, Plus, Trash2, Pencil, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
 
 interface VersiculoDiario {
@@ -16,6 +17,7 @@ interface VersiculoDiario {
 }
 
 export default function VersiculosPage() {
+  const { toast, confirm } = useToast();
   const [versiculos, setVersiculos] = useState<VersiculoDiario[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -31,7 +33,7 @@ export default function VersiculosPage() {
         setVersiculos(data.versiculos);
       }
     } catch (err) {
-      console.error('Erro ao buscar versiculos:', err);
+      console.error('Erro ao buscar versículos:', err);
     } finally {
       setLoading(false);
     }
@@ -64,23 +66,32 @@ export default function VersiculosPage() {
       if (res.ok) {
         resetForm();
         fetchVersiculos();
+        toast(editingId ? 'Versículo atualizado.' : 'Versículo criado.', 'ok');
       } else {
-        const data = await res.json();
-        alert(data.error || 'Erro ao salvar versiculo');
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Erro ao salvar versículo', 'err');
       }
     } catch (err) {
-      console.error('Erro ao salvar versiculo:', err);
+      console.error('Erro ao salvar versículo:', err);
+      toast('Erro de conexão ao salvar versículo.', 'err');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este versiculo?')) return;
-    try {
-      const res = await fetch(`/api/admin/versiculos/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchVersiculos();
-    } catch (err) {
-      console.error('Erro ao excluir:', err);
-    }
+    confirm('Tem certeza que deseja excluir este versículo?', async () => {
+      try {
+        const res = await fetch(`/api/admin/versiculos/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast('Versículo excluído.', 'ok');
+          fetchVersiculos();
+        } else {
+          toast('Erro ao excluir versículo.', 'err');
+        }
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        toast('Erro de conexão ao excluir.', 'err');
+      }
+    }, { title: 'Excluir versículo', danger: true });
   };
 
   const toggleAtivo = async (v: VersiculoDiario) => {
@@ -99,42 +110,42 @@ export default function VersiculosPage() {
   return (
     <div>
       <SectionHead
-        title="Versiculos Diarios"
-        subtitle="Gerencie os versiculos e reflexoes exibidos no site publico. Rotaciona a cada 12 horas."
-        action={{ label: 'Novo Versiculo', onClick: () => setShowForm(true) }}
+        title="Versículos Diarios"
+        subtitle="Gerencie os versículos e reflexões exibidos no site público. Rotaciona a cada 12 horas."
+        action={{ label: 'Novo Versículo', onClick: () => setShowForm(true) }}
       />
 
       {showForm && (
         <div className={styles.formCard}>
-          <h3>{editingId ? 'Editar Versiculo' : 'Novo Versiculo'}</h3>
+          <h3>{editingId ? 'Editar Versículo' : 'Novo Versículo'}</h3>
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label>Referencia Biblica *</label>
+                <label>Referência Biblica *</label>
                 <input
                   type="text"
                   value={form.referencia}
                   onChange={e => setForm({ ...form, referencia: e.target.value })}
-                  placeholder="Ex: Joao 3:16"
+                  placeholder="Ex: João 3:16"
                   required
                 />
               </div>
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                <label>Versiculo *</label>
+                <label>Versículo *</label>
                 <textarea
                   value={form.versiculo}
                   onChange={e => setForm({ ...form, versiculo: e.target.value })}
-                  placeholder="Texto do versiculo biblico"
+                  placeholder="Texto do versículo bíblico"
                   rows={3}
                   required
                 />
               </div>
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                <label>Reflexao *</label>
+                <label>Reflexão *</label>
                 <textarea
                   value={form.reflexao}
                   onChange={e => setForm({ ...form, reflexao: e.target.value })}
-                  placeholder="Reflexao espiritual associada ao versiculo"
+                  placeholder="Reflexão espiritual associada ao versículo"
                   rows={4}
                   required
                 />
@@ -145,7 +156,7 @@ export default function VersiculosPage() {
                 Cancelar
               </button>
               <button type="submit" className={styles.btnPrimary}>
-                {editingId ? 'Salvar Alteracoes' : 'Criar Versiculo'}
+                {editingId ? 'Salvar Alterações' : 'Criar Versículo'}
               </button>
             </div>
           </form>

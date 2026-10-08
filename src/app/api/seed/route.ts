@@ -14,7 +14,7 @@ export async function POST() {
 async function handleSeed() {
   try {
     if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: 'Nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
     }
 
     await requireSuperAdmin();
@@ -34,8 +34,8 @@ async function handleSeed() {
 
     return NextResponse.json({ success: true, user: { id: admin.id, email: admin.email, role: admin.role } });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('Seed error:', error);
     return NextResponse.json({ error: 'Erro ao executar seed' }, { status: 500 });
   }

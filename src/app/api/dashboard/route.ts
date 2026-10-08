@@ -30,8 +30,8 @@ export async function GET(request?: NextRequest) {
     const dados = await indicadoresDashboardLegado(filtros);
     return NextResponse.json(dados);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar dados do dashboard' }, { status: 500 });
   }

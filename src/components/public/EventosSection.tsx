@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, MapPin } from 'lucide-react';
+import { formatarDataLonga, formatarHora } from '@/lib/datas';
 
 interface Evento {
   id: string;
@@ -17,19 +18,11 @@ interface Evento {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
+  return formatarDataLonga(dateStr);
 }
 
 function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatarHora(dateStr);
 }
 
 export default function EventosSection({ organizacaoId }: { organizacaoId?: string }) {
@@ -61,7 +54,7 @@ export default function EventosSection({ organizacaoId }: { organizacaoId?: stri
       <section>
         <div className="container">
           <div className="section-heading">
-            <span className="label">Proximas Programacoes</span>
+            <span className="label">Próximas Programações</span>
             <h2>Eventos</h2>
             <div className="divider" />
           </div>
@@ -75,9 +68,9 @@ export default function EventosSection({ organizacaoId }: { organizacaoId?: stri
     <section>
       <div className="container">
         <div className="section-heading">
-          <span className="label">Proximas Programacoes</span>
+          <span className="label">Próximas Programações</span>
           <h2>Eventos</h2>
-          <p>Confira nossas proximas programacoes e participe conosco.</p>
+          <p>Confira nossas próximas programações e participe conosco.</p>
           <div className="divider" />
         </div>
 

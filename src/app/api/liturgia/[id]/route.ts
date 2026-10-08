@@ -17,14 +17,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
 
-    if (!liturgia) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+    if (!liturgia) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
 
     const podeVer = await canManageOrganization(user.id, liturgia.organizacaoId);
-    if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     return NextResponse.json({ liturgia });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('GET /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
@@ -36,20 +36,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const user = await requireAuth();
     const { id } = await params;
     const hasPerm = await hasPermission(user.id, 'liturgia', 'editar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para editar liturgias' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para editar liturgias' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, congregacao, data, horarioInicio, horarioFimPrevisto, tipoCulto, tema, dirigente, pregador, responsavel, observacoes, itens } = body;
 
     const existing = await prisma.liturgia.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
 
     const podeEditar = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!podeEditar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeEditar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     if (organizacaoId && organizacaoId !== existing.organizacaoId) {
       const podeMover = await canManageOrganization(user.id, organizacaoId);
-      if (!podeMover) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeMover) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
     }
 
     const congregacaoId =
@@ -112,8 +112,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ liturgia });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('PUT /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
@@ -125,20 +125,20 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const user = await requireAuth();
     const { id } = await params;
     const hasPerm = await hasPermission(user.id, 'liturgia', 'excluir');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para excluir liturgias' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para excluir liturgias' }, { status: 403 });
 
     const existing = await prisma.liturgia.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
 
     const podeExcluir = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     await prisma.liturgia.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('DELETE /api/liturgia/[id] error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     }
     if (status) where.status = status;
@@ -92,8 +92,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ pregacoes, total, page, totalPages: Math.ceil(total / limit) });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('GET /api/comunicacao/pregacoes error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'pregacoes', 'criar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para criar pregacoes' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para criar pregações' }, { status: 403 });
 
     const body = await request.json();
     const {
@@ -113,20 +113,20 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!organizacaoId || !titulo || !data) {
-      return NextResponse.json({ error: 'organizacaoId, titulo e data sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId, título e data são obrigatórios' }, { status: 400 });
     }
 
     const canManage = await canManageOrganization(user.id, organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     if (videoUrl) {
       try {
         new URL(videoUrl);
       } catch {
-        return NextResponse.json({ error: 'URL do video invalida' }, { status: 400 });
+        return NextResponse.json({ error: 'URL do video inválida' }, { status: 400 });
       }
       if (videoUrl.startsWith('javascript:') || videoUrl.startsWith('data:')) {
-        return NextResponse.json({ error: 'URL contem esquema nao permitido' }, { status: 400 });
+        return NextResponse.json({ error: 'URL contém esquema não permitido' }, { status: 400 });
       }
     }
 
@@ -134,18 +134,18 @@ export async function POST(request: NextRequest) {
       try {
         new URL(capaUrl);
       } catch {
-        return NextResponse.json({ error: 'URL da capa invalida' }, { status: 400 });
+        return NextResponse.json({ error: 'URL da capa inválida' }, { status: 400 });
       }
     }
 
     if (liturgiaId) {
       const liturgia = await prisma.liturgia.findUnique({ where: { id: liturgiaId } });
-      if (!liturgia) return NextResponse.json({ error: 'Liturgia nao encontrada' }, { status: 404 });
+      if (!liturgia) return NextResponse.json({ error: 'Liturgia não encontrada' }, { status: 404 });
       if (liturgia.organizacaoId !== organizacaoId) {
-        return NextResponse.json({ error: 'Liturgia pertence a outra organizacao' }, { status: 403 });
+        return NextResponse.json({ error: 'Liturgia pertence a outra organização' }, { status: 403 });
       }
       const existingPregacao = await prisma.pregacao.findUnique({ where: { liturgiaId } });
-      if (existingPregacao) return NextResponse.json({ error: 'Esta liturgia ja possui uma pregacao vinculada' }, { status: 400 });
+      if (existingPregacao) return NextResponse.json({ error: 'Esta liturgia já possui uma pregação vinculada' }, { status: 400 });
     }
 
     let baseSlug = slugify(titulo);
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
         slug,
         descricao: descricao || null,
         tema: tema || null,
-        tipo: tipo || 'Pregacao',
+        tipo: tipo || 'Pregação',
         pregadorId: pregadorId || null,
         pregadorNome: pregadorNome || null,
         data: new Date(data),
@@ -190,8 +190,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pregacao }, { status: 201 });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/comunicacao/pregacoes error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

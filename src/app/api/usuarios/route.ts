@@ -6,18 +6,18 @@ import { requireAuth, hasPermission, canAssignRole, canManageOrganization } from
 import { assertOrgAccess, resolveOrgScope, orgFilter, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 const criarUsuarioSchema = z.object({
-  name: z.string().min(1, 'Nome e obrigatorio'),
-  email: z.string().email('Email invalido'),
+  name: z.string().min(1, 'Nome é obrigatório'),
+  email: z.string().email('E-mail inválido'),
   telefone: z.string().optional(),
-  password: z.string().min(6, 'Senha deve ter no minimo 6 caracteres'),
+  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
   confirmPassword: z.string(),
-  role: z.string().min(1, 'Perfil e obrigatorio'),
+  role: z.string().min(1, 'Perfil é obrigatório'),
   perfilId: z.string().optional(),
-  organizacoes: z.array(z.string()).min(1, 'Selecione pelo menos uma organizacao'),
+  organizacoes: z.array(z.string()).min(1, 'Selecione pelo menos uma organização'),
   permissoes: z.record(z.string(), z.boolean()).optional(),
   ativo: z.boolean().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Senhas nao conferem',
+  message: 'Senhas não conferem',
   path: ['confirmPassword'],
 });
 
@@ -91,11 +91,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ usuarios: safe, total, page, limit });
   } catch (error) {
     if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
-    return NextResponse.json({ error: 'Erro ao buscar usuarios' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 });
   }
 }
 
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
 
     const canCreate = await hasPermission(requester.id, 'Usuarios', 'criar');
     if (!canCreate && requester.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Sem permissao para criar usuarios' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para criar usuários' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -114,19 +114,19 @@ export async function POST(request: Request) {
     if (requester.role !== 'SUPER_ADMIN') {
       const allowed = await canAssignRole(requester.id, validated.role);
       if (!allowed) {
-        return NextResponse.json({ error: 'Nao e permitido atribuir este perfil' }, { status: 403 });
+        return NextResponse.json({ error: 'Não e permitido atribuir este perfil' }, { status: 403 });
       }
     }
 
     const existing = await prisma.user.findUnique({ where: { email: validated.email } });
     if (existing) {
-      return NextResponse.json({ error: 'Este email ja esta cadastrado' }, { status: 409 });
+      return NextResponse.json({ error: 'Este email já esta cadastrado' }, { status: 409 });
     }
 
     for (const orgId of validated.organizacoes) {
       const canManage = await canManageOrganization(requester.id, orgId);
       if (!canManage) {
-        return NextResponse.json({ error: 'Voce nao tem acesso a uma das organizacoes selecionadas' }, { status: 403 });
+        return NextResponse.json({ error: 'Você não tem acesso a uma das organizações selecionadas' }, { status: 403 });
       }
     }
 
@@ -134,7 +134,7 @@ export async function POST(request: Request) {
       where: { id: { in: validated.organizacoes }, ativo: true },
     });
     if (orgsAreValid.length !== validated.organizacoes.length) {
-      return NextResponse.json({ error: 'Uma ou mais organizacoes invalidas' }, { status: 400 });
+      return NextResponse.json({ error: 'Uma ou mais organizações inválidas' }, { status: 400 });
     }
 
     const passwordHash = await bcrypt.hash(validated.password, 10);
@@ -193,10 +193,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: msg }, { status: 400 });
     }
     if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }
-    return NextResponse.json({ error: 'Erro ao criar usuario' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao criar usuário' }, { status: 500 });
   }
 }

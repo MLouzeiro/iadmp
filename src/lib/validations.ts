@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const membroSchema = z.object({
-  nome: z.string().min(1, 'Nome e obrigatorio'),
-  email: z.string().email('Email invalido').optional().or(z.literal('')),
+  nome: z.string().min(1, 'Nome é obrigatório'),
+  email: z.string().email('E-mail inválido').optional().or(z.literal('')),
   telefone: z.string().optional(),
   whatsapp: z.string().optional(),
   dataNascimento: z.string().optional(),
@@ -15,8 +15,8 @@ export const membroSchema = z.object({
 });
 
 export const liderancaSchema = z.object({
-  nome: z.string().min(1, 'Nome e obrigatorio'),
-  cargo: z.string().min(1, 'Cargo e obrigatorio'),
+  nome: z.string().min(1, 'Nome é obrigatório'),
+  cargo: z.string().min(1, 'Cargo é obrigatório'),
   biografia: z.string().optional(),
   ordemExibicao: z.number().optional(),
   publico: z.boolean().optional(),
@@ -28,10 +28,10 @@ export const liderancaSchema = z.object({
 });
 
 export const eventoSchema = z.object({
-  nome: z.string().min(1, 'Nome e obrigatorio'),
+  nome: z.string().min(1, 'Nome é obrigatório'),
   categoriaId: z.string().optional(),
-  dataInicio: z.string().min(1, 'Data de inicio e obrigatoria'),
-  dataEvento: z.string().min(1, 'Data do evento e obrigatoria'),
+  dataInicio: z.string().min(1, 'Data de início é obrigatória'),
+  dataEvento: z.string().min(1, 'Data do evento é obrigatória'),
   dataFim: z.string().optional(),
   tema: z.string().optional(),
   preletores: z.array(z.string()).optional(),
@@ -42,11 +42,18 @@ export const eventoSchema = z.object({
   responsavelGeral: z.string().optional(),
   publicarNoSite: z.boolean().optional(),
   orcamentoPrevisto: z.number().optional(),
+  aceitaInscricoes: z.boolean().optional(),
+  limiteInscricoes: z.number().int().min(0).optional(),
+  taxaInscricao: z.number().min(0).optional(),
+  chavePix: z.string().optional(),
+  tipoChavePix: z.enum(['CPF', 'CNPJ', 'EMAIL', 'TELEFONE', 'ALEATORIA']).optional(),
+  nomeRecebedor: z.string().optional(),
+  cidadeRecebedor: z.string().optional(),
 });
 
 export const avisoSchema = z.object({
-  titulo: z.string().min(1, 'Titulo e obrigatorio'),
-  descricao: z.string().min(1, 'Descricao e obrigatoria'),
+  titulo: z.string().min(1, 'Título é obrigatório'),
+  descricao: z.string().min(1, 'Descrição é obrigatória'),
   imagem: z.string().optional(),
   categoria: z.string().optional(),
   dataInicio: z.string().optional(),
@@ -60,7 +67,7 @@ export const avisoSchema = z.object({
 });
 
 export const liturgiaSchema = z.object({
-  data: z.string().min(1, 'Data e obrigatoria'),
+  data: z.string().min(1, 'Data é obrigatória'),
   horario: z.string().optional(),
   dirigente: z.string().optional(),
   pregador: z.string().optional(),
@@ -71,7 +78,7 @@ export const liturgiaSchema = z.object({
 
 export const liturgiaItemSchema = z.object({
   ordem: z.number().min(1),
-  titulo: z.string().min(1, 'Titulo e obrigatorio'),
+  titulo: z.string().min(1, 'Título é obrigatório'),
   responsavel: z.string().optional(),
   horarioPrevisto: z.string().optional(),
   duracao: z.string().optional(),
@@ -79,17 +86,35 @@ export const liturgiaItemSchema = z.object({
 });
 
 export const financeiroSchema = z.object({
-  descricao: z.string().min(1, 'Descricao e obrigatoria'),
+  descricao: z.string().min(1, 'Descrição é obrigatória'),
   valor: z.number().min(0, 'Valor deve ser positivo'),
   data: z.string().optional(),
   tipo: z.enum(['ENTRADA', 'SAIDA']),
+  categoria: z.enum(['DIZIMO', 'OFERTA', 'DOACAO', 'INSCRICAO', 'DESPESA', 'OUTRO']).optional(),
   fornecedor: z.string().optional(),
   responsavel: z.string().optional(),
   observacoes: z.string().optional(),
   categoriaFinanceiraId: z.string().optional(),
 });
 
+export const inscricaoPublicaSchema = z.object({
+  nome: z.string().min(2, 'Nome muito curto').max(120),
+  email: z.string().email('E-mail inválido').optional().or(z.literal('')),
+  telefone: z.string().max(30).optional().or(z.literal('')),
+  observacoes: z.string().max(500).optional().or(z.literal('')),
+});
+
+export const inscricaoAdminSchema = z.object({
+  nome: z.string().min(2, 'Nome muito curto').max(120),
+  email: z.string().email('E-mail inválido').optional().or(z.literal('')),
+  telefone: z.string().max(30).optional().or(z.literal('')),
+  membroId: z.string().optional(),
+  status: z.enum(['PENDENTE', 'CONFIRMADA', 'CANCELADA', 'REALIZADA']).optional(),
+  valorPrevisto: z.number().min(0).optional(),
+  observacoes: z.string().max(500).optional().or(z.literal('')),
+});
+
 export const loginSchema = z.object({
-  email: z.string().email('Email invalido'),
-  password: z.string().min(6, 'Senha deve ter no minimo 6 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
 });

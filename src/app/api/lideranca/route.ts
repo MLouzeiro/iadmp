@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { liderancaSchema } from '@/lib/validations';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
+import { parseDataDateOnly } from '@/lib/datas';
 import {
   resolveOrgScope,
   resolveTargetOrgId,
@@ -40,10 +41,10 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(lideres);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
-    return NextResponse.json({ error: 'Erro ao buscar lideranca' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar liderança' }, { status: 500 });
   }
 }
 
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const podeCriar = await hasPermission(user.id, 'lideranca', 'criar');
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para criar lideranca' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para criar liderança' }, { status: 403 });
 
     const body = await request.json();
     const validated = liderancaSchema.parse(body);
@@ -72,8 +73,8 @@ export async function POST(request: NextRequest) {
         ordemExibicao: validated.ordemExibicao || 0,
         publico: validated.publico ?? true,
         ativo: validated.ativo ?? true,
-        dataInicio: validated.dataInicio ? new Date(validated.dataInicio) : null,
-        dataFim: validated.dataFim ? new Date(validated.dataFim) : null,
+        dataInicio: validated.dataInicio ? parseDataDateOnly(validated.dataInicio) : null,
+        dataFim: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
         membroId: validated.membroId || null,
         ministerioId: validated.ministerioId || null,
       },
@@ -92,15 +93,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(lider, { status: 201 });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     if (error?.message === ORG_REQUIRED) {
-      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
     }
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Dados invalidos' }, { status: 400 });
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
-    return NextResponse.json({ error: 'Erro ao criar lider' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao criar líder' }, { status: 500 });
   }
 }

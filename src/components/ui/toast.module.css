@@ -1,0 +1,160 @@
+.wrap {
+  position: fixed;
+  top: 1.15rem;
+  right: 1.15rem;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: min(380px, calc(100vw - 2rem));
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+  font-size: 0.855rem;
+  animation: toastIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.ok { border-left-color: #4caf50; }
+.ok .dot { background: #4caf50; }
+.err { border-left-color: #e74c3c; }
+.err .dot { background: #e74c3c; }
+.warn { border-left-color: #e0a020; }
+.warn .dot { background: #e0a020; }
+.info { border-left-color: #2196f3; }
+.info .dot { background: #2196f3; }
+
+.close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.close:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: var(--overlay-dark);
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  animation: dialogIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dialogTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.12rem;
+  color: var(--text-primary);
+  margin: 0 0 0.65rem;
+}
+
+.dialogMsg {
+  color: var(--text-secondary);
+  font-size: 0.895rem;
+  line-height: 1.6;
+  margin-bottom: 1.35rem;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.dialogCancel,
+.dialogOk,
+.dialogDanger {
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.dialogCancel {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.dialogCancel:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.dialogOk {
+  background: var(--gradient-gold);
+  color: #fff;
+  border-color: transparent;
+}
+
+.dialogOk:hover { filter: brightness(1.08); }
+
+.dialogDanger {
+  background: rgba(231, 76, 60, 0.14);
+  color: #ff8a80;
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.dialogDanger:hover {
+  background: rgba(231, 76, 60, 0.22);
+}

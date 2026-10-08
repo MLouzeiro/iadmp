@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
 import { resolveCongregacaoId, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
+import { parseDataDateOnly } from '@/lib/datas';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     const where: any = {};
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     } else if (user.role !== 'SUPER_ADMIN') {
       const vinculos = await prisma.usuarioOrganizacao.findMany({
@@ -37,8 +38,8 @@ export async function GET(request: NextRequest) {
     }
     if (dataInicio || dataFim) {
       where.data = {};
-      if (dataInicio) where.data.gte = new Date(dataInicio);
-      if (dataFim) where.data.lte = new Date(dataFim);
+      if (dataInicio) where.data.gte = parseDataDateOnly(dataInicio);
+      if (dataFim) where.data.lte = parseDataDateOnly(dataFim);
     }
 
     const [liturgias, total] = await Promise.all([
@@ -58,8 +59,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ liturgias, total, page, totalPages: Math.ceil(total / limit) });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('GET /api/liturgia error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
@@ -70,17 +71,17 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'liturgia', 'criar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para criar liturgias' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para criar liturgias' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, congregacao, data, horarioInicio, horarioFimPrevisto, tipoCulto, tema, dirigente, pregador, responsavel, observacoes, modeloId, itens } = body;
 
     if (!organizacaoId || !data || !horarioInicio) {
-      return NextResponse.json({ error: 'organizacaoId, data e horarioInicio sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId, data e horarioInicio são obrigatórios' }, { status: 400 });
     }
 
     const podeCriar = await canManageOrganization(user.id, organizacaoId);
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const congregacaoId = await resolveCongregacaoId(organizacaoId, {
       congregacaoId: body.congregacaoId,
@@ -91,10 +92,10 @@ export async function POST(request: NextRequest) {
       data: {
         organizacaoId,
         congregacaoId,
-        data: new Date(data),
+        data: parseDataDateOnly(data),
         horarioInicio,
         horarioFimPrevisto: horarioFimPrevisto || null,
-        tipoCulto: tipoCulto || 'Celebracao',
+        tipoCulto: tipoCulto || 'Celebração',
         tema: tema || null,
         dirigente: dirigente || null,
         dirigenteUserId: user.id,
@@ -137,8 +138,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ liturgia }, { status: 201 });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('POST /api/liturgia error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

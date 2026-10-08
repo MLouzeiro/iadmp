@@ -36,13 +36,13 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth();
     const podeVer = await hasPermission(user.id, 'dashboard', 'visualizar');
     if (!podeVer && user.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Sem permissao para ver indicadores' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para ver indicadores' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
     const periodoParam = (searchParams.get('periodo') || 'mes_atual') as TipoPeriodo;
     if (!PERIODOS.includes(periodoParam)) {
-      return NextResponse.json({ error: 'Periodo invalido' }, { status: 400 });
+      return NextResponse.json({ error: 'Período inválido' }, { status: 400 });
     }
 
     const periodo = resolvePeriodo(periodoParam, {
@@ -85,10 +85,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHORIZED') {
-        return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       }
       if (error.message === 'FORBIDDEN') {
-        return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+        return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
       }
       if (error.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     }

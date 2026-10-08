@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     }
     if (ativo !== null && ativo !== undefined && ativo !== '') where.ativo = ativo === 'true';
@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ versiculos });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('GET /api/admin/versiculos error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -48,17 +48,17 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'comunicacao', 'criar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para criar versiculos' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para criar versículos' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, referencia, versiculo, reflexao, ativo } = body;
 
     if (!organizacaoId || !referencia || !versiculo || !reflexao) {
-      return NextResponse.json({ error: 'organizacaoId, referencia, versiculo e reflexao sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId, referência, versículo e reflexão são obrigatórios' }, { status: 400 });
     }
 
     const canManage = await canManageOrganization(user.id, organizacaoId);
-    if (!canManage) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!canManage) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const novoVersiculo = await prisma.versiculoDiario.create({
       data: {
@@ -77,8 +77,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ versiculo: novoVersiculo }, { status: 201 });
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/admin/versiculos error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

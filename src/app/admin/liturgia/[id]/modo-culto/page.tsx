@@ -6,9 +6,9 @@ import { ChevronLeft, ChevronRight, X, Play, Pause, SkipForward } from 'lucide-r
 import styles from '../../liturgia.module.css';
 
 const MOMENTO_LABELS: Record<string, string> = {
-  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oracao', DIZIMOS: 'Dizimos',
+  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oração', DIZIMOS: 'Dízimos',
   ALAS: 'Alas', DINAMICA: 'Dinamica', MENSAGEM: 'Mensagem', RESPOSTA: 'Resposta',
-  COMUNICADOS: 'Comunicados', BENCAO: 'Bencao', MUSICA_ESPECIAL: 'Musica Especial',
+  COMUNICADOS: 'Comunicados', BENCAO: 'Bênção', MUSICA_ESPECIAL: 'Música Especial',
   TESTEMUNHO: 'Testemunho', CEIA: 'Ceia', BAPTISMO: 'Batismo', OUTRO: 'Outro',
 };
 
@@ -97,7 +97,7 @@ export default function ModoCultoPage() {
           <div className={styles.worshipProgressBar} style={{ width: `${progress}%` }} />
         </div>
         <button onClick={() => setCurrentIndex(i => Math.min(i + 1, total - 1))} disabled={currentIndex === total - 1} className={styles.worshipNavBtn}>
-          Proximo <ChevronRight size={16} />
+          Próximo <ChevronRight size={16} />
         </button>
       </div>
     </div>

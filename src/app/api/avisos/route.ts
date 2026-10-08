@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { avisoSchema } from '@/lib/validations';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
+import { parseDataDateOnly } from '@/lib/datas';
 import {
   resolveOrgScope,
   resolveTargetOrgId,
@@ -44,8 +45,8 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(avisos);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar avisos' }, { status: 500 });
   }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const podeCriar = await hasPermission(user.id, 'avisos', 'criar');
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para criar avisos' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para criar avisos' }, { status: 403 });
 
     const body = await request.json();
     const validated = avisoSchema.parse(body);
@@ -74,8 +75,8 @@ export async function POST(request: NextRequest) {
         descricao: validated.descricao,
         imagem: body.imagem || null,
         categoria: body.categoria || null,
-        comecaEm: validated.dataInicio ? new Date(validated.dataInicio) : new Date(),
-        terminaEm: validated.dataFim ? new Date(validated.dataFim) : null,
+        comecaEm: validated.dataInicio ? parseDataDateOnly(validated.dataInicio) : new Date(),
+        terminaEm: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
         urgencia: body.urgencia || 'NORMAL',
         situacaoAviso: validated.status || 'ATIVO',
         publicoAlvo: validated.publicoAlvo || null,
@@ -98,14 +99,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(aviso, { status: 201 });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     if (error?.message === ORG_REQUIRED) {
-      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
     }
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Dados invalidos' }, { status: 400 });
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Erro ao criar aviso' }, { status: 500 });
   }

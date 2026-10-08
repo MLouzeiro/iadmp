@@ -80,7 +80,7 @@ describe('isolamento de membros por organizacao', () => {
   it('GET /api/membros com organizacaoId alheio retorna 403', async () => {
     const res = await membrosGET(new NextRequest('http://localhost/api/membros?organizacaoId=org-b'));
     expect(res.status).toBe(403);
-    expect(await res.json()).toEqual({ error: 'Sem permissao para esta organizacao' });
+    expect(await res.json()).toEqual({ error: 'Sem permissão para esta organização' });
     expect(mockMembroFindMany).not.toHaveBeenCalled();
   });
 

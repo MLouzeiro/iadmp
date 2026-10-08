@@ -64,7 +64,7 @@ function idParams(id = 'id1') {
   return { params: Promise.resolve({ id }) };
 }
 
-const ORG403 = { error: 'Sem permissao para esta organizacao' };
+const ORG403 = { error: 'Sem permissão para esta organização' };
 
 beforeEach(() => {
   jest.clearAllMocks();

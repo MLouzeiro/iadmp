@@ -53,7 +53,7 @@ export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string
         }
       }
     } catch (err) {
-      console.error('Erro ao buscar versiculo:', err);
+      console.error('Erro ao buscar versículo:', err);
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,7 @@ export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string
       <section className="verse-section">
         <div className="container">
           <div className="section-heading">
-            <span className="label">Versiculo do Momento</span>
+            <span className="label">Versículo do Momento</span>
             <div className="divider" />
           </div>
           <div className="verse-card">
@@ -107,14 +107,14 @@ export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string
     <section className="verse-section">
       <div className="container">
         <div className="section-heading">
-          <span className="label">Versiculo do Momento</span>
+          <span className="label">Versículo do Momento</span>
           <div className="divider" />
         </div>
         <div className={`verse-card fade-in ${fadeOut ? 'verse-fade-out' : ''}`}>
           <p className="reference">{verse.referencia}</p>
           <p className="text">&ldquo;{verse.versiculo}&rdquo;</p>
           <div className="reflection">
-            <span className="reflection-label">Reflexao</span>
+            <span className="reflection-label">Reflexão</span>
             {verse.reflexao}
           </div>
           {countdown && (

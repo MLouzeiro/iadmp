@@ -46,11 +46,11 @@ export default function ComunicacaoPage() {
 
   return (
     <div>
-      <SectionHead icon={<Radio size={24} />} title="Comunicacao" subtitle="Canais oficiais e pregacoes da igreja" />
+      <SectionHead icon={<Radio size={24} />} title="Comunicação" subtitle="Canais oficiais e pregações da igreja" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         {[
-          { label: 'Total Pregacoes', value: data?.totalPregacoes ?? 0, color: 'var(--color-secondary)' },
+          { label: 'Total Pregações', value: data?.totalPregacoes ?? 0, color: 'var(--color-secondary)' },
           { label: 'Publicadas', value: data?.publicadas ?? 0, color: '#4caf50' },
           { label: 'Rascunhos', value: data?.rascunhos ?? 0, color: '#ff9800' },
           { label: 'Canais Ativos', value: data?.canaisAtivos ?? 0, color: 'var(--color-primary)' },
@@ -64,7 +64,7 @@ export default function ComunicacaoPage() {
 
       {data?.ultimaPregacao && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Ultima Pregacao Publicada</div>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Última Pregação Publicada</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{data.ultimaPregacao.titulo}</div>
@@ -82,14 +82,14 @@ export default function ComunicacaoPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Pregacoes</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Pregações</h3>
             <Link href="/admin/comunicacao/pregacoes/nova" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', background: 'var(--gradient-gold)', color: '#000', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'none' }}>
               <Plus size={14} /> Nova
             </Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <Link href="/admin/comunicacao/pregacoes" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', textDecoration: 'none', color: 'var(--text-primary)', fontSize: '0.9rem', transition: 'var(--transition)' }}>
-              <Mic size={18} /> Todas as pregacoes <ArrowRight size={14} style={{ marginLeft: 'auto' }} />
+              <Mic size={18} /> Todas as pregações <ArrowRight size={14} style={{ marginLeft: 'auto' }} />
             </Link>
           </div>
         </div>

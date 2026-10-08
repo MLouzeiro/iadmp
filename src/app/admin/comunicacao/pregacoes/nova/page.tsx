@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { Mic, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../pregacoes.module.css';
 import formStyles from '@/components/ui/form.module.css';
 
@@ -17,14 +18,15 @@ interface Liturgia {
   status: string;
 }
 
-const TIPOS_PREGACAO = ['Pregacao', 'Estudo biblico', 'Devocional', 'Palavra', 'Sermao', 'Palestra', 'Conferencia', 'Outro'];
+const TIPOS_PREGACAO = ['Pregação', 'Estudo bíblico', 'Devocional', 'Palavra', 'Sermão', 'Palestra', 'Conferência', 'Outro'];
 
 export default function NovaPregacaoPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [liturgias, setLiturgias] = useState<Liturgia[]>([]);
   const [form, setForm] = useState({
-    titulo: '', descricao: '', tema: '', tipo: 'Pregacao', pregadorNome: '',
+    titulo: '', descricao: '', tema: '', tipo: 'Pregação', pregadorNome: '',
     data: new Date().toISOString().split('T')[0], liturgiaId: '',
     referenciaLivro: '', referenciaCapitulo: '', referenciaVersIni: '', referenciaVersFim: '',
     videoUrl: '', capaUrl: '', observacoes: '', status: 'RASCUNHO',
@@ -52,14 +54,15 @@ export default function NovaPregacaoPage() {
       });
       if (res.ok) {
         const data = await res.json();
+        toast('Pregação criada.', 'ok');
         router.push(`/admin/comunicacao/pregacoes/${data.pregacao.id}`);
       } else {
-        const data = await res.json();
-        alert(data.error || 'Erro ao criar pregação');
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Erro ao criar prega��o', 'err');
       }
     } catch (err) {
       console.error('Erro:', err);
-      alert('Erro ao criar pregação');
+      toast('Erro ao criar prega��o', 'err');
     } finally {
       setSaving(false);
     }
@@ -68,15 +71,15 @@ export default function NovaPregacaoPage() {
   return (
     <div style={{ maxWidth: 800 }}>
       <Link href="/admin/comunicacao/pregacoes" className={styles.detailBack}>
-        <ArrowLeft size={16} /> Voltar para pregacoes
+        <ArrowLeft size={16} /> Voltar para pregações
       </Link>
-      <SectionHead icon={<Mic size={24} />} title="Nova Pregacao" />
+      <SectionHead icon={<Mic size={24} />} title="Nova Pregação" />
 
       <div className={formStyles.formCard}>
         <form onSubmit={handleSubmit} className={formStyles.formGrid}>
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Titulo <span className={formStyles.fieldRequired}>*</span></label>
-            <input className={formStyles.input} type="text" value={form.titulo} onChange={e => setForm({ ...form, titulo: e.target.value })} placeholder="Titulo da pregação" required />
+            <label className={formStyles.fieldLabel}>Título <span className={formStyles.fieldRequired}>*</span></label>
+            <input className={formStyles.input} type="text" value={form.titulo} onChange={e => setForm({ ...form, titulo: e.target.value })} placeholder="Título da pregação" required />
           </div>
 
           <div className={formStyles.field}>
@@ -112,12 +115,12 @@ export default function NovaPregacaoPage() {
           </div>
 
           <div className={formStyles.sectionDivider}>
-            <div className={formStyles.sectionDividerTitle}>Referencia Biblica</div>
+            <div className={formStyles.sectionDividerTitle}>Referência Biblica</div>
           </div>
 
           <div className={formStyles.field}>
             <label className={formStyles.fieldLabel}>Livro</label>
-            <input className={formStyles.input} type="text" value={form.referenciaLivro} onChange={e => setForm({ ...form, referenciaLivro: e.target.value })} placeholder="Ex: Joao" />
+            <input className={formStyles.input} type="text" value={form.referenciaLivro} onChange={e => setForm({ ...form, referenciaLivro: e.target.value })} placeholder="Ex: João" />
           </div>
 
           <div className={formStyles.field}>
@@ -126,12 +129,12 @@ export default function NovaPregacaoPage() {
           </div>
 
           <div className={formStyles.field}>
-            <label className={formStyles.fieldLabel}>Versiculo Inicial</label>
+            <label className={formStyles.fieldLabel}>Versículo Inicial</label>
             <input className={formStyles.input} type="number" value={form.referenciaVersIni} onChange={e => setForm({ ...form, referenciaVersIni: e.target.value })} placeholder="16" />
           </div>
 
           <div className={formStyles.field}>
-            <label className={formStyles.fieldLabel}>Versiculo Final</label>
+            <label className={formStyles.fieldLabel}>Versículo Final</label>
             <input className={formStyles.input} type="number" value={form.referenciaVersFim} onChange={e => setForm({ ...form, referenciaVersFim: e.target.value })} placeholder="18" />
           </div>
 
@@ -150,13 +153,13 @@ export default function NovaPregacaoPage() {
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Descricao</label>
-            <textarea className={formStyles.textarea} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} placeholder="Descricao da pregação" rows={4} />
+            <label className={formStyles.fieldLabel}>Descrição</label>
+            <textarea className={formStyles.textarea} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} placeholder="Descrição da pregação" rows={4} />
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
-            <label className={formStyles.fieldLabel}>Observacoes</label>
-            <textarea className={formStyles.textarea} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} placeholder="Observacoes internas" rows={2} />
+            <label className={formStyles.fieldLabel}>Observações</label>
+            <textarea className={formStyles.textarea} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações internas" rows={2} />
           </div>
 
           <div className={formStyles.field}>
@@ -171,7 +174,7 @@ export default function NovaPregacaoPage() {
             <div className={formStyles.formActions}>
               <Link href="/admin/comunicacao/pregacoes" className={`${formStyles.btn} ${formStyles.btnSecondary}`}>Cancelar</Link>
               <button type="submit" className={`${formStyles.btn} ${formStyles.btnPrimary}`} disabled={saving}>
-                {saving ? 'Salvando...' : 'Criar Pregacao'}
+                {saving ? 'Salvando...' : 'Criar Pregação'}
               </button>
             </div>
           </div>

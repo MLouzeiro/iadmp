@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, Plus, Calendar, Clock, User, Search, ChevronRight, Trash2, Copy, Eye, Play, FileText } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from './liturgia.module.css';
 
 interface Liturgia {
@@ -34,6 +35,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function LiturgiaPage() {
   const router = useRouter();
+  const { toast, confirm } = useToast();
   const [liturgias, setLiturgias] = useState<Liturgia[]>([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
@@ -66,13 +68,20 @@ export default function LiturgiaPage() {
   useEffect(() => { fetchLiturgias(); }, [fetchLiturgias]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta liturgia?')) return;
-    try {
-      const res = await fetch(`/api/liturgia/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchLiturgias();
-    } catch (err) {
-      console.error('Erro ao excluir:', err);
-    }
+    confirm('Tem certeza que deseja excluir esta liturgia?', async () => {
+      try {
+        const res = await fetch(`/api/liturgia/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast('Liturgia excluída.', 'ok');
+          fetchLiturgias();
+        } else {
+          toast('Erro ao excluir liturgia.', 'err');
+        }
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        toast('Erro de conexão ao excluir.', 'err');
+      }
+    }, { title: 'Excluir liturgia', danger: true });
   };
 
   const handleDuplicar = async (id: string) => {
@@ -162,7 +171,7 @@ export default function LiturgiaPage() {
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
               <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} style={{ padding: '0.5rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', opacity: page <= 1 ? 0.5 : 1 }}>Anterior</button>
               <span style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Pagina {page} de {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '0.5rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', opacity: page >= totalPages ? 0.5 : 1 }}>Proxima</button>
+              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '0.5rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', opacity: page >= totalPages ? 0.5 : 1 }}>Próxima</button>
             </div>
           )}
         </>

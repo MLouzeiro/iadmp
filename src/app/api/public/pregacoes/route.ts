@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6');
 
     if (!organizacaoId) {
-      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
     }
 
     const pregacoes = await prisma.pregacao.findMany({

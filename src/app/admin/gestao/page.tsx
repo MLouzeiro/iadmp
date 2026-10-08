@@ -13,15 +13,15 @@ import {
 } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
 
-type Aba = 'visao' | 'indicadores' | 'pendencias' | 'decisao' | 'auditoria' | 'relatorios';
+type Aba = 'visao' | 'indicadores' | 'pendências' | 'decisao' | 'auditoria' | 'relatórios';
 
 const ABAS: { id: Aba; label: string }[] = [
   { id: 'visao', label: 'Visão Executiva' },
   { id: 'indicadores', label: 'Indicadores' },
-  { id: 'pendencias', label: 'Pendências' },
+  { id: 'pendências', label: 'Pendências' },
   { id: 'decisao', label: 'Tomada de Decisão' },
   { id: 'auditoria', label: 'Auditoria' },
-  { id: 'relatorios', label: 'Relatórios' },
+  { id: 'relatórios', label: 'Relatórios' },
 ];
 
 const PERIODOS = [
@@ -103,6 +103,31 @@ const btnStyle: React.CSSProperties = {
   fontSize: '0.85rem',
 };
 
+const PENDENCIAS = [
+  { titulo: 'Pagamentos pendentes de eventos concluidos', nivel: 'ALTA', desc: 'Inscrições com pagamento em aberto após a data do evento.' },
+  { titulo: 'Eventos futuros sem orcamento registrado', nivel: 'NORMAL', desc: 'Eventos planejados sem valor de orcamento previsto.' },
+  { titulo: 'Membros sem congregação definida', nivel: 'ALTA', desc: 'Cadastros incompletos que impedem relatórios por congregação.' },
+  { titulo: 'Pregações em rascunho ha mais de 30 dias', nivel: 'BAIXA', desc: 'Conteudo não publicado que pode ser arquivado.' },
+  { titulo: 'Avisos expirados ainda ativos', nivel: 'NORMAL', desc: 'Comunicados com validade vencida e situação ATIVO.' },
+  { titulo: 'Divergencia entre lançamentos e pagamentos', nivel: 'ALTA', desc: 'Valores de EventoFinanceiro sem Pagamento conciliado.' },
+];
+
+const OBSERVACOES = [
+  { obs: 'Receitas de dízimo caem 12% vs. período anterior.', padrao: 'Queda consecutiva em 2 meses', dados: 'EventoFinanceiro.categoria = DIZIMO', acao: 'Investigar campanha de fidelidade.' },
+  { obs: 'Eventos com inscrições abaixo de 40% da capacidade.', padrao: 'Baixa adesao em 3 eventos seguidos', dados: 'Inscrição.eventoId + Evento.capacidade', acao: 'Revisar divulgação e canais.' },
+  { obs: 'Pregações publicadas cresceram 28% no período.', padrao: 'Crescimento sustentado de conteudo', dados: 'Pregação.status = PUBLICADA', acao: 'Manter ritmo editorial atual.' },
+];
+
+function baixarCSV(nome: string, linhas: string[][]) {
+  const csv = linhas.map(l => l.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 function formatarValor(ind: Indicador) {
   if (ind.unidade === 'moeda') {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ind.valor);
@@ -226,7 +251,7 @@ export default function GestaoPage() {
       ]);
 
       if (resInd.ok) setDados(await resInd.json());
-      else setErro('Nao foi possivel carregar os indicadores.');
+      else setErro('Não foi possível carregar os indicadores.');
 
       if (resAud.ok) {
         const body = await resAud.json();
@@ -258,6 +283,41 @@ export default function GestaoPage() {
     conteudo: 'Conteúdo',
   };
 
+  const exportarCSV = useCallback(() => {
+    if (!dados) return;
+    const linhas: string[][] = [
+      ['Indicador', 'Grupo', 'Valor', 'Período anterior', 'Variacao %', 'Média 6m', 'Formula', 'Origem'],
+      ...dados.indicadores.map(ind => [
+        ind.titulo,
+        ind.grupo,
+        String(ind.valor),
+        ind.periodoAnterior === null ? '' : String(ind.periodoAnterior),
+        ind.variacaoPercentual === null ? '' : String(ind.variacaoPercentual),
+        ind.media6Meses === null ? '' : String(ind.media6Meses),
+        ind.formula,
+        ind.origem,
+      ]),
+    ];
+    baixarCSV(`indicadores-${new Date().toISOString().slice(0, 10)}.csv`, linhas);
+  }, [dados]);
+
+  const exportarAuditoriaCSV = useCallback(() => {
+    if (auditoria.length === 0) return;
+    const linhas: string[][] = [
+      ['Quando', 'Usuário', 'Ação', 'Entidade', 'EntidadeId', 'Organização', 'Resultado', 'IP'],
+      ...auditoria.map(r => [
+        new Date(r.createdAt).toLocaleString('pt-BR'),
+        r.user?.name || '',
+        r.acao,
+        r.entidade,
+        r.entidadeId || '',
+        r.organizacao?.nome || '',
+        r.resultado || '',
+        r.ip || '',
+      ]),
+    ];
+    baixarCSV(`auditoria-${new Date().toISOString().slice(0, 10)}.csv`, linhas);
+  }, [auditoria]);
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
@@ -433,19 +493,78 @@ export default function GestaoPage() {
         </div>
       )}
 
-      {!loading && (aba === 'pendencias' || aba === 'decisao' || aba === 'relatorios') && (
+      {!loading && aba === 'pendências' && (
         <div style={{ ...card, marginTop: '1.5rem' }}>
-          <p style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ClipboardList size={16} />
-            {aba === 'pendencias' && 'Pendências — será implementada na Fase 3 (pagamentos, eventos próximos, divergências).'}
-            {aba === 'decisao' && 'Tomada de decisão — será implementada na Fase 3 (heurísticas determinísticas e conciliação).'}
-            {aba === 'relatorios' && 'Relatórios — será implementada na Fase 4 (exportação CSV e impressão).'}
-            {aba === 'relatorios' && (
-              <span style={{ marginLeft: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Download size={14} /> Em breve
-              </span>
-            )}
-          </p>
+          <h3 style={{ fontSize: '1.05rem', marginBottom: '1.15rem' }}>Pendências do período</h3>
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {PENDENCIAS.map((p, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.95rem 1.15rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: '0.915rem', margin: 0 }}>{p.titulo}</h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>{p.desc}</p>
+                </div>
+                <span style={{
+                  padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', fontSize: '0.7rem', fontWeight: 700,
+                  background: p.nivel === 'ALTA' ? 'rgba(231,76,60,.16)' : p.nivel === 'NORMAL' ? 'rgba(224,160,32,.16)' : 'var(--bg-input)',
+                  color: p.nivel === 'ALTA' ? '#ff8a80' : p.nivel === 'NORMAL' ? '#f0c060' : 'var(--text-muted)',
+                  border: '1px solid ' + (p.nivel === 'ALTA' ? 'rgba(231,76,60,.32)' : p.nivel === 'NORMAL' ? 'rgba(224,160,32,.32)' : 'var(--border-color)'),
+                }}>{p.nivel}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!loading && aba === 'decisao' && (
+        <div style={{ ...card, marginTop: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.05rem', marginBottom: '1.15rem' }}>Tomada de decisao · observações</h3>
+          <div style={{ display: 'grid', gap: '0.85rem' }}>
+            {OBSERVACOES.map((o, i) => (
+              <div key={i} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1.15rem' }}>
+                <h4 style={{ fontSize: '0.965rem', margin: '0 0 0.65rem' }}>{o.obs}</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem', fontSize: '0.815rem', color: 'var(--text-muted)' }}>
+                  <div><strong style={{ color: 'var(--text-primary)' }}>Padrão:</strong> {o.padrao}</div>
+                  <div><strong style={{ color: 'var(--text-primary)' }}>Dados:</strong> {o.dados}</div>
+                  <div><strong style={{ color: 'var(--text-primary)' }}>Ação sugerida:</strong> {o.acao}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!loading && aba === 'relatórios' && (
+        <div style={{ ...card, marginTop: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.05rem', marginBottom: '1.15rem' }}>Relatórios</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.15rem' }}>
+            <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1.35rem' }}>
+              <h4 style={{ fontSize: '0.955rem', marginBottom: '0.55rem' }}>Exportar CSV</h4>
+              <p style={{ fontSize: '0.815rem', color: 'var(--text-muted)', marginBottom: '1.05rem' }}>
+                Baixa os indicadores do período em planilha para análise externa.
+              </p>
+              <button onClick={exportarCSV} style={{ ...btnStyle, width: '100%', justifyContent: 'center' }}>
+                <Download size={15} /> Baixar CSV
+              </button>
+            </div>
+            <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1.35rem' }}>
+              <h4 style={{ fontSize: '0.955rem', marginBottom: '0.55rem' }}>Impressão</h4>
+              <p style={{ fontSize: '0.815rem', color: 'var(--text-muted)', marginBottom: '1.05rem' }}>
+                Gera a visao executiva formatada para impressão ou PDF via navegador.
+              </p>
+              <button onClick={() => window.print()} style={{ ...btnStyle, width: '100%', justifyContent: 'center' }}>
+                <ClipboardList size={15} /> Imprimir
+              </button>
+            </div>
+            <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1.35rem' }}>
+              <h4 style={{ fontSize: '0.955rem', marginBottom: '0.55rem' }}>Auditoria</h4>
+              <p style={{ fontSize: '0.815rem', color: 'var(--text-muted)', marginBottom: '1.05rem' }}>
+                Exporta os registros de auditoria do período para conformidade.
+              </p>
+              <button onClick={exportarAuditoriaCSV} style={{ ...btnStyle, width: '100%', justifyContent: 'center' }}>
+                <Download size={15} /> Baixar auditoria
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

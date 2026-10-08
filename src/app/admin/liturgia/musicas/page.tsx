@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import SectionHead from '@/components/ui/SectionHead';
 import { Music, Plus, Trash2, Edit, Search, X } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../liturgia.module.css';
 
-const CATEGORIAS = ['Adoracao', 'Louvor', 'Comunhao', 'Celestial', 'Natalino', 'Outro'];
+const CATEGORIAS = ['Adoração', 'Louvor', 'Comunhão', 'Celestial', 'Natalino', 'Outro'];
 
 interface Musica {
   id: string;
@@ -20,6 +21,7 @@ interface Musica {
 }
 
 export default function MusicasPage() {
+  const { toast, confirm } = useToast();
   const [musicas, setMusicas] = useState<Musica[]>([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
@@ -32,7 +34,7 @@ export default function MusicasPage() {
   const [formCompositor, setFormCompositor] = useState('');
   const [formArtista, setFormArtista] = useState('');
   const [formTom, setFormTom] = useState('');
-  const [formCategoria, setFormCategoria] = useState('Adoracao');
+  const [formCategoria, setFormCategoria] = useState('Adoração');
   const [formLetra, setFormLetra] = useState('');
   const [formLink, setFormLink] = useState('');
   const [formObservacoes, setFormObservacoes] = useState('');
@@ -56,7 +58,7 @@ export default function MusicasPage() {
 
   const resetForm = () => {
     setFormTitulo(''); setFormCompositor(''); setFormArtista(''); setFormTom('');
-    setFormCategoria('Adoracao'); setFormLetra(''); setFormLink(''); setFormObservacoes('');
+    setFormCategoria('Adoração'); setFormLetra(''); setFormLink(''); setFormObservacoes('');
     setEditingId(null); setShowForm(false);
   };
 
@@ -68,7 +70,7 @@ export default function MusicasPage() {
   };
 
   const handleSave = async () => {
-    if (!formTitulo) { alert('Titulo e obrigatorio'); return; }
+    if (!formTitulo) { toast('Título é obrigatório', 'warn'); return; }
     const payload = {
       organizacaoId, titulo: formTitulo, compositor: formCompositor, artista: formArtista,
       tom: formTom, categoria: formCategoria, letra: formLetra, link: formLink, observacoes: formObservacoes,
@@ -76,32 +78,41 @@ export default function MusicasPage() {
     const url = editingId ? `/api/liturgia/musicas/${editingId}` : '/api/liturgia/musicas';
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (res.ok) { resetForm(); fetchMusicas(); } else { const err = await res.json(); alert(err.error); }
+    if (res.ok) {
+      resetForm();
+      fetchMusicas();
+      toast(editingId ? 'Música atualizada.' : 'Música criada.', 'ok');
+    } else {
+      const err = await res.json().catch(() => ({}));
+      toast(err.error || 'Erro ao salvar música', 'err');
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir esta musica?')) return;
-    await fetch(`/api/liturgia/musicas/${id}`, { method: 'DELETE' });
-    fetchMusicas();
+    confirm('Excluir esta música?', async () => {
+      await fetch(`/api/liturgia/musicas/${id}`, { method: 'DELETE' });
+      toast('Música excluída.', 'ok');
+      fetchMusicas();
+    }, { title: 'Excluir música', danger: true });
   };
 
   return (
     <div>
-      <SectionHead icon={<Music size={24} />} title="Musicas">
+      <SectionHead icon={<Music size={24} />} title="Músicas">
         <button onClick={() => { resetForm(); setShowForm(true); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: 'var(--gradient-gold)', color: '#000', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: '0.85rem', border: 'none', cursor: 'pointer' }}>
-          <Plus size={16} /> Nova Musica
+          <Plus size={16} /> Nova Música
         </button>
       </SectionHead>
 
       {showForm && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.05rem', color: 'var(--text-primary)' }}>{editingId ? 'Editar Musica' : 'Nova Musica'}</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.05rem', color: 'var(--text-primary)' }}>{editingId ? 'Editar Música' : 'Nova Música'}</h3>
             <button onClick={resetForm} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={18} /></button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Titulo *</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Título *</label>
               <input type="text" value={formTitulo} onChange={e => setFormTitulo(e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
             </div>
             <div>
@@ -141,7 +152,7 @@ export default function MusicasPage() {
       )}
 
       <div className={styles.filtersBar}>
-        <input type="text" placeholder="Buscar musica..." value={busca} onChange={e => setBusca(e.target.value)} style={{ flex: 1, minWidth: 200, padding: '0.6rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
+        <input type="text" placeholder="Buscar música..." value={busca} onChange={e => setBusca(e.target.value)} style={{ flex: 1, minWidth: 200, padding: '0.6rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
         <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '0.6rem 0.75rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }}>
           <option value="">Todas categorias</option>
           {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -151,8 +162,8 @@ export default function MusicasPage() {
       {loading ? <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Carregando...</div> : musicas.length === 0 ? (
         <div className={styles.emptyState}>
           <Music size={40} className={styles.emptyStateIcon} />
-          <h3 className={styles.emptyStateTitle}>Nenhuma musica encontrada</h3>
-          <p className={styles.emptyStateDesc}>Adicione musicas ao catalogo da igreja</p>
+          <h3 className={styles.emptyStateTitle}>Nenhuma música encontrada</h3>
+          <p className={styles.emptyStateDesc}>Adicione músicas ao catálogo da igreja</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

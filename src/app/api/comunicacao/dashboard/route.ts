@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(dados);
   } catch (error: unknown) {
     const err = error as { message?: string };
-    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (err.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (err.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (err.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     console.error('GET /api/comunicacao/dashboard error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

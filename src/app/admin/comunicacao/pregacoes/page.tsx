@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { Mic, Plus, Calendar, User, BookOpen, ExternalLink, Trash2, Eye, Star, Archive, Send } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from './pregacoes.module.css';
 
 interface Pregacao {
@@ -34,10 +35,11 @@ const STATUS_LABELS: Record<string, string> = {
   ARQUIVADA: 'Arquivada',
 };
 
-const TIPOS_PREGACAO = ['Pregacao', 'Estudo biblico', 'Devocional', 'Palavra', 'Sermao', 'Palestra', 'Conferencia', 'Outro'];
+const TIPOS_PREGACAO = ['Pregação', 'Estudo bíblico', 'Devocional', 'Palavra', 'Sermão', 'Palestra', 'Conferência', 'Outro'];
 
 export default function PregacoesPage() {
   const router = useRouter();
+  const { toast, confirm } = useToast();
   const [pregacoes, setPregacoes] = useState<Pregacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
@@ -65,7 +67,7 @@ export default function PregacoesPage() {
         setTotalPages(data.totalPages);
       }
     } catch (err) {
-      console.error('Erro ao buscar pregacoes:', err);
+      console.error('Erro ao buscar pregações:', err);
     } finally {
       setLoading(false);
     }
@@ -74,13 +76,20 @@ export default function PregacoesPage() {
   useEffect(() => { fetchPregacoes(); }, [fetchPregacoes]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta pregação?')) return;
-    try {
-      const res = await fetch(`/api/comunicacao/pregacoes/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchPregacoes();
-    } catch (err) {
-      console.error('Erro ao excluir:', err);
-    }
+    confirm('Tem certeza que deseja excluir esta pregação?', async () => {
+      try {
+        const res = await fetch(`/api/comunicacao/pregacoes/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast('Pregação excluída.', 'ok');
+          fetchPregacoes();
+        } else {
+          toast('Erro ao excluir pregação.', 'err');
+        }
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        toast('Erro de conexão ao excluir.', 'err');
+      }
+    }, { title: 'Excluir pregação', danger: true });
   };
 
   const handleAction = async (id: string, action: string) => {
@@ -88,7 +97,7 @@ export default function PregacoesPage() {
       const res = await fetch(`/api/comunicacao/pregacoes/${id}/${action}`, { method: 'POST' });
       if (res.ok) fetchPregacoes();
     } catch (err) {
-      console.error('Erro ao executar acao:', err);
+      console.error('Erro ao executar ação:', err);
     }
   };
 
@@ -108,15 +117,15 @@ export default function PregacoesPage() {
   return (
     <div>
       <div className={styles.pageHeader}>
-        <SectionHead icon={<Mic size={24} />} title="Pregacoes" />
+        <SectionHead icon={<Mic size={24} />} title="Pregações" />
         <Link href="/admin/comunicacao/pregacoes/nova" className={`${styles.btn} ${styles.btnPrimary}`}>
-          <Plus size={16} /> Nova Pregacao
+          <Plus size={16} /> Nova Pregação
         </Link>
       </div>
 
       <div className={styles.filtersBar}>
         <div className={styles.filterGroup} style={{ flex: 1, minWidth: 200 }}>
-          <input type="text" placeholder="Buscar por titulo, pregador, tema..." value={busca} onChange={e => { setBusca(e.target.value); setPage(1); }} className={styles.searchInput} />
+          <input type="text" placeholder="Buscar por título, pregador, tema..." value={busca} onChange={e => { setBusca(e.target.value); setPage(1); }} className={styles.searchInput} />
         </div>
         <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }} className={styles.selectFilter}>
           <option value="">Todos os status</option>
@@ -131,7 +140,7 @@ export default function PregacoesPage() {
         <select value={ordenar} onChange={e => setOrdenar(e.target.value)} className={styles.selectFilter}>
           <option value="recentes">Mais recentes</option>
           <option value="antigas">Mais antigas</option>
-          <option value="titulo">Titulo</option>
+          <option value="título">Título</option>
         </select>
       </div>
 
@@ -143,7 +152,7 @@ export default function PregacoesPage() {
           <h3 className={styles.emptyStateTitle}>Nenhuma pregação encontrada</h3>
           <p className={styles.emptyStateDesc}>Cadastre a primeira pregação da igreja</p>
           <Link href="/admin/comunicacao/pregacoes/nova" className={`${styles.btn} ${styles.btnPrimary}`}>
-            <Plus size={16} /> Nova Pregacao
+            <Plus size={16} /> Nova Pregação
           </Link>
         </div>
       ) : (
@@ -187,7 +196,7 @@ export default function PregacoesPage() {
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
               <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className={`${styles.btn} ${styles.btnSecondary}`} style={{ opacity: page <= 1 ? 0.5 : 1 }}>Anterior</button>
               <span style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Pagina {page} de {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className={`${styles.btn} ${styles.btnSecondary}`} style={{ opacity: page >= totalPages ? 0.5 : 1 }}>Proxima</button>
+              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className={`${styles.btn} ${styles.btnSecondary}`} style={{ opacity: page >= totalPages ? 0.5 : 1 }}>Próxima</button>
             </div>
           )}
         </>

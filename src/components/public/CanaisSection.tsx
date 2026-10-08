@@ -50,7 +50,7 @@ export default function CanaisSection({ organizacaoId }: { organizacaoId: string
         <div className="section-heading">
           <span className="label">Acompanhe Nossa Igreja</span>
           <h2>Canais Oficiais</h2>
-          <p>Conecte-se conosco atraves das nossas redes sociais.</p>
+          <p>Conecte-se conosco através das nossas redes sociais.</p>
           <div className="divider" />
         </div>
         <div className="grid-3" style={{ maxWidth: '800px', margin: '0 auto', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>

@@ -7,16 +7,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const user = await requireAuth();
     const { id } = await params;
     const hasPerm = await hasPermission(user.id, 'liturgia', 'criar');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
 
     const existing = await prisma.liturgia.findUnique({
       where: { id },
       include: { itens: { orderBy: { ordem: 'asc' } } },
     });
-    if (!existing) return NextResponse.json({ error: 'Liturgia original nao encontrada' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Liturgia original não encontrada' }, { status: 404 });
 
     const podeDuplicar = await canManageOrganization(user.id, existing.organizacaoId);
-    if (!podeDuplicar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeDuplicar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const body = await request.json().catch(() => ({}));
     const novaData = body.data || new Date().toISOString();
@@ -66,8 +66,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json({ liturgia }, { status: 201 });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/liturgia/[id]/duplicar error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

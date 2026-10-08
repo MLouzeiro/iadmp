@@ -61,14 +61,12 @@ function fimDoMes(d: Date) {
 }
 
 /**
- * Interpreta `YYYY-MM-DD` como data LOCAL (e não UTC), para que
- * `dataInicio=2026-01-01` signifique a meia-noite do dia 1 no fuso do servidor/usuário.
+ * Interpreta `YYYY-MM-DD` como data LOCAL (e nǜo UTC), para que
+ * `dataInicio=2026-01-01` signifique a meia-noite do dia 1 no fuso do servidor/usuǭrio.
+ * Reexportado de `@/lib/datas` (fonte única de helpers de data).
  */
-export function parseDataLocal(valor: string): Date {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(valor);
-  if (!m) return new Date(valor);
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-}
+export { parseDataLocal } from './datas';
+import { parseDataLocal } from './datas';
 
 
 /**
@@ -202,8 +200,8 @@ const INDICADORES: IndicadorDef[] = [
     chave: 'lideresAtivos',
     grupo: 'pessoas',
     titulo: 'Líderes ativos',
-    formula: 'COUNT(Lideranca WHERE ativo = true)',
-    origem: 'Lideranca.ativo',
+    formula: 'COUNT(Liderança WHERE ativo = true)',
+    origem: 'Liderança.ativo',
     modelo: 'lideranca',
     tipo: 'contagem',
     campoData: 'createdAt',
@@ -246,11 +244,11 @@ const INDICADORES: IndicadorDef[] = [
     filtroBase: { status: 'CANCELADO' },
   },
   {
-    chave: 'inscricoes',
+    chave: 'inscrições',
     grupo: 'eventos',
     titulo: 'Inscrições no período',
-    formula: 'COUNT(Inscricao WHERE createdAt no período)',
-    origem: 'Inscricao.createdAt',
+    formula: 'COUNT(Inscrição WHERE createdAt no período)',
+    origem: 'Inscrição.createdAt',
     modelo: 'inscricao',
     tipo: 'contagem',
     campoData: 'createdAt',
@@ -259,8 +257,8 @@ const INDICADORES: IndicadorDef[] = [
     chave: 'checkIns',
     grupo: 'eventos',
     titulo: 'Check-ins realizados',
-    formula: 'COUNT(Inscricao WHERE checkIn = true E dataCheckIn no período)',
-    origem: 'Inscricao.checkIn + Inscricao.dataCheckIn',
+    formula: 'COUNT(Inscrição WHERE checkIn = true E dataCheckIn no período)',
+    origem: 'Inscrição.checkIn + Inscrição.dataCheckIn',
     modelo: 'inscricao',
     tipo: 'contagem',
     campoData: 'dataCheckIn',
@@ -292,7 +290,7 @@ const INDICADORES: IndicadorDef[] = [
     filtroBase: { generoMovimentacao: 'SAIDA' },
   },
   {
-    chave: 'dizimos',
+    chave: 'dízimos',
     grupo: 'financeiro',
     titulo: 'Dízimos',
     formula: 'SUM(EventoFinanceiro.valor WHERE categoria = DIZIMO E quando no período)',
@@ -331,8 +329,8 @@ const INDICADORES: IndicadorDef[] = [
     chave: 'valorPagoInscricoes',
     grupo: 'financeiro',
     titulo: 'Recebido em inscrições',
-    formula: 'SUM(Inscricao.valorPago WHERE dataCheckIn/createdAt no período)',
-    origem: 'Inscricao.valorPago',
+    formula: 'SUM(Inscrição.valorPago WHERE dataCheckIn/createdAt no período)',
+    origem: 'Inscrição.valorPago',
     modelo: 'inscricao',
     tipo: 'soma',
     campoSoma: 'valorPago',
@@ -354,8 +352,8 @@ const INDICADORES: IndicadorDef[] = [
     chave: 'pregacoesPublicadas',
     grupo: 'conteudo',
     titulo: 'Pregações publicadas',
-    formula: 'COUNT(Pregacao WHERE status = PUBLICADA E data no período)',
-    origem: 'Pregacao.status + Pregacao.data',
+    formula: 'COUNT(Pregação WHERE status = PUBLICADA E data no período)',
+    origem: 'Pregação.status + Pregação.data',
     modelo: 'pregacao',
     tipo: 'contagem',
     campoData: 'data',

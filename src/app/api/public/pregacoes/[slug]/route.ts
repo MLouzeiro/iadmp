@@ -35,7 +35,7 @@ export async function GET(
     });
 
     if (!pregacao) {
-      return NextResponse.json({ error: 'Pregacao nao encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Pregação não encontrada' }, { status: 404 });
     }
 
     return NextResponse.json({ pregacao });

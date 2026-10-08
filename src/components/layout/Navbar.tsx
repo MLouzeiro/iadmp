@@ -5,18 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { navigation, socialLinks } from '@/data/site-data';
+import { useTheme } from '@/components/theme/ThemeProvider';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState('dark');
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const saved = localStorage.getItem('iadmp-theme') || 'dark';
-    setTheme(saved);
-    document.documentElement.setAttribute('data-theme', saved);
-  }, []);
+  const { tema, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,12 +21,9 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('iadmp-theme', next);
-    document.documentElement.setAttribute('data-theme', next);
-  };
+  const theme = tema === 'auto'
+    ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : tema;
 
   return (
     <>
@@ -80,7 +72,7 @@ export default function Navbar() {
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
 
-            <Link href="/admin" className="btn btn-primary btn-sm">
+            <Link href="/admin/login" className="btn btn-primary btn-sm">
               Entrar
             </Link>
           </div>
@@ -119,7 +111,7 @@ export default function Navbar() {
             </a>
           ))}
         </div>
-        <Link href="/admin" onClick={() => setMobileOpen(false)} className="btn btn-primary" style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <Link href="/admin/login" onClick={() => setMobileOpen(false)} className="btn btn-primary" style={{ marginTop: '1rem', textAlign: 'center' }}>
           Entrar no Sistema
         </Link>
         <button

@@ -9,8 +9,8 @@ export async function GET() {
     return NextResponse.json(orgs);
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
-      return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
-    return NextResponse.json({ error: 'Erro ao buscar organizacoes' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar organizações' }, { status: 500 });
   }
 }

@@ -1,18 +1,24 @@
 'use client';
 
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useEffect, useState, createContext, useContext, useCallback } from 'react';
 import { defaultColors, type ThemeColors } from '@/lib/theme-palettes';
 
 interface ThemeContextType {
   colors: ThemeColors;
   tema: string;
   loading: boolean;
+  toggleTheme: () => void;
+  setTemaManual: (t: string) => void;
+  updateColors: (c: Partial<ThemeColors>) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   colors: defaultColors,
   tema: 'dark',
   loading: true,
+  toggleTheme: () => {},
+  setTemaManual: () => {},
+  updateColors: () => {},
 });
 
 export function useTheme() {
@@ -25,6 +31,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const savedTheme = typeof window !== 'undefined' ? localStorage.getItem('iadmp-theme') : null;
+    if (savedTheme) setTema(savedTheme);
+
     fetch('/api/configuracoes')
       .then((res) => res.json())
       .then((data) => {
@@ -40,7 +49,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             corTextoSecundario: data.corTextoSecundario,
             corBorda: data.corBorda,
           });
-          setTema(data.tema || 'dark');
+          if (!savedTheme && data.tema) setTema(data.tema);
         }
         setLoading(false);
       })
@@ -48,22 +57,47 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const handleUpdate = (e: CustomEvent) => {
       const d = e.detail;
-      setColors({
-        corPrincipal: d.corPrincipal,
-        corSecundaria: d.corSecundaria,
-        corDestaque: d.corDestaque,
-        corFundo: d.corFundo,
-        corFundoClaro: d.corFundoClaro,
-        corSuperficie: d.corSuperficie,
-        corTexto: d.corTexto,
-        corTextoSecundario: d.corTextoSecundario,
-        corBorda: d.corBorda,
-      });
-      if (d.tema) setTema(d.tema);
+      if (d.corPrincipal) {
+        setColors({
+          corPrincipal: d.corPrincipal,
+          corSecundaria: d.corSecundaria,
+          corDestaque: d.corDestaque,
+          corFundo: d.corFundo,
+          corFundoClaro: d.corFundoClaro,
+          corSuperficie: d.corSuperficie,
+          corTexto: d.corTexto,
+          corTextoSecundario: d.corTextoSecundario,
+          corBorda: d.corBorda,
+        });
+      }
+      if (d.tema) {
+        setTema(d.tema);
+        try { localStorage.setItem('iadmp-theme', d.tema); } catch {}
+      }
     };
 
     window.addEventListener('theme-updated', handleUpdate as EventListener);
     return () => window.removeEventListener('theme-updated', handleUpdate as EventListener);
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTema((prev) => {
+      const base = prev === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : prev;
+      const next = base === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('iadmp-theme', next); } catch {}
+      return next;
+    });
+  }, []);
+
+  const setTemaManual = useCallback((t: string) => {
+    setTema(t);
+    try { localStorage.setItem('iadmp-theme', t); } catch {}
+  }, []);
+
+  const updateColors = useCallback((c: Partial<ThemeColors>) => {
+    setColors((prev) => ({ ...prev, ...c }));
   }, []);
 
   useEffect(() => {
@@ -95,7 +129,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--shadow-glow', `0 0 30px ${colors.corPrincipal}14`);
     root.style.setProperty('--overlay-dark', `${colors.corFundo}d9`);
     root.style.setProperty('--overlay-light', `${colors.corFundo}80`);
-    root.style.setProperty('--gradient-gold', `linear-gradient(135deg, ${colors.corPrincipal}, ${colors.corPrincipal})`);
+    root.style.setProperty('--gradient-gold', `linear-gradient(135deg, ${colors.corPrincipal}, ${colors.corDestaque || colors.corSecundaria || colors.corPrincipal})`);
     root.style.setProperty('--gradient-gold-soft', `linear-gradient(135deg, ${colors.corPrincipal}26, ${colors.corPrincipal}0d)`);
     root.style.setProperty('--gradient-dark', `linear-gradient(180deg, ${colors.corFundo} 0%, ${colors.corSuperficie} 100%)`);
 
@@ -107,7 +141,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [colors, tema, loading]);
 
   return (
-    <ThemeContext.Provider value={{ colors, tema, loading }}>
+    <ThemeContext.Provider value={{ colors, tema, loading, toggleTheme, setTemaManual, updateColors }}>
       {children}
     </ThemeContext.Provider>
   );

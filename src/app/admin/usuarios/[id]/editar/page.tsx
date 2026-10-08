@@ -45,7 +45,7 @@ interface UsuarioData {
 const roleOptions = [
   { value: 'SUPER_ADMIN', label: 'Super Admin' },
   { value: 'ADMIN_IGREJA', label: 'Administrador da Igreja' },
-  { value: 'LIDER', label: 'Lider' },
+  { value: 'LIDER', label: 'Líder' },
   { value: 'COORDENADOR', label: 'Coordenador' },
   { value: 'MUSICO', label: 'Musico' },
   { value: 'MEMBER', label: 'Membro' },
@@ -59,15 +59,15 @@ const statusOptions = [
 const moduloLabels: Record<string, string> = {
   Dashboard: 'Dashboard',
   Membros: 'Membros',
-  Lideranca: 'Lideranca',
+  Lideranca: 'Liderança',
   Eventos: 'Eventos',
   Financeiro: 'Financeiro',
   Liturgia: 'Liturgia',
   Avisos: 'Avisos',
   Galeria: 'Galeria',
   Oportunidades: 'Oportunidades',
-  Configuracoes: 'Configuracoes',
-  Usuarios: 'Usuarios',
+  Configuracoes: 'Configurações',
+  Usuarios: 'Usuários',
 };
 
 const acaoLabels: Record<string, string> = {
@@ -180,12 +180,12 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
     setError('');
 
     if (form.password && form.password !== form.confirmPassword) {
-      setError('As senhas nao conferem');
+      setError('As senhas não conferem');
       return;
     }
 
     if (form.role !== 'SUPER_ADMIN' && selectedOrgs.length === 0) {
-      setError('Selecione pelo menos uma organizacao para este usuario');
+      setError('Selecione pelo menos uma organização para este usuário');
       return;
     }
 
@@ -215,13 +215,13 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Erro ao salvar usuario');
+        setError(data.error || 'Erro ao salvar usuário');
         return;
       }
 
       router.push('/admin/usuarios');
     } catch {
-      setError('Erro ao salvar usuario');
+      setError('Erro ao salvar usuário');
     } finally {
       setSaving(false);
     }
@@ -240,7 +240,7 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
   return (
     <div>
       <div className={styles.pageHeader}>
-        <SectionHead icon={<span>✏️</span>} title="Editar Usuario" subtitle="Altere os dados e permissoes do usuario" />
+        <SectionHead icon={<span>✏️</span>} title="Editar Usuário" subtitle="Altere os dados e permissões do usuário" />
         <Button variant="secondary" icon={<ArrowLeft size={16} />} onClick={() => router.push('/admin/usuarios')} size="sm">
           Voltar
         </Button>
@@ -269,7 +269,7 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
         <FormCard title="Perfil">
           <FormGrid>
             <Select
-              label="Perfil/Funcao"
+              label="Perfil/Função"
               required
               options={roleOptions}
               value={form.role}
@@ -277,7 +277,7 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
             />
             {form.role !== 'SUPER_ADMIN' && (
               <Select
-                label="Perfil de permissoes"
+                label="Perfil de permissões"
                 options={perfis.map(p => ({ value: p.id, label: `${p.nome} - ${p.descricao || ''}` }))}
                 value={form.perfilId}
                 onChange={(e) => setForm({ ...form, perfilId: e.target.value })}
@@ -325,10 +325,10 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
         )}
 
         {form.role !== 'SUPER_ADMIN' && (
-          <FormCard title="Permissoes de acesso">
+          <FormCard title="Permissões de acesso">
             {isCustomPerms && (
               <div style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: 'var(--radius-sm)', padding: '0.5rem 0.75rem', marginBottom: '1rem', color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>
-                Permissoes personalizadas
+                Permissões personalizadas
               </div>
             )}
             <div style={{ display: 'grid', gap: '1rem' }}>
@@ -374,7 +374,7 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
             Cancelar
           </Button>
           <Button type="submit" disabled={saving} icon={<Save size={16} />}>
-            {saving ? 'Salvando...' : 'Salvar Alteracoes'}
+            {saving ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
         </div>
       </form>

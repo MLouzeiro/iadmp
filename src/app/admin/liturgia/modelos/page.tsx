@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import SectionHead from '@/components/ui/SectionHead';
 import { LayoutTemplate, Plus, Trash2, Edit, X, ChevronDown, ChevronRight } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../liturgia.module.css';
 
 const MOMENTO_TYPES = [
   { value: 'ABERTURA', label: 'Abertura' }, { value: 'LOUVOR', label: 'Louvor' },
-  { value: 'ORACAO', label: 'Oracao' }, { value: 'DIZIMOS', label: 'Dizimos' },
+  { value: 'ORACAO', label: 'Oração' }, { value: 'DIZIMOS', label: 'Dízimos' },
   { value: 'ALAS', label: 'Alas' }, { value: 'DINAMICA', label: 'Dinamica' },
   { value: 'MENSAGEM', label: 'Mensagem' }, { value: 'RESPOSTA', label: 'Resposta' },
-  { value: 'COMUNICADOS', label: 'Comunicados' }, { value: 'BENCAO', label: 'Bencao' },
-  { value: 'MUSICA_ESPECIAL', label: 'Musica Especial' }, { value: 'TESTEMUNHO', label: 'Testemunho' },
+  { value: 'COMUNICADOS', label: 'Comunicados' }, { value: 'BENCAO', label: 'Bênção' },
+  { value: 'MUSICA_ESPECIAL', label: 'Música Especial' }, { value: 'TESTEMUNHO', label: 'Testemunho' },
   { value: 'CEIA', label: 'Ceia' }, { value: 'BAPTISMO', label: 'Batismo' },
   { value: 'OUTRO', label: 'Outro' },
 ];
@@ -26,6 +27,7 @@ interface Modelo {
 }
 
 export default function ModelosPage() {
+  const { toast, confirm } = useToast();
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -71,18 +73,27 @@ export default function ModelosPage() {
   const removeMomento = (idx: number) => setFormMomentos(prev => prev.filter((_, i) => i !== idx));
 
   const handleSave = async () => {
-    if (!formNome) { alert('Nome e obrigatorio'); return; }
+    if (!formNome) { toast('Nome é obrigatório', 'warn'); return; }
     const payload = { organizacaoId, nome: formNome, descricao: formDescricao, tipoCulto: formTipoCulto, momentos: formMomentos };
     const url = editingId ? `/api/liturgia/modelos/${editingId}` : '/api/liturgia/modelos';
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (res.ok) { resetForm(); fetchModelos(); } else { const err = await res.json(); alert(err.error); }
+    if (res.ok) {
+      resetForm();
+      fetchModelos();
+      toast(editingId ? 'Modelo atualizado.' : 'Modelo criado.', 'ok');
+    } else {
+      const err = await res.json().catch(() => ({}));
+      toast(err.error || 'Erro ao salvar modelo', 'err');
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir este modelo?')) return;
-    await fetch(`/api/liturgia/modelos/${id}`, { method: 'DELETE' });
-    fetchModelos();
+    confirm('Excluir este modelo?', async () => {
+      await fetch(`/api/liturgia/modelos/${id}`, { method: 'DELETE' });
+      toast('Modelo excluído.', 'ok');
+      fetchModelos();
+    }, { title: 'Excluir modelo', danger: true });
   };
 
   return (
@@ -109,7 +120,7 @@ export default function ModelosPage() {
               <input type="text" value={formTipoCulto} onChange={e => setFormTipoCulto(e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descricao</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descrição</label>
               <input type="text" value={formDescricao} onChange={e => setFormDescricao(e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
             </div>
           </div>
@@ -127,7 +138,7 @@ export default function ModelosPage() {
                 <select value={m.tipo} onChange={e => updateMomento(idx, 'tipo', e.target.value)} style={{ padding: '0.4rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }}>
                   {MOMENTO_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
-                <input type="text" value={m.titulo} onChange={e => updateMomento(idx, 'titulo', e.target.value)} placeholder="Titulo" style={{ flex: 1, padding: '0.4rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
+                <input type="text" value={m.titulo} onChange={e => updateMomento(idx, 'titulo', e.target.value)} placeholder="Título" style={{ flex: 1, padding: '0.4rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 <input type="number" value={m.duracaoPrevista || ''} onChange={e => updateMomento(idx, 'duracaoPrevista', e.target.value ? parseInt(e.target.value) : null)} placeholder="Min" style={{ width: '60px', padding: '0.4rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 <button onClick={() => removeMomento(idx)} style={{ background: 'none', border: 'none', color: '#f44336', cursor: 'pointer', padding: '0.25rem' }}><Trash2 size={14} /></button>
               </div>

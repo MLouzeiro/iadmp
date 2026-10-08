@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
 import { Mic, ArrowLeft, Calendar, User, BookOpen, ExternalLink, Trash2, Pencil, Send, Archive, Star, Share2, Copy, MessageCircle } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../pregacoes.module.css';
 
 interface Pregacao {
@@ -57,6 +58,7 @@ function isYouTubeUrl(url: string): boolean {
 
 export default function PregacaoDetailPage() {
   const router = useRouter();
+  const { toast, confirm } = useToast();
   const params = useParams();
   const id = params.id as string;
   const [pregacao, setPregacao] = useState<Pregacao | null>(null);
@@ -84,13 +86,20 @@ export default function PregacaoDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Tem certeza que deseja excluir esta pregação?')) return;
-    try {
-      const res = await fetch(`/api/comunicacao/pregacoes/${id}`, { method: 'DELETE' });
-      if (res.ok) router.push('/admin/comunicacao/pregacoes');
-    } catch (err) {
-      console.error('Erro:', err);
-    }
+    confirm('Tem certeza que deseja excluir esta pregação?', async () => {
+      try {
+        const res = await fetch(`/api/comunicacao/pregacoes/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast('Pregação excluída.', 'ok');
+          router.push('/admin/comunicacao/pregacoes');
+        } else {
+          toast('Erro ao excluir pregação.', 'err');
+        }
+      } catch (err) {
+        console.error('Erro:', err);
+        toast('Erro de conexão ao excluir.', 'err');
+      }
+    }, { title: 'Excluir pregação', danger: true });
   };
 
   const handleShare = async () => {
@@ -101,7 +110,7 @@ export default function PregacaoDetailPage() {
       } catch {}
     } else {
       navigator.clipboard.writeText(url);
-      alert('Link copiado!');
+      toast('Link copiado!', 'ok');
     }
   };
 
@@ -129,7 +138,7 @@ export default function PregacaoDetailPage() {
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Carregando...</div>;
-  if (!pregacao) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Pregacao nao encontrada</div>;
+  if (!pregacao) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Pregação não encontrada</div>;
 
   const ytId = pregacao.videoUrl ? extractYouTubeId(pregacao.videoUrl) : null;
   const isYt = pregacao.videoUrl ? isYouTubeUrl(pregacao.videoUrl) : false;
@@ -137,7 +146,7 @@ export default function PregacaoDetailPage() {
   return (
     <div className={styles.detailContainer}>
       <Link href="/admin/comunicacao/pregacoes" className={styles.detailBack}>
-        <ArrowLeft size={16} /> Voltar para pregacoes
+        <ArrowLeft size={16} /> Voltar para pregações
       </Link>
 
       {pregacao.capaUrl && (
@@ -193,7 +202,7 @@ export default function PregacaoDetailPage() {
                 className={styles.videoIframe}
                 src={`https://www.youtube.com/embed/${ytId}`}
                 title={pregacao.titulo}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-média; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
@@ -207,7 +216,7 @@ export default function PregacaoDetailPage() {
 
       {pregacao.descricao && (
         <div className={styles.detailSection}>
-          <div className={styles.detailSectionTitle}>Descricao</div>
+          <div className={styles.detailSectionTitle}>Descrição</div>
           <div className={styles.detailDescricao}>{pregacao.descricao}</div>
         </div>
       )}
@@ -230,7 +239,7 @@ export default function PregacaoDetailPage() {
 
       {pregacao.observacoes && (
         <div className={styles.detailSection}>
-          <div className={styles.detailSectionTitle}>Observacoes</div>
+          <div className={styles.detailSectionTitle}>Observações</div>
           <div className={styles.detailDescricao}>{pregacao.observacoes}</div>
         </div>
       )}
@@ -241,7 +250,7 @@ export default function PregacaoDetailPage() {
           {shareSupported && (
             <button onClick={handleShare} className={styles.shareBtn}><Share2 size={14} /> Compartilhar</button>
           )}
-          <button onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Link copiado!'); }} className={styles.shareBtn}><Copy size={14} /> Copiar link</button>
+          <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast('Link copiado!', 'ok'); }} className={styles.shareBtn}><Copy size={14} /> Copiar link</button>
           <button onClick={shareWhatsApp} className={styles.shareBtn}><MessageCircle size={14} /> WhatsApp</button>
           <button onClick={shareFacebook} className={styles.shareBtn}>📘 Facebook</button>
         </div>

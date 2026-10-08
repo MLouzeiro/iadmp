@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const organizacaoId = searchParams.get('organizacaoId');
 
     if (!organizacaoId) {
-      return NextResponse.json({ error: 'organizacaoId e obrigatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
     }
 
     const currentSlot = getCurrentSlot();

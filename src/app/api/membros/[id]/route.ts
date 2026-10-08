@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
+import { parseDataDateOnly } from '@/lib/datas';
 import {
   assertOrgAccess,
   resolveCongregacaoId,
@@ -27,13 +28,13 @@ export async function GET(
       },
     });
     if (!membro) {
-      return NextResponse.json({ error: 'Membro nao encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 });
     }
     await assertOrgAccess(user.id, membro.organizacaoId, request);
     return NextResponse.json(membro);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao buscar membro' }, { status: 500 });
   }
@@ -46,11 +47,11 @@ export async function PUT(
   try {
     const user = await requireAuth();
     const podeEditar = await hasPermission(user.id, 'membros', 'editar');
-    if (!podeEditar) return NextResponse.json({ error: 'Sem permissao para editar membros' }, { status: 403 });
+    if (!podeEditar) return NextResponse.json({ error: 'Sem permissão para editar membros' }, { status: 403 });
 
     const { id } = await params;
     const existing = await prisma.membro.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Membro nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 });
 
     await assertOrgAccess(user.id, existing.organizacaoId, request);
 
@@ -61,7 +62,7 @@ export async function PUT(
     if (body.telefone !== undefined) data.telefone = body.telefone;
     if (body.whatsapp !== undefined) data.whatsapp = body.whatsapp;
     if (body.dataNascimento !== undefined) {
-      data.dataNascimento = body.dataNascimento ? new Date(body.dataNascimento) : null;
+      data.dataNascimento = body.dataNascimento ? parseDataDateOnly(body.dataNascimento) : null;
     }
     if (body.endereco !== undefined) data.endereco = body.endereco;
     if (body.status !== undefined) data.status = body.status;
@@ -94,8 +95,8 @@ export async function PUT(
 
     return NextResponse.json(membro);
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao atualizar membro' }, { status: 500 });
   }
@@ -108,11 +109,11 @@ export async function DELETE(
   try {
     const user = await requireAuth();
     const podeExcluir = await hasPermission(user.id, 'membros', 'excluir');
-    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissao para excluir membros' }, { status: 403 });
+    if (!podeExcluir) return NextResponse.json({ error: 'Sem permissão para excluir membros' }, { status: 403 });
 
     const { id } = await params;
     const existing = await prisma.membro.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Membro nao encontrado' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 });
 
     await assertOrgAccess(user.id, existing.organizacaoId, request);
     await prisma.membro.delete({ where: { id } });
@@ -127,10 +128,10 @@ export async function DELETE(
       req: request,
     });
 
-    return NextResponse.json({ message: 'Membro excluido' });
+    return NextResponse.json({ message: 'Membro excluído' });
   } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     return NextResponse.json({ error: 'Erro ao excluir membro' }, { status: 500 });
   }

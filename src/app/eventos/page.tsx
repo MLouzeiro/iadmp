@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Calendar } from 'lucide-react';
+import EventosList from '@/components/public/EventosList';
 
 export const metadata: Metadata = {
   title: 'Eventos - IADMP',
-  description: 'Confira os eventos da Igreja Assembleia de Deus Ministerio da Promessa.',
+  description: 'Confira os eventos da Igreja Assembleia de Deus Ministério da Promessa.',
 };
 
 export default function EventosPage() {
@@ -19,17 +19,13 @@ export default function EventosPage() {
       <section>
         <div className="container">
           <div className="section-heading">
-            <span className="label">Proximos Eventos</span>
+            <span className="label">Próximos Eventos</span>
             <h2>Calendario da Igreja</h2>
-            <p>Em breve novos eventos serao disponibilizados.</p>
+            <p>Todos os eventos e cultos da nossa comunidade.</p>
             <div className="divider" />
           </div>
 
-          <div className="empty-state">
-            <Calendar size={64} style={{ color: 'var(--color-primary)' }} />
-            <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Em Breve</h3>
-            <p>Novos eventos serao anunciados em breve. Fique atento!</p>
-          </div>
+          <EventosList />
         </div>
       </section>
     </>

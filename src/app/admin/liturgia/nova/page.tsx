@@ -4,27 +4,28 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, Plus, Trash2, GripVertical, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../liturgia.module.css';
 
 const MOMENTO_TYPES = [
   { value: 'ABERTURA', label: 'Abertura' },
   { value: 'LOUVOR', label: 'Louvor' },
-  { value: 'ORACAO', label: 'Oracao' },
-  { value: 'DIZIMOS', label: 'Dizimos e Ofertas' },
+  { value: 'ORACAO', label: 'Oração' },
+  { value: 'DIZIMOS', label: 'Dízimos e Ofertas' },
   { value: 'ALAS', label: 'Momento das Alas' },
   { value: 'DINAMICA', label: 'Dinamica' },
-  { value: 'MENSAGEM', label: 'Mensagem/Pregacao' },
+  { value: 'MENSAGEM', label: 'Mensagem/Pregação' },
   { value: 'RESPOSTA', label: 'Momento de Resposta' },
   { value: 'COMUNICADOS', label: 'Comunicados' },
-  { value: 'BENCAO', label: 'Bencao Final' },
-  { value: 'MUSICA_ESPECIAL', label: 'Musica Especial' },
+  { value: 'BENCAO', label: 'Bênção Final' },
+  { value: 'MUSICA_ESPECIAL', label: 'Música Especial' },
   { value: 'TESTEMUNHO', label: 'Testemunho' },
   { value: 'CEIA', label: 'Ceia do Senhor' },
   { value: 'BAPTISMO', label: 'Batismo' },
   { value: 'OUTRO', label: 'Outro' },
 ];
 
-const TIPOS_CULTO = ['Celebracao', 'Encontro', 'Reuniao de Oracao', 'Vigilia', 'Batismo', 'Ceia', 'Especial'];
+const TIPOS_CULTO = ['Celebração', 'Encontro', 'Reunião de Oração', 'Vigília', 'Batismo', 'Ceia', 'Especial'];
 
 interface Organizacao {
   id: string;
@@ -65,6 +66,7 @@ interface MomentoForm {
 
 export default function NovaLiturgiaPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [organizacoes, setOrganizacoes] = useState<Organizacao[]>([]);
   const [musicas, setMusicas] = useState<Musica[]>([]);
@@ -74,7 +76,7 @@ export default function NovaLiturgiaPage() {
   const [data, setData] = useState('');
   const [horarioInicio, setHorarioInicio] = useState('19:00');
   const [horarioFimPrevisto, setHorarioFimPrevisto] = useState('21:00');
-  const [tipoCulto, setTipoCulto] = useState('Celebracao');
+  const [tipoCulto, setTipoCulto] = useState('Celebração');
   const [tema, setTema] = useState('');
   const [dirigente, setDirigente] = useState('');
   const [pregador, setPregador] = useState('');
@@ -129,7 +131,7 @@ export default function NovaLiturgiaPage() {
   };
 
   const applyModelo = (modelo: Modelo) => {
-    setTipoCulto(modelo.tipoCulto || 'Celebracao');
+    setTipoCulto(modelo.tipoCulto || 'Celebração');
     const newItens: MomentoForm[] = modelo.momentos.map(m => ({
       tipo: m.tipo,
       titulo: m.titulo,
@@ -148,7 +150,7 @@ export default function NovaLiturgiaPage() {
 
   const handleSave = async () => {
     if (!organizacaoId || !data || !horarioInicio) {
-      alert('Preencha organizacao, data e horario de inicio');
+      toast('Preencha organização, data e horário de início', 'warn');
       return;
     }
     setSaving(true);
@@ -172,13 +174,14 @@ export default function NovaLiturgiaPage() {
 
       if (res.ok) {
         const data = await res.json();
+        toast('Liturgia criada.', 'ok');
         router.push(`/admin/liturgia/${data.liturgia.id}`);
       } else {
-        const err = await res.json();
-        alert(err.error || 'Erro ao salvar');
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || 'Erro ao salvar', 'err');
       }
     } catch (err) {
-      alert('Erro ao salvar liturgia');
+      toast('Erro ao salvar liturgia', 'err');
     } finally {
       setSaving(false);
     }
@@ -205,7 +208,7 @@ export default function NovaLiturgiaPage() {
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Congregacao</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Congregação</label>
             <input type="text" value={congregacao} onChange={e => setCongregacao(e.target.value)} placeholder="Ex: Matriz, Vila Sarney..." style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
@@ -222,11 +225,11 @@ export default function NovaLiturgiaPage() {
             <input type="date" value={data} onChange={e => setData(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horario Inicio *</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horário Início *</label>
             <input type="time" value={horarioInicio} onChange={e => setHorarioInicio(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horario Fim Previsto</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horário Fim Previsto</label>
             <input type="time" value={horarioFimPrevisto} onChange={e => setHorarioFimPrevisto(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
@@ -245,13 +248,13 @@ export default function NovaLiturgiaPage() {
             <input type="text" value={pregador} onChange={e => setPregador(e.target.value)} placeholder="Nome do pregador" style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Responsavel</label>
-            <input type="text" value={responsavel} onChange={e => setResponsavel(e.target.value)} placeholder="Responsavel geral" style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Responsável</label>
+            <input type="text" value={responsavel} onChange={e => setResponsavel(e.target.value)} placeholder="Responsável geral" style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Observacoes</label>
+          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Observações</label>
           <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem', resize: 'vertical' }} />
         </div>
       </div>
@@ -300,7 +303,7 @@ export default function NovaLiturgiaPage() {
                     <button onClick={() => moveMomento(idx, -1)} disabled={idx === 0} style={{ background: 'none', border: 'none', color: idx === 0 ? 'var(--text-muted)' : 'var(--text-primary)', cursor: idx === 0 ? 'not-allowed' : 'pointer', padding: '0.25rem', opacity: idx === 0 ? 0.3 : 1 }}>&#9650;</button>
                     <button onClick={() => moveMomento(idx, 1)} disabled={idx === itens.length - 1} style={{ background: 'none', border: 'none', color: idx === itens.length - 1 ? 'var(--text-muted)' : 'var(--text-primary)', cursor: idx === itens.length - 1 ? 'not-allowed' : 'pointer', padding: '0.25rem', opacity: idx === itens.length - 1 ? 0.3 : 1 }}>&#9660;</button>
                   </div>
-                  <button onClick={() => addMomento(idx)} title="Adicionar apos" style={{ background: 'none', border: 'none', color: 'var(--color-secondary)', cursor: 'pointer', padding: '0.25rem' }}><Plus size={16} /></button>
+                  <button onClick={() => addMomento(idx)} title="Adicionar após" style={{ background: 'none', border: 'none', color: 'var(--color-secondary)', cursor: 'pointer', padding: '0.25rem' }}><Plus size={16} /></button>
                   <button onClick={() => removeMomento(idx)} className={styles.momentoFormRemove}><Trash2 size={16} /></button>
                 </div>
 
@@ -312,19 +315,19 @@ export default function NovaLiturgiaPage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Titulo *</label>
-                    <input type="text" value={item.titulo} onChange={e => updateMomento(idx, 'titulo', e.target.value)} placeholder="Ex: Louvor, Pregacao..." style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Título *</label>
+                    <input type="text" value={item.titulo} onChange={e => updateMomento(idx, 'titulo', e.target.value)} placeholder="Ex: Louvor, Pregação..." style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Horario Previsto</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Horário Previsto</label>
                     <input type="time" value={item.horarioPrevisto} onChange={e => updateMomento(idx, 'horarioPrevisto', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Duracao (min)</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Duração (min)</label>
                     <input type="number" value={item.duracaoPrevista} onChange={e => updateMomento(idx, 'duracaoPrevista', e.target.value)} placeholder="Minutos" style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Responsavel</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Responsável</label>
                     <input type="text" value={item.responsavel} onChange={e => updateMomento(idx, 'responsavel', e.target.value)} placeholder="Nome" style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                   <div>
@@ -338,25 +341,25 @@ export default function NovaLiturgiaPage() {
                   </div>
                   {(item.tipo === 'MENSAGEM' || item.tipo === 'RESPOSTA') && (
                     <div className={styles.fullWidth}>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tema da Pregacao</label>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tema da Pregação</label>
                       <input type="text" value={item.temaPregacao} onChange={e => updateMomento(idx, 'temaPregacao', e.target.value)} placeholder="Tema da mensagem" style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                     </div>
                   )}
                   {item.tipo === 'LOUVOR' && (
                     <div className={styles.fullWidth}>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Musica (opcional)</label>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Música (opcional)</label>
                       <select value={item.musicaId} onChange={e => updateMomento(idx, 'musicaId', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }}>
-                        <option value="">Selecionar musica...</option>
+                        <option value="">Selecionar música...</option>
                         {musicas.map(m => <option key={m.id} value={m.id}>{m.titulo} - {m.compositor || m.artista || ''}</option>)}
                       </select>
                     </div>
                   )}
                   <div className={styles.fullWidth}>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descricao</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descrição</label>
                     <textarea value={item.descricao} onChange={e => updateMomento(idx, 'descricao', e.target.value)} rows={2} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem', resize: 'vertical' }} />
                   </div>
                   <div className={styles.fullWidth}>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Observacoes</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Observações</label>
                     <input type="text" value={item.observacoes} onChange={e => updateMomento(idx, 'observacoes', e.target.value)} placeholder="Anotacoes internas" style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                 </div>

@@ -4,20 +4,21 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import SectionHead from '@/components/ui/SectionHead';
 import { BookOpen, Plus, Trash2, GripVertical, ArrowLeft, Save } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from '../../liturgia.module.css';
 
 const MOMENTO_TYPES = [
   { value: 'ABERTURA', label: 'Abertura' }, { value: 'LOUVOR', label: 'Louvor' },
-  { value: 'ORACAO', label: 'Oracao' }, { value: 'DIZIMOS', label: 'Dizimos e Ofertas' },
+  { value: 'ORACAO', label: 'Oração' }, { value: 'DIZIMOS', label: 'Dízimos e Ofertas' },
   { value: 'ALAS', label: 'Momento das Alas' }, { value: 'DINAMICA', label: 'Dinamica' },
-  { value: 'MENSAGEM', label: 'Mensagem/Pregacao' }, { value: 'RESPOSTA', label: 'Momento de Resposta' },
-  { value: 'COMUNICADOS', label: 'Comunicados' }, { value: 'BENCAO', label: 'Bencao Final' },
-  { value: 'MUSICA_ESPECIAL', label: 'Musica Especial' }, { value: 'TESTEMUNHO', label: 'Testemunho' },
+  { value: 'MENSAGEM', label: 'Mensagem/Pregação' }, { value: 'RESPOSTA', label: 'Momento de Resposta' },
+  { value: 'COMUNICADOS', label: 'Comunicados' }, { value: 'BENCAO', label: 'Bênção Final' },
+  { value: 'MUSICA_ESPECIAL', label: 'Música Especial' }, { value: 'TESTEMUNHO', label: 'Testemunho' },
   { value: 'CEIA', label: 'Ceia do Senhor' }, { value: 'BAPTISMO', label: 'Batismo' },
   { value: 'OUTRO', label: 'Outro' },
 ];
 
-const TIPOS_CULTO = ['Celebracao', 'Encontro', 'Reuniao de Oracao', 'Vigilia', 'Batismo', 'Ceia', 'Especial'];
+const TIPOS_CULTO = ['Celebração', 'Encontro', 'Reunião de Oração', 'Vigília', 'Batismo', 'Ceia', 'Especial'];
 
 interface MomentoForm {
   tipo: string; titulo: string; horarioPrevisto: string; duracaoPrevista: string;
@@ -28,6 +29,7 @@ interface MomentoForm {
 export default function EditarLiturgiaPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const id = params.id as string;
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ export default function EditarLiturgiaPage() {
   const [data, setData] = useState('');
   const [horarioInicio, setHorarioInicio] = useState('');
   const [horarioFimPrevisto, setHorarioFimPrevisto] = useState('');
-  const [tipoCulto, setTipoCulto] = useState('Celebracao');
+  const [tipoCulto, setTipoCulto] = useState('Celebração');
   const [tema, setTema] = useState('');
   const [dirigente, setDirigente] = useState('');
   const [pregador, setPregador] = useState('');
@@ -91,7 +93,7 @@ export default function EditarLiturgiaPage() {
   };
 
   const handleSave = async () => {
-    if (!organizacaoId || !data || !horarioInicio) { alert('Preencha os campos obrigatorios'); return; }
+    if (!organizacaoId || !data || !horarioInicio) { toast('Preencha os campos obrigatórios', 'warn'); return; }
     setSaving(true);
     try {
       const payload = {
@@ -106,9 +108,15 @@ export default function EditarLiturgiaPage() {
       const res = await fetch(`/api/liturgia/${id}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       });
-      if (res.ok) { const data = await res.json(); router.push(`/admin/liturgia/${data.liturgia.id}`); }
-      else { const err = await res.json(); alert(err.error || 'Erro ao salvar'); }
-    } catch { alert('Erro ao salvar liturgia'); } finally { setSaving(false); }
+      if (res.ok) {
+        const data = await res.json();
+        toast('Liturgia salva.', 'ok');
+        router.push(`/admin/liturgia/${data.liturgia.id}`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || 'Erro ao salvar', 'err');
+      }
+    } catch { toast('Erro ao salvar liturgia', 'err'); } finally { setSaving(false); }
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Carregando...</div>;
@@ -129,7 +137,7 @@ export default function EditarLiturgiaPage() {
             <input type="text" value={organizacaoId} disabled style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', fontSize: '0.85rem', opacity: 0.7 }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Congregacao</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Congregação</label>
             <input type="text" value={congregacao} onChange={e => setCongregacao(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
@@ -145,11 +153,11 @@ export default function EditarLiturgiaPage() {
             <input type="date" value={data} onChange={e => setData(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horario Inicio *</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horário Início *</label>
             <input type="time" value={horarioInicio} onChange={e => setHorarioInicio(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horario Fim</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Horário Fim</label>
             <input type="time" value={horarioFimPrevisto} onChange={e => setHorarioFimPrevisto(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
@@ -167,12 +175,12 @@ export default function EditarLiturgiaPage() {
             <input type="text" value={pregador} onChange={e => setPregador(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Responsavel</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Responsável</label>
             <input type="text" value={responsavel} onChange={e => setResponsavel(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
           </div>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Observacoes</label>
+          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Observações</label>
           <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} style={{ width: '100%', padding: '0.6rem 0.75rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.85rem', resize: 'vertical' }} />
         </div>
       </div>
@@ -208,19 +216,19 @@ export default function EditarLiturgiaPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Titulo *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Título *</label>
                   <input type="text" value={item.titulo} onChange={e => updateMomento(idx, 'titulo', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Horario</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Horário</label>
                   <input type="time" value={item.horarioPrevisto} onChange={e => updateMomento(idx, 'horarioPrevisto', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Duracao (min)</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Duração (min)</label>
                   <input type="number" value={item.duracaoPrevista} onChange={e => updateMomento(idx, 'duracaoPrevista', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Responsavel</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Responsável</label>
                   <input type="text" value={item.responsavel} onChange={e => updateMomento(idx, 'responsavel', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 </div>
                 <div>
@@ -231,13 +239,13 @@ export default function EditarLiturgiaPage() {
                 </div>
                 {(item.tipo === 'MENSAGEM' || item.tipo === 'RESPOSTA') && (
                   <div className={styles.fullWidth}>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tema da Pregacao</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tema da Pregação</label>
                     <input type="text" value={item.temaPregacao} onChange={e => updateMomento(idx, 'temaPregacao', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                   </div>
                 )}
                 {item.tipo === 'LOUVOR' && (
                   <div className={styles.fullWidth}>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Musica</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Música</label>
                     <select value={item.musicaId} onChange={e => updateMomento(idx, 'musicaId', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }}>
                       <option value="">Selecionar...</option>
                       {musicas.map(m => <option key={m.id} value={m.id}>{m.titulo}</option>)}
@@ -245,11 +253,11 @@ export default function EditarLiturgiaPage() {
                   </div>
                 )}
                 <div className={styles.fullWidth}>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descricao</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Descrição</label>
                   <textarea value={item.descricao} onChange={e => updateMomento(idx, 'descricao', e.target.value)} rows={2} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem', resize: 'vertical' }} />
                 </div>
                 <div className={styles.fullWidth}>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Observacoes</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Observações</label>
                   <input type="text" value={item.observacoes} onChange={e => updateMomento(idx, 'observacoes', e.target.value)} style={{ width: '100%', padding: '0.5rem', background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
                 </div>
               </div>
@@ -261,7 +269,7 @@ export default function EditarLiturgiaPage() {
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginBottom: '2rem' }}>
         <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}>Cancelar</button>
         <button onClick={handleSave} disabled={saving} style={{ padding: '0.75rem 2rem', background: saving ? 'var(--text-muted)' : 'var(--gradient-gold)', color: '#000', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Save size={16} /> {saving ? 'Salvando...' : 'Salvar Alteracoes'}
+          <Save size={16} /> {saving ? 'Salvando...' : 'Salvar Alterações'}
         </button>
       </div>
     </div>

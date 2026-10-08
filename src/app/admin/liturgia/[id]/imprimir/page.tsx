@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation';
 import styles from '../../liturgia.module.css';
 
 const MOMENTO_LABELS: Record<string, string> = {
-  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oracao', DIZIMOS: 'Dizimos',
+  ABERTURA: 'Abertura', LOUVOR: 'Louvor', ORACAO: 'Oração', DIZIMOS: 'Dízimos',
   ALAS: 'Alas', DINAMICA: 'Dinamica', MENSAGEM: 'Mensagem', RESPOSTA: 'Resposta',
-  COMUNICADOS: 'Comunicados', BENCAO: 'Bencao', MUSICA_ESPECIAL: 'Musica Especial',
+  COMUNICADOS: 'Comunicados', BENCAO: 'Bênção', MUSICA_ESPECIAL: 'Música Especial',
   TESTEMUNHO: 'Testemunho', CEIA: 'Ceia', BAPTISMO: 'Batismo', OUTRO: 'Outro',
 };
 
@@ -42,11 +42,11 @@ export default function ImprimirLiturgiaPage() {
       <div className={styles.printContainer}>
         <div className={styles.printHeader}>
           <h1>{liturgia.tema || 'Liturgia do Culto'}</h1>
-          <p><strong>Data:</strong> {dataFormatada} | <strong>Horario:</strong> {liturgia.horarioInicio}{liturgia.horarioFimPrevisto ? ` - ${liturgia.horarioFimPrevisto}` : ''}</p>
+          <p><strong>Data:</strong> {dataFormatada} | <strong>Horário:</strong> {liturgia.horarioInicio}{liturgia.horarioFimPrevisto ? ` - ${liturgia.horarioFimPrevisto}` : ''}</p>
           <p><strong>Tipo:</strong> {liturgia.tipoCulto} | <strong>Igreja:</strong> {liturgia.organizacao?.nome}</p>
           {liturgia.dirigente && <p><strong>Dirigente:</strong> {liturgia.dirigente}</p>}
           {liturgia.pregador && <p><strong>Pregador:</strong> {liturgia.pregador}</p>}
-          {liturgia.responsavel && <p><strong>Responsavel:</strong> {liturgia.responsavel}</p>}
+          {liturgia.responsavel && <p><strong>Responsável:</strong> {liturgia.responsavel}</p>}
         </div>
         {liturgia.itens.map((item: any) => (
           <div key={item.id} className={styles.printMomento}>

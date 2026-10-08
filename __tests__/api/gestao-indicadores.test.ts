@@ -67,7 +67,7 @@ describe('GET /api/gestao/indicadores', () => {
     expect(res.status).toBe(403);
   });
 
-  it('retorna 400 para periodo invalido', async () => {
+  it('retorna 400 para periodo inválido', async () => {
     const res = await indicadoresGET(
       new NextRequest('http://localhost/api/gestao/indicadores?periodo=bogus')
     );

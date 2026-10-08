@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { leaders } from '@/data/site-data';
+import LiderancaList from '@/components/public/LiderancaList';
+import { congregations } from '@/data/site-data';
 
 export const metadata: Metadata = {
-  title: 'Lideranca - IADMP',
-  description: 'Conheca a lideranca da Igreja Assembleia de Deus Ministerio da Promessa.',
+  title: 'Liderança - IADMP',
+  description: 'Conheça a liderança da Igreja Assembleia de Deus Ministério da Promessa.',
 };
 
 export default function LiderancaPage() {
@@ -11,25 +12,33 @@ export default function LiderancaPage() {
     <>
       <div className="page-header">
         <div className="container">
-          <h1>Nossa Lideranca</h1>
+          <h1>Nossa Liderança</h1>
           <p>Servos de Deus que guiem nossa comunidade com amor e dedicao.</p>
         </div>
       </div>
 
       <section>
         <div className="container">
-          <div className="grid-4">
-            {leaders.map((leader) => (
-              <div key={leader.id} className="leader-card">
-                {leader.image ? (
-                  <img src={leader.image} alt={leader.name} className="leader-avatar" />
-                ) : (
-                  <div className="leader-avatar-placeholder">
-                    {leader.name.charAt(0)}
-                  </div>
-                )}
-                <h3>{leader.name}</h3>
-                <p className="role">{leader.role}</p>
+          <LiderancaList />
+        </div>
+      </section>
+
+      <section style={{ background: 'var(--bg-secondary)' }}>
+        <div className="container">
+          <div className="section-heading">
+            <span className="label">Congregações</span>
+            <h2>Onde Nos Reunimos</h2>
+            <p>Conheça as congregações da nossa família de fé.</p>
+            <div className="divider" />
+          </div>
+          <div className="grid-3">
+            {congregations.map((c) => (
+              <div key={c.id} className="congregation-card">
+                {c.image && <img src={c.image} alt={c.name} />}
+                <div className="overlay">
+                  <h3>{c.name}</h3>
+                  <p>{c.description}</p>
+                </div>
               </div>
             ))}
           </div>

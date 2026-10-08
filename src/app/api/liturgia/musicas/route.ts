@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const where: any = { ativo: true };
     if (organizacaoId) {
       const podeVer = await canManageOrganization(user.id, organizacaoId);
-      if (!podeVer) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+      if (!podeVer) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
       where.organizacaoId = organizacaoId;
     } else if (user.role !== 'SUPER_ADMIN') {
       const vinculos = await prisma.usuarioOrganizacao.findMany({
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ musicas });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     console.error('GET /api/liturgia/musicas error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
@@ -48,17 +48,17 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const hasPerm = await hasPermission(user.id, 'liturgia', 'gerenciar_musicas');
-    if (!hasPerm) return NextResponse.json({ error: 'Sem permissao para gerenciar musicas' }, { status: 403 });
+    if (!hasPerm) return NextResponse.json({ error: 'Sem permissão para gerenciar músicas' }, { status: 403 });
 
     const body = await request.json();
     const { organizacaoId, titulo, compositor, artista, tom, categoria, letra, link, observacoes } = body;
 
     if (!organizacaoId || !titulo) {
-      return NextResponse.json({ error: 'organizacaoId e titulo sao obrigatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'organizacaoId e título são obrigatórios' }, { status: 400 });
     }
 
     const podeCriar = await canManageOrganization(user.id, organizacaoId);
-    if (!podeCriar) return NextResponse.json({ error: 'Sem permissao para esta organizacao' }, { status: 403 });
+    if (!podeCriar) return NextResponse.json({ error: 'Sem permissão para esta organização' }, { status: 403 });
 
     const musica = await prisma.liturgiaMusica.create({
       data: {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         compositor: compositor || null,
         artista: artista || null,
         tom: tom || null,
-        categoria: categoria || 'Adoracao',
+        categoria: categoria || 'Adoração',
         letra: letra || null,
         link: link || null,
         observacoes: observacoes || null,
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ musica }, { status: 201 });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
-    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissao' }, { status: 403 });
+    if (error.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (error.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     console.error('POST /api/liturgia/musicas error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

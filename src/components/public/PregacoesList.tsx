@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatarDataCurta } from '@/lib/datas';
 import Link from 'next/link';
 import { Play, Calendar, BookOpen } from 'lucide-react';
 import { useChurchInfo } from './ChurchInfo';
@@ -23,11 +24,7 @@ interface Pregacao {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatarDataCurta(dateStr);
 }
 
 function getReference(p: Pregacao): string | null {
@@ -54,7 +51,7 @@ export default function PregacoesList() {
           setPregacoes(data.pregacoes);
         }
       } catch (err) {
-        console.error('Erro ao buscar pregacoes:', err);
+        console.error('Erro ao buscar pregações:', err);
       } finally {
         setLoading(false);
       }
@@ -66,7 +63,7 @@ export default function PregacoesList() {
     <>
       <div className="page-header">
         <div className="container">
-          <h1>Pregacoes</h1>
+          <h1>Pregações</h1>
           <p>Mensagens pregadas na nossa comunidade.</p>
         </div>
       </div>
@@ -75,7 +72,7 @@ export default function PregacoesList() {
         <div className="container">
           <div className="section-heading">
             <span className="label">Palavra de Deus</span>
-            <h2>Todas as Pregacoes</h2>
+            <h2>Todas as Pregações</h2>
             <p>Ouça e assista as mensagens mais recentes.</p>
             <div className="divider" />
           </div>
@@ -120,7 +117,7 @@ export default function PregacoesList() {
             <div className="empty-state">
               <Play size={64} style={{ color: 'var(--color-primary)' }} />
               <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Em Breve</h3>
-              <p>Novas pregacoes serao publicadas em breve.</p>
+              <p>Novas pregações serao publicadas em breve.</p>
             </div>
           )}
         </div>

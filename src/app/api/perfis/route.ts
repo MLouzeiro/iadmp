@@ -7,7 +7,7 @@ export async function GET() {
     const user = await requireAuth();
     const podeVer = await hasPermission(user.id, 'usuarios', 'visualizar');
     if (!podeVer && user.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Sem permissao para listar perfis' }, { status: 403 });
+      return NextResponse.json({ error: 'Sem permissão para listar perfis' }, { status: 403 });
     }
 
     const perfis = await prisma.perfil.findMany({
@@ -21,7 +21,7 @@ export async function GET() {
     return NextResponse.json(perfis);
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
-      return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Erro ao buscar perfis' }, { status: 500 });
   }

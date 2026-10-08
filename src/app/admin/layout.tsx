@@ -2,279 +2,196 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images, Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate, Radio, Mic, BarChart3 } from 'lucide-react';
+import {
+  LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images,
+  Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate,
+  Radio, Mic, BarChart3, Menu, X, ClipboardList,
+} from 'lucide-react';
 import { useState } from 'react';
+import { signOut } from 'next-auth/react';
+import { useToast } from '@/components/ui/Toast';
+import styles from './admin.module.css';
 
-const sidebarLinks = [
-  { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-  { name: 'Centro de Gestao', path: '/admin/gestao', icon: BarChart3 },
-  { name: 'Membros', path: '/admin/membros', icon: Users },
-  { name: 'Lideranca', path: '/admin/lideranca', icon: UserCheck },
-  { name: 'Eventos', path: '/admin/eventos', icon: Calendar },
-  { name: 'Financeiro', path: '/admin/financeiro', icon: DollarSign },
-  { name: 'Avisos', path: '/admin/avisos', icon: Bell },
-  { name: 'Galeria', path: '/admin/galeria', icon: Images },
-  { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
-  { name: 'Usuarios', path: '/admin/usuarios', icon: Shield },
-];
+interface NavItem {
+  name: string;
+  path: string;
+  icon: React.ElementType;
+  sub?: { name: string; path: string; icon: React.ElementType }[];
+}
 
-const liturgiaSubLinks = [
-  { name: 'Programacoes', path: '/admin/liturgia', icon: BookOpen },
-  { name: 'Musicas', path: '/admin/liturgia/musicas', icon: Music },
-  { name: 'Modelos', path: '/admin/liturgia/modelos', icon: LayoutTemplate },
-];
-
-const configSubLinks = [
-  { name: 'Geral', path: '/admin/configuracoes', icon: Settings },
-  { name: 'Aparencia', path: '/admin/configuracoes/aparencia', icon: Palette },
-];
-
-const comunicacaoSubLinks = [
-  { name: 'Dashboard', path: '/admin/comunicacao', icon: LayoutDashboard },
-  { name: 'Canais', path: '/admin/comunicacao/canais', icon: Radio },
-  { name: 'Pregacoes', path: '/admin/comunicacao/pregacoes', icon: Mic },
-  { name: 'Versiculos', path: '/admin/comunicacao/versiculos', icon: BookOpen },
+const grupos: { label: string; itens: NavItem[] }[] = [
+  {
+    label: 'Visão',
+    itens: [
+      { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+      { name: 'Centro de Gestão', path: '/admin/gestao', icon: BarChart3 },
+      { name: 'Auditoria', path: '/admin/gestao?aba=auditoria', icon: ClipboardList },
+    ],
+  },
+  {
+    label: 'Pessoas',
+    itens: [
+      { name: 'Membros', path: '/admin/membros', icon: Users },
+      { name: 'Liderança', path: '/admin/lideranca', icon: UserCheck },
+      { name: 'Usuários', path: '/admin/usuarios', icon: Shield },
+    ],
+  },
+  {
+    label: 'Operação',
+    itens: [
+      {
+        name: 'Liturgia',
+        path: '/admin/liturgia',
+        icon: BookOpen,
+        sub: [
+          { name: 'Programações', path: '/admin/liturgia', icon: BookOpen },
+          { name: 'Músicas', path: '/admin/liturgia/musicas', icon: Music },
+          { name: 'Modelos', path: '/admin/liturgia/modelos', icon: LayoutTemplate },
+        ],
+      },
+      { name: 'Eventos', path: '/admin/eventos', icon: Calendar },
+      { name: 'Financeiro', path: '/admin/financeiro', icon: DollarSign },
+      { name: 'Avisos', path: '/admin/avisos', icon: Bell },
+      { name: 'Galeria', path: '/admin/galeria', icon: Images },
+      { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
+    ],
+  },
+  {
+    label: 'Comunicação',
+    itens: [
+      {
+        name: 'Comunicação',
+        path: '/admin/comunicacao',
+        icon: Radio,
+        sub: [
+          { name: 'Dashboard', path: '/admin/comunicacao', icon: LayoutDashboard },
+          { name: 'Canais', path: '/admin/comunicacao/canais', icon: Radio },
+          { name: 'Pregações', path: '/admin/comunicacao/pregacoes', icon: Mic },
+          { name: 'Versículos', path: '/admin/comunicacao/versiculos', icon: BookOpen },
+        ],
+      },
+      {
+        name: 'Configurações',
+        path: '/admin/configuracoes',
+        icon: Settings,
+        sub: [
+          { name: 'Geral', path: '/admin/configuracoes', icon: Settings },
+          { name: 'Aparência', path: '/admin/configuracoes/aparencia', icon: Palette },
+        ],
+      },
+    ],
+  },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [configOpen, setConfigOpen] = useState(pathname.startsWith('/admin/configuracoes'));
-  const [liturgiaOpen, setLiturgiaOpen] = useState(pathname.startsWith('/admin/liturgia'));
-  const [comunicacaoOpen, setComunicacaoOpen] = useState(pathname.startsWith('/admin/comunicacao'));
+  const { confirm } = useToast();
+  const [openSub, setOpenSub] = useState<Record<string, boolean>>({
+    '/admin/liturgia': pathname.startsWith('/admin/liturgia'),
+    '/admin/comunicacao': pathname.startsWith('/admin/comunicacao'),
+    '/admin/configuracoes': pathname.startsWith('/admin/configuracoes'),
+  });
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
 
-  const isConfigActive = pathname.startsWith('/admin/configuracoes');
+  const isActive = (path: string) => {
+    if (path === '/admin') return pathname === '/admin';
+    return pathname === path || pathname.startsWith(path + '/');
+  };
+
+  const handleLogout = () => {
+    confirm('Deseja encerrar a sessão e sair do painel?', () => {
+      signOut({ callbackUrl: '/admin/login' });
+    }, { title: 'Sair do painel' });
+  };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', paddingTop: 'var(--header-height)' }}>
-      <aside style={{
-        width: '250px',
-        background: 'var(--bg-nav)',
-        borderRight: '1px solid var(--border-color)',
-        padding: '2rem 0',
-        position: 'fixed',
-        top: 'var(--header-height)',
-        left: 0,
-        bottom: 0,
-        overflowY: 'auto',
-      }}>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0 1rem' }}>
-          {sidebarLinks.map(({ name, path, icon: Icon }) => {
-            const isActive = pathname === path;
-            return (
-              <Link
-                key={path}
-                href={path}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-sm)',
-                  color: isActive ? 'var(--color-secondary)' : 'var(--text-primary)',
-                  background: isActive ? 'var(--bg-card)' : 'transparent',
-                  textDecoration: 'none',
-                  fontWeight: isActive ? 600 : 400,
-                  transition: 'var(--transition)',
-                }}
-              >
-                <Icon size={20} />
-                {name}
-              </Link>
-            );
-          })}
-
-          {/* Liturgia com sub-menu */}
-          <button
-            onClick={() => setLiturgiaOpen(!liturgiaOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-sm)',
-              color: pathname.startsWith('/admin/liturgia') ? 'var(--color-secondary)' : 'var(--text-primary)',
-              background: pathname.startsWith('/admin/liturgia') ? 'var(--bg-card)' : 'transparent',
-              fontWeight: pathname.startsWith('/admin/liturgia') ? 600 : 400,
-              transition: 'var(--transition)',
-              cursor: 'pointer',
-              width: '100%',
-              textAlign: 'left',
-              fontSize: 'inherit',
-              fontFamily: 'inherit',
-            }}
-          >
-            <BookOpen size={20} />
-            Liturgia
-            <ChevronDown size={16} style={{ marginLeft: 'auto', transform: liturgiaOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'var(--transition)' }} />
-          </button>
-
-          {liturgiaOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '1rem' }}>
-              {liturgiaSubLinks.map(({ name, path, icon: Icon }) => {
-                const isActive = pathname === path || (path === '/admin/liturgia' && pathname === '/admin/liturgia');
+    <div className={styles.adminWrap}>
+      <div
+        className={`${styles.overlay} ${mobileOpen ? styles.overlayShow : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+      <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ''}`}>
+        <nav className={styles.nav}>
+          {grupos.map((g) => (
+            <div key={g.label}>
+              <div className={styles.sideLabel}>{g.label}</div>
+              {g.itens.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                if (item.sub) {
+                  const open = !!openSub[item.path];
+                  return (
+                    <div key={item.path}>
+                      <button
+                        type="button"
+                        className={`${styles.sideItem} ${active ? styles.sideItemActive : ''}`}
+                        onClick={() => setOpenSub((p) => ({ ...p, [item.path]: !p[item.path] }))}
+                      >
+                        <Icon size={19} />
+                        {item.name}
+                        <ChevronDown size={15} className={`${styles.chev} ${open ? styles.chevOpen : ''}`} />
+                      </button>
+                      {open && (
+                        <div className={styles.subList}>
+                          {item.sub.map((s) => {
+                            const SubIcon = s.icon;
+                            const subActive = isActive(s.path);
+                            return (
+                              <Link
+                                key={s.path}
+                                href={s.path}
+                                className={`${styles.subItem} ${subActive ? styles.subItemActive : ''}`}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                <SubIcon size={15} />
+                                {s.name}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
                 return (
                   <Link
-                    key={path}
-                    href={path}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      padding: '0.6rem 1rem',
-                      borderRadius: 'var(--radius-sm)',
-                      color: isActive ? 'var(--color-primary)' : 'var(--text-muted)',
-                      background: isActive ? 'var(--gradient-gold-soft)' : 'transparent',
-                      textDecoration: 'none',
-                      fontWeight: isActive ? 600 : 400,
-                      transition: 'var(--transition)',
-                      fontSize: '0.85rem',
-                    }}
+                    key={item.path}
+                    href={item.path}
+                    className={`${styles.sideItem} ${active ? styles.sideItemActive : ''}`}
+                    onClick={() => setMobileOpen(false)}
                   >
-                    <Icon size={16} />
-                    {name}
+                    <Icon size={19} />
+                    {item.name}
                   </Link>
                 );
               })}
             </div>
-          )}
+          ))}
 
-          {/* Configuracoes com sub-menu */}
-          <button
-            onClick={() => setConfigOpen(!configOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-sm)',
-              color: isConfigActive ? 'var(--color-secondary)' : 'var(--text-primary)',
-              background: isConfigActive ? 'var(--bg-card)' : 'transparent',
-              fontWeight: isConfigActive ? 600 : 400,
-              transition: 'var(--transition)',
-              cursor: 'pointer',
-              width: '100%',
-              textAlign: 'left',
-              fontSize: 'inherit',
-              fontFamily: 'inherit',
-            }}
-          >
-            <Settings size={20} />
-            Configuracoes
-            <ChevronDown size={16} style={{ marginLeft: 'auto', transform: configOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'var(--transition)' }} />
-          </button>
-
-          {configOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '1rem' }}>
-              {configSubLinks.map(({ name, path, icon: Icon }) => {
-                const isActive = pathname === path;
-                return (
-                  <Link
-                    key={path}
-                    href={path}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      padding: '0.6rem 1rem',
-                      borderRadius: 'var(--radius-sm)',
-                      color: isActive ? 'var(--color-primary)' : 'var(--text-muted)',
-                      background: isActive ? 'var(--gradient-gold-soft)' : 'transparent',
-                      textDecoration: 'none',
-                      fontWeight: isActive ? 600 : 400,
-                      transition: 'var(--transition)',
-                      fontSize: '0.85rem',
-                    }}
-                  >
-                    <Icon size={16} />
-                    {name}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Comunicacao com sub-menu */}
-          <button
-            onClick={() => setComunicacaoOpen(!comunicacaoOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-sm)',
-              color: pathname.startsWith('/admin/comunicacao') ? 'var(--color-secondary)' : 'var(--text-primary)',
-              background: pathname.startsWith('/admin/comunicacao') ? 'var(--bg-card)' : 'transparent',
-              fontWeight: pathname.startsWith('/admin/comunicacao') ? 600 : 400,
-              transition: 'var(--transition)',
-              cursor: 'pointer',
-              width: '100%',
-              textAlign: 'left',
-              fontSize: 'inherit',
-              fontFamily: 'inherit',
-            }}
-          >
-            <Radio size={20} />
-            Comunicacao
-            <ChevronDown size={16} style={{ marginLeft: 'auto', transform: comunicacaoOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'var(--transition)' }} />
-          </button>
-
-          {comunicacaoOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '1rem' }}>
-              {comunicacaoSubLinks.map(({ name, path, icon: Icon }) => {
-                const isActive = pathname === path || (path !== '/admin/comunicacao' && pathname.startsWith(path));
-                return (
-                  <Link
-                    key={path}
-                    href={path}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      padding: '0.6rem 1rem',
-                      borderRadius: 'var(--radius-sm)',
-                      color: isActive ? 'var(--color-primary)' : 'var(--text-muted)',
-                      background: isActive ? 'var(--gradient-gold-soft)' : 'transparent',
-                      textDecoration: 'none',
-                      fontWeight: isActive ? 600 : 400,
-                      transition: 'var(--transition)',
-                      fontSize: '0.85rem',
-                    }}
-                  >
-                    <Icon size={16} />
-                    {name}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
-          <Link
-            href="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-sm)',
-              color: 'var(--text-muted)',
-              textDecoration: 'none',
-              marginTop: '2rem',
-              borderTop: '1px solid var(--border-color)',
-              paddingTop: '2rem',
-            }}
-          >
-            <LogOut size={20} />
+          <div className={styles.divider} />
+          <Link href="/" className={styles.sideItem} onClick={() => setMobileOpen(false)}>
+            <LogOut size={19} />
             Voltar ao site
           </Link>
+          <button type="button" className={styles.logout} onClick={handleLogout}>
+            <LogOut size={19} />
+            Sair
+          </button>
         </nav>
       </aside>
-      <main style={{ flex: 1, marginLeft: '250px', padding: '2rem' }}>
-        {children}
-      </main>
+      <main className={styles.main}>{children}</main>
+      <button
+        type="button"
+        className={styles.mobileToggle}
+        onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label="Menu do painel"
+      >
+        {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
     </div>
   );
 }

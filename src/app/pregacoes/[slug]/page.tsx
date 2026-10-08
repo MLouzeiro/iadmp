@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import PregacaoDetail from '@/components/public/PregacaoDetail';
 
 export const metadata: Metadata = {
-  title: 'Pregacao - IADMP',
-  description: 'Mensagem pregada na Igreja Assembleia de Deus Missao da Promessa.',
+  title: 'Pregação - IADMP',
+  description: 'Mensagem pregada na Igreja Assembleia de Deus Missão da Promessa.',
 };
 
 type Params = { params: Promise<{ slug: string }> };
