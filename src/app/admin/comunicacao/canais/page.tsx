@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import SectionHead from '@/components/ui/SectionHead';
@@ -36,7 +36,7 @@ export default function CanaisPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { orgs, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [form, setForm] = useState({ organizacaoId: '', tipo: 'youtube', nome: '', url: '', descricao: '', ativo: true, ordem: 0 });
 
   const fetchCanais = useCallback(async () => {

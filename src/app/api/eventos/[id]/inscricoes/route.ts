@@ -118,7 +118,7 @@ export async function POST(
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
     if (error?.message === ORG_REQUIRED) {
-      return NextResponse.json({ error: 'organizacaoId é obrigatório' }, { status: 400 });
+      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o do evento' }, { status: 400 });
     }
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });

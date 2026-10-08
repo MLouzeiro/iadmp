@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Bell, Search } from 'lucide-react';
@@ -40,7 +40,7 @@ function dataBR(iso?: string | null) {
 
 export default function AvisosPage() {
   const { toast, confirm } = useToast();
-  const { orgs, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

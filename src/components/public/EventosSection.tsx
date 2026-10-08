@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, MapPin } from 'lucide-react';
 import { formatarDataLonga, formatarHora } from '@/lib/datas';
+import { CountdownBadge } from '@/components/public/CountdownCard';
 
 interface Evento {
   id: string;
@@ -12,6 +13,9 @@ interface Evento {
   dataInicio: string;
   dataEvento: string;
   dataFim?: string;
+  inscricoesAbremEm?: string | null;
+  inscricoesFechamEm?: string | null;
+  aceitaInscricoes?: boolean;
   local?: string;
   status: string;
   preletores: string[];
@@ -94,6 +98,14 @@ export default function EventosSection({ organizacaoId }: { organizacaoId?: stri
                     {ev.preletores.join(', ')}
                   </p>
                 )}
+                <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
+                  <CountdownBadge
+                    dataEvento={ev.dataEvento}
+                    inscricoesAbremEm={ev.inscricoesAbremEm}
+                    inscricoesFechamEm={ev.inscricoesFechamEm}
+                    aceitaInscricoes={ev.aceitaInscricoes}
+                  />
+                </div>
               </div>
             ))}
           </div>

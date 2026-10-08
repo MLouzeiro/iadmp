@@ -6,12 +6,17 @@ import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import Badge, { statusBadgeVariant } from '@/components/ui/Badge';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatarDataCurta } from '@/lib/datas';
+import { CountdownBadge } from '@/components/public/CountdownCard';
 
 interface Evento {
   id: string;
   nome: string;
   tema?: string | null;
   dataEvento: string;
+  dataFim?: string | null;
+  inscricoesAbremEm?: string | null;
+  inscricoesFechamEm?: string | null;
+  aceitaInscricoes?: boolean;
   local?: string | null;
   status: string;
   preletores?: string | null;
@@ -63,7 +68,15 @@ export default function EventosList() {
               <MapPin size={14} /> {e.local}
             </p>
           )}
-          {e.preletores && <p className="event-prelec">Preleção: {e.preletores}</p>}
+          {e.preletores && <p className="event-prelec">Prele\u00e7\u00e3o: {e.preletores}</p>}
+          <div style={{ marginTop: '0.65rem' }}>
+            <CountdownBadge
+              dataEvento={e.dataEvento}
+              inscricoesAbremEm={e.inscricoesAbremEm}
+              inscricoesFechamEm={e.inscricoesFechamEm}
+              aceitaInscricoes={e.aceitaInscricoes}
+            />
+          </div>
         </article>
         </Link>
       ))}

@@ -302,6 +302,8 @@ model Evento {
   dataInicio        DateTime
   dataEvento        DateTime
   dataFim           DateTime?
+  inscricoesAbremEm  DateTime?
+  inscricoesFechamEm DateTime?
   tema              String?
   preletores        String[]
   diasDuracao       Int?

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Utilitários de data do projeto.
  *
  * Problema original (bug 11/10 -> 10/10): `new Date("2026-10-11")` é interpretado
@@ -95,4 +95,32 @@ export function diaDoMes(valor: string | Date | null | undefined): string {
   const d = valor instanceof Date ? valor : new Date(valor);
   if (isNaN(d.getTime())) return '';
   return String(d.getUTCDate()).padStart(2, '0');
+}
+
+/**
+ * Dias at\u00e9 uma data (UTC).
+ * - Positivo = futuro (ex.: 12 = "em 12 dias")
+ * - 0 = hoje
+ * - Negativo = passado (ex.: -3 = "h\u00e1 3 dias")
+ * - 
+ull = data inv\u00e1lida ou ausente
+ */
+export function diasAte(valor: string | Date | null | undefined): number | null {
+  if (!valor) return null;
+  const d = valor instanceof Date ? valor : new Date(valor);
+  if (isNaN(d.getTime())) return null;
+  const agora = new Date();
+  const alvoUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const hojeUTC = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth(), agora.getUTCDate());
+  return Math.round((alvoUTC - hojeUTC) / 86400000);
+}
+
+/** Formata a contagem regressiva: "em 12 dias", "hoje", "há 3 dias". */
+export function formatarContagem(dias: number | null): string {
+  if (dias === null) return '';
+  if (dias > 1) return `em ${dias} dias`;
+  if (dias === 1) return 'amanhã';
+  if (dias === 0) return 'hoje';
+  if (dias === -1) return 'ontem';
+  return `há ${Math.abs(dias)} dias`;
 }

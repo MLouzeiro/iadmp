@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { defaultColors } from '@/lib/theme-palettes';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
     const organizacaoId = scope.requestedOrgId || (scope.mode === 'SINGLE' ? scope.orgIds[0] : null);
     if (!organizacaoId) {
       return NextResponse.json(
-        { error: 'organizacaoId é obrigatório para editar configurações' },
+        { error: 'Selecione a organiza\u00e7\u00e3o do registro para editar configurações' },
         { status: 400 }
       );
     }

@@ -65,6 +65,8 @@ export async function PUT(
     if (body.dataInicio !== undefined) data.dataInicio = parseDataDateOnly(body.dataInicio);
     if (body.dataEvento !== undefined) data.dataEvento = parseDataDateOnly(body.dataEvento);
     if (body.dataFim !== undefined) data.dataFim = body.dataFim ? parseDataDateOnly(body.dataFim) : null;
+    if (body.inscricoesAbremEm !== undefined) data.inscricoesAbremEm = body.inscricoesAbremEm ? parseDataDateOnly(body.inscricoesAbremEm) : null;
+    if (body.inscricoesFechamEm !== undefined) data.inscricoesFechamEm = body.inscricoesFechamEm ? parseDataDateOnly(body.inscricoesFechamEm) : null;
     if (body.tema !== undefined) data.tema = body.tema;
     if (body.preletores !== undefined) data.preletores = body.preletores;
     if (body.diasDuracao !== undefined) data.diasDuracao = body.diasDuracao;

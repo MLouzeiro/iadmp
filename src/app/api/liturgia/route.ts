@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
 import { resolveCongregacaoId, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     const { organizacaoId, congregacao, data, horarioInicio, horarioFimPrevisto, tipoCulto, tema, dirigente, pregador, responsavel, observacoes, modeloId, itens } = body;
 
     if (!organizacaoId || !data || !horarioInicio) {
-      return NextResponse.json({ error: 'organizacaoId, data e horarioInicio são obrigatórios' }, { status: 400 });
+      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o e preencha data e hor\u00e1rio de in\u00edcio' }, { status: 400 });
     }
 
     const podeCriar = await canManageOrganization(user.id, organizacaoId);

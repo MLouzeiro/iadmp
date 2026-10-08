@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const { organizacaoId, nome, descricao, tipoCulto, momentos } = body;
 
     if (!organizacaoId || !nome) {
-      return NextResponse.json({ error: 'organizacaoId e nome são obrigatórios' }, { status: 400 });
+      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o e informe o nome' }, { status: 400 });
     }
 
     const podeCriar = await canManageOrganization(user.id, organizacaoId);

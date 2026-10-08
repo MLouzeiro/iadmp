@@ -1,4 +1,4 @@
-import {
+﻿import {
   membroSchema,
   eventoSchema,
   avisoSchema,
@@ -47,6 +47,58 @@ describe('validations — schemas Zod', () => {
         status: 'PLANEJADO',
         publicarNoSite: true,
       });
+            expect(result.success).toBe(true);
+    });
+
+    it('rejeita dataFim anterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-01',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita dataFim igual ou posterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-03',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejeita inscricoesFechamEm anterior \u00e0 abertura', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-10-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita janela de inscri\u00e7\u00f5es v\u00e1lida', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-09-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('aceita evento sem janela de inscri\u00e7\u00f5es', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Culto',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-01',
+        aceitaInscricoes: true,
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -61,6 +113,58 @@ describe('validations — schemas Zod', () => {
         titulo: 'Reunião de líderes',
         descricao: 'Sexta às 19h',
         prioridade: 'ALTA',
+      });
+            expect(result.success).toBe(true);
+    });
+
+    it('rejeita dataFim anterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-01',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita dataFim igual ou posterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-03',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejeita inscricoesFechamEm anterior \u00e0 abertura', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-10-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita janela de inscri\u00e7\u00f5es v\u00e1lida', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-09-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('aceita evento sem janela de inscri\u00e7\u00f5es', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Culto',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-01',
+        aceitaInscricoes: true,
       });
       expect(result.success).toBe(true);
     });
@@ -82,6 +186,58 @@ describe('validations — schemas Zod', () => {
         valor: 100,
         tipo: 'ENTRADA',
       });
+            expect(result.success).toBe(true);
+    });
+
+    it('rejeita dataFim anterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-01',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita dataFim igual ou posterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-03',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejeita inscricoesFechamEm anterior \u00e0 abertura', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-10-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita janela de inscri\u00e7\u00f5es v\u00e1lida', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-09-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('aceita evento sem janela de inscri\u00e7\u00f5es', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Culto',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-01',
+        aceitaInscricoes: true,
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -99,6 +255,58 @@ describe('validations — schemas Zod', () => {
 
     it('aceita credenciais válidas', () => {
       const result = loginSchema.safeParse({ email: 'admin@igreja.com', password: 'secret123' });
+            expect(result.success).toBe(true);
+    });
+
+    it('rejeita dataFim anterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-01',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita dataFim igual ou posterior \u00e0 data do evento', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        dataFim: '2026-10-03',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejeita inscricoesFechamEm anterior \u00e0 abertura', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-10-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('aceita janela de inscri\u00e7\u00f5es v\u00e1lida', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Congresso',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-03',
+        inscricoesAbremEm: '2026-09-01',
+        inscricoesFechamEm: '2026-09-30',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('aceita evento sem janela de inscri\u00e7\u00f5es', () => {
+      const result = eventoSchema.safeParse({
+        nome: 'Culto',
+        dataInicio: '2026-10-01',
+        dataEvento: '2026-10-01',
+        aceitaInscricoes: true,
+      });
       expect(result.success).toBe(true);
     });
   });

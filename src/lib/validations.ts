@@ -27,29 +27,52 @@ export const liderancaSchema = z.object({
   ministerioId: z.string().optional(),
 });
 
-export const eventoSchema = z.object({
-  nome: z.string().min(1, 'Nome é obrigatório'),
-  categoriaId: z.string().optional(),
-  dataInicio: z.string().min(1, 'Data de início é obrigatória'),
-  dataEvento: z.string().min(1, 'Data do evento é obrigatória'),
-  dataFim: z.string().optional(),
-  tema: z.string().optional(),
-  preletores: z.array(z.string()).optional(),
-  diasDuracao: z.number().optional(),
-  status: z.enum(['PLANEJADO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']).optional(),
-  observacoes: z.string().optional(),
-  local: z.string().optional(),
-  responsavelGeral: z.string().optional(),
-  publicarNoSite: z.boolean().optional(),
-  orcamentoPrevisto: z.number().optional(),
-  aceitaInscricoes: z.boolean().optional(),
-  limiteInscricoes: z.number().int().min(0).optional(),
-  taxaInscricao: z.number().min(0).optional(),
-  chavePix: z.string().optional(),
-  tipoChavePix: z.enum(['CPF', 'CNPJ', 'EMAIL', 'TELEFONE', 'ALEATORIA']).optional(),
-  nomeRecebedor: z.string().optional(),
-  cidadeRecebedor: z.string().optional(),
-});
+export const eventoSchema = z
+  .object({
+    nome: z.string().min(1, 'Nome é obrigatório'),
+    categoriaId: z.string().optional(),
+    dataInicio: z.string().min(1, 'Data de início é obrigatória'),
+    dataEvento: z.string().min(1, 'Data do evento é obrigatória'),
+    dataFim: z.string().optional(),
+    inscricoesAbremEm: z.string().optional(),
+    inscricoesFechamEm: z.string().optional(),
+    tema: z.string().optional(),
+    preletores: z.array(z.string()).optional(),
+    diasDuracao: z.number().int().min(1).optional(),
+    status: z.enum(['PLANEJADO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']).optional(),
+    observacoes: z.string().optional(),
+    local: z.string().optional(),
+    responsavelGeral: z.string().optional(),
+    publicarNoSite: z.boolean().optional(),
+    orcamentoPrevisto: z.number().optional(),
+    aceitaInscricoes: z.boolean().optional(),
+    limiteInscricoes: z.number().int().min(0).optional(),
+    taxaInscricao: z.number().min(0).optional(),
+    chavePix: z.string().optional(),
+    tipoChavePix: z.enum(['CPF', 'CNPJ', 'EMAIL', 'TELEFONE', 'ALEATORIA']).optional(),
+    nomeRecebedor: z.string().optional(),
+    cidadeRecebedor: z.string().optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.dataFim && val.dataEvento && new Date(val.dataFim) < new Date(val.dataEvento)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dataFim'],
+        message: 'Data fim deve ser igual ou posterior à data do evento',
+      });
+    }
+    if (
+      val.inscricoesAbremEm &&
+      val.inscricoesFechamEm &&
+      new Date(val.inscricoesFechamEm) < new Date(val.inscricoesAbremEm)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['inscricoesFechamEm'],
+        message: 'Fechamento das inscrições deve ser igual ou posterior à abertura',
+      });
+    }
+  });
 
 export const avisoSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),

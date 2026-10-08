@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Calendar, Users } from 'lucide-react';
@@ -40,7 +40,7 @@ function dataBR(iso: string) {
 
 export default function EventosAdminPage() {
   const { toast, confirm } = useToast();
-  const { orgs, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -51,6 +51,10 @@ export default function EventosAdminPage() {
     nome: '',
     dataEvento: '',
     dataInicio: '',
+    dataFim: '',
+    inscricoesAbremEm: '',
+    inscricoesFechamEm: '',
+    diasDuracao: '',
     tema: '',
     local: '',
     status: 'PLANEJADO',
@@ -76,9 +80,15 @@ export default function EventosAdminPage() {
 
   useEffect(() => { fetchEventos(); }, [fetchEventos]);
 
+  useEffect(() => {
+    if (orgs.length === 1) {
+      setForm((f) => (f.organizacaoId ? f : { ...f, organizacaoId: orgs[0].id }));
+    }
+  }, [orgs]);
+
   const openNovo = () => {
     setEditando(null);
-    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', dataEvento: '', dataInicio: '', tema: '', local: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', dataEvento: '', dataInicio: '', dataFim: '', inscricoesAbremEm: '', inscricoesFechamEm: '', diasDuracao: '', tema: '', local: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
     setModalOpen(true);
   };
 
@@ -89,6 +99,10 @@ export default function EventosAdminPage() {
       nome: e.nome,
       dataEvento: e.dataEvento ? e.dataEvento.slice(0, 10) : '',
       dataInicio: e.dataInicio ? e.dataInicio.slice(0, 10) : '',
+      dataFim: (e as unknown as { dataFim?: string }).dataFim ? (e as unknown as { dataFim: string }).dataFim.slice(0, 10) : '',
+      inscricoesAbremEm: (e as unknown as { inscricoesAbremEm?: string }).inscricoesAbremEm ? (e as unknown as { inscricoesAbremEm: string }).inscricoesAbremEm.slice(0, 10) : '',
+      inscricoesFechamEm: (e as unknown as { inscricoesFechamEm?: string }).inscricoesFechamEm ? (e as unknown as { inscricoesFechamEm: string }).inscricoesFechamEm.slice(0, 10) : '',
+      diasDuracao: (e as unknown as { diasDuracao?: number }).diasDuracao != null ? String((e as unknown as { diasDuracao: number }).diasDuracao) : '',
       tema: e.tema || '',
       local: e.local || '',
       status: e.status,
@@ -106,19 +120,36 @@ export default function EventosAdminPage() {
   };
 
   const salvar = async () => {
+    if (orgsLoading) {
+      toast('Carregando organiza\u00e7\u00f5es, aguarde...', 'warn');
+      return;
+    }
     if (!form.nome.trim() || !form.dataEvento) {
       toast('Preencha nome e data do evento.', 'warn');
       return;
     }
     if (multiOrg && !form.organizacaoId) {
-      toast('Selecione a organização do evento.', 'warn');
+      toast('Selecione a organiza\u00e7\u00e3o do evento.', 'warn');
       return;
     }
+
+    let diasDuracao = form.diasDuracao ? parseInt(form.diasDuracao) : undefined;
+    if (!diasDuracao && form.dataFim) {
+      const inicio = new Date(form.dataEvento + 'T12:00:00');
+      const fim = new Date(form.dataFim + 'T12:00:00');
+      const diff = Math.round((fim.getTime() - inicio.getTime()) / 86400000) + 1;
+      if (diff > 0) diasDuracao = diff;
+    }
+
     const payload = {
       organizacaoId: form.organizacaoId || undefined,
       nome: form.nome,
       dataEvento: form.dataEvento,
       dataInicio: form.dataInicio || undefined,
+      dataFim: form.dataFim || undefined,
+      inscricoesAbremEm: form.inscricoesAbremEm || undefined,
+      inscricoesFechamEm: form.inscricoesFechamEm || undefined,
+      diasDuracao,
       tema: form.tema || undefined,
       local: form.local || undefined,
       status: form.status,
@@ -174,7 +205,9 @@ export default function EventosAdminPage() {
       : []),
     { name: 'nome', label: 'Nome', value: form.nome, required: true, full: true },
     { name: 'dataEvento', label: 'Data do evento', type: 'date', value: form.dataEvento, required: true },
-    { name: 'dataInicio', label: 'Data de início', type: 'date', value: form.dataInicio },
+    { name: 'dataInicio', label: 'Data de in\u00edcio', type: 'date', value: form.dataInicio },
+    { name: 'dataFim', label: 'Data fim', type: 'date', value: form.dataFim },
+    { name: 'diasDuracao', label: 'Dura\u00e7\u00e3o (dias)', type: 'number', value: form.diasDuracao, min: 1, placeholder: 'Auto se data fim preenchida' },
     { name: 'tema', label: 'Tema', value: form.tema },
     { name: 'local', label: 'Local', value: form.local },
     {
@@ -189,6 +222,12 @@ export default function EventosAdminPage() {
     { name: 'orcamentoPrevisto', label: 'Orçamento previsto (R$)', type: 'number', value: form.orcamentoPrevisto, min: 0, step: 0.01 },
     { name: 'publicarNoSite', label: 'Publicar no site', type: 'checkbox', value: form.publicarNoSite, placeholder: 'Exibir no site público' },
     { name: 'aceitaInscricoes', label: 'Aceita inscrições', type: 'checkbox', value: form.aceitaInscricoes, placeholder: 'Abrir inscrições para este evento' },
+    ...(form.aceitaInscricoes
+      ? [
+          { name: 'inscricoesAbremEm', label: 'Inscri\u00e7\u00f5es abrem em', type: 'date' as const, value: form.inscricoesAbremEm },
+          { name: 'inscricoesFechamEm', label: 'Inscri\u00e7\u00f5es fecham em', type: 'date' as const, value: form.inscricoesFechamEm },
+        ]
+      : []),
     { name: 'limiteInscricoes', label: 'Limite de vagas', type: 'number', value: form.limiteInscricoes, min: 0 },
     { name: 'taxaInscricao', label: 'Taxa de inscrição (R$)', type: 'number', value: form.taxaInscricao, min: 0, step: 0.01 },
     { name: 'chavePix', label: 'Chave PIX', value: form.chavePix, full: true, placeholder: 'CPF, CNPJ, e-mail, telefone ou chave aleatoria' },

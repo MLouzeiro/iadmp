@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
@@ -27,7 +27,7 @@ interface Lider {
 
 export default function LiderancaPage() {
   const { toast, confirm } = useToast();
-  const { orgs, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [lideres, setLideres] = useState<Lider[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { formatarDataLonga, formatarHora } from '@/lib/datas';
 import InscricaoForm from '@/components/public/InscricaoForm';
+import CountdownCard from '@/components/public/CountdownCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,8 @@ async function getEvento(id: string) {
         dataEvento: true,
         dataInicio: true,
         dataFim: true,
+        inscricoesAbremEm: true,
+        inscricoesFechamEm: true,
         local: true,
         status: true,
         observacoes: true,
@@ -86,9 +89,19 @@ export default async function EventoDetalhePage({ params }: { params: Promise<{ 
                     <h3 style={{ margin: 0, fontSize: '1.15rem' }}>{formatarDataLonga(evento.dataEvento)}</h3>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.885rem', margin: 0 }}>
                       {formatarHora(evento.dataInicio || evento.dataEvento)}
+                      {evento.dataFim && evento.dataFim !== evento.dataEvento && (
+                        <span>{' \u00b7 at\u00e9 '}{formatarDataLonga(evento.dataFim)}</span>
+                      )}
                     </p>
                   </div>
                 </div>
+
+                <CountdownCard
+                  dataEvento={evento.dataEvento instanceof Date ? evento.dataEvento.toISOString() : evento.dataEvento}
+                  inscricoesAbremEm={evento.inscricoesAbremEm instanceof Date ? evento.inscricoesAbremEm.toISOString() : evento.inscricoesAbremEm}
+                  inscricoesFechamEm={evento.inscricoesFechamEm instanceof Date ? evento.inscricoesFechamEm.toISOString() : evento.inscricoesFechamEm}
+                  aceitaInscricoes={evento.aceitaInscricoes}
+                />
 
                 {evento.local && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: 'var(--text-secondary)' }}>

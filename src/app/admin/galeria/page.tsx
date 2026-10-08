@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Images, Image as ImageIcon } from 'lucide-react';
@@ -26,7 +26,7 @@ interface GaleriaItem {
 
 export default function GaleriaAdminPage() {
   const { toast, confirm } = useToast();
-  const { orgs, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [itens, setItens] = useState<GaleriaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
