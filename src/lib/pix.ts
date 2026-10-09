@@ -3,7 +3,7 @@
  *
  * Layout do payload:
  *  00 - Payload Format Indicator (01)
- *  01 - Point of Initiation (12 = dinâmico com reuso, 11 = estático)
+ *  01 - Point of Initiation (11 = estático/reutilizável — payload embute a chave)
  *  26 - Merchant Account Information (GUI br.gov.bcb.pix + chave [+ descrição])
  *  52 - Merchant Category Code (0000)
  *  53 - Transaction Currency (986 = BRL)
@@ -25,8 +25,14 @@ export interface PixConfig {
   txid?: string | null;
 }
 
+const encoder = new TextEncoder();
+
+function byteLen(s: string): number {
+  return encoder.encode(s).length;
+}
+
 function tlv(id: string, value: string): string {
-  return `${id}${String(value.length).padStart(2, '0')}${value}`;
+  return `${id}${String(byteLen(value)).padStart(2, '0')}${value}`;
 }
 
 /** CRC16-CCITT (0xFFFF) — exigência do padrão EMV/PIX. */
@@ -50,15 +56,39 @@ function sanitizar(valor: string, max: number): string {
     .slice(0, max);
 }
 
-/** Normaliza chave PIX: telefone ganha +55, e-mail/caixa alta não se aplica. */
+const PHONE_LIKE = /^(\+?55)?\(?\d{2}\)?\s?9?\d{4}-?\d{4}$/;
+
+/** Valida CPF pelos dígitos verificadores (protege chave contra heurística de telefone). */
+function ehCpfValido(s: string): boolean {
+  if (!/^\d{11}$/.test(s) || /^(\d)\1{10}$/.test(s)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += Number(s[i]) * (10 - i);
+  const d1 = (sum * 10) % 11 % 10;
+  if (d1 !== Number(s[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += Number(s[i]) * (11 - i);
+  const d2 = (sum * 10) % 11 % 10;
+  return d2 === Number(s[10]);
+}
+
+function paraTelefone(k: string): string {
+  const digitos = k.replace(/\D/g, '');
+  if (!digitos) return k;
+  return `+${digitos.startsWith('55') ? digitos : `55${digitos}`}`;
+}
+
+/**
+ * Normaliza chave PIX: telefone ganha +55.
+ * Nunca altera chaves com tipo explícito diferente de TELEFONE (ex.: CPF com
+ * 3º dígito 9 cairia no regex de telefone); sem tipo, só converte se o valor
+ * parecer telefone e não for um CPF válido.
+ */
 export function normalizarChave(chave: string, tipo?: string | null): string {
   const k = chave.trim();
   if (!k) return k;
   const t = (tipo || '').toUpperCase();
-  if (t === 'TELEFONE' || /^(\+?55)?\(?\d{2}\)?\s?9?\d{4}-?\d{4}$/.test(k)) {
-    const digitos = k.replace(/\D/g, '');
-    return `+${digitos.startsWith('55') ? digitos : `55${digitos}`}`;
-  }
+  if (t === 'TELEFONE') return paraTelefone(k);
+  if (!t && PHONE_LIKE.test(k) && !ehCpfValido(k.replace(/\D/g, ''))) return paraTelefone(k);
   return k;
 }
 
@@ -77,14 +107,18 @@ export function gerarBrCode(config: PixConfig): string {
   const txid = (config.txid || '***').replace(/[^A-Za-z0-9]/g, '').slice(0, 25) || '***';
 
   let merchantAccount = tlv('00', 'br.gov.bcb.pix') + tlv('01', chave);
+  // Campo 26 (MAI) aceita no máximo 99 bytes no EMV
+  if (byteLen(merchantAccount) > 99) throw new Error('Chave PIX longa demais para o BR Code');
   if (config.descricao) {
     const desc = sanitizar(config.descricao, 20);
-    if (desc) merchantAccount += tlv('02', desc);
+    if (desc && byteLen(merchantAccount) + 4 + byteLen(desc) <= 99) {
+      merchantAccount += tlv('02', desc);
+    }
   }
 
   let payload =
     tlv('00', '01') +
-    tlv('01', '12') +
+    tlv('01', '11') +
     tlv('26', merchantAccount) +
     tlv('52', '0000') +
     tlv('53', '986');
