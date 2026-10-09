@@ -5,8 +5,9 @@ import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
 import {
   assertOrgAccess,
-  resolveOrgScope,
+  resolveTargetOrgId,
   ORG_FORBIDDEN,
+  ORG_REQUIRED,
   orgForbiddenResponse,
 } from '@/lib/tenant';
 
@@ -52,15 +53,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const scope = await resolveOrgScope(user, body.organizacaoId);
-
-    const organizacaoId = scope.requestedOrgId || (scope.mode === 'SINGLE' ? scope.orgIds[0] : null);
-    if (!organizacaoId) {
-      return NextResponse.json(
-        { error: 'Selecione a organiza\u00e7\u00e3o do registro para editar configurações' },
-        { status: 400 }
-      );
-    }
+    const organizacaoId = await resolveTargetOrgId(user, body.organizacaoId);
 
     await assertOrgAccess(user.id, organizacaoId, request);
 
@@ -127,6 +120,9 @@ export async function PUT(request: NextRequest) {
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
+    if (error?.message === ORG_REQUIRED) {
+      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o do registro' }, { status: 400 });
+    }
     console.error('Error updating church config:', error);
     return NextResponse.json(
       { error: 'Erro ao salvar configurações' },

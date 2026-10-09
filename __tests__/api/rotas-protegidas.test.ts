@@ -12,6 +12,7 @@ import { POST as avisosPOST } from '@/app/api/avisos/route';
 import { DELETE as liderDELETE } from '@/app/api/lideranca/[id]/route';
 import { GET as seedGET } from '@/app/api/seed/route';
 import { requireAuth, requireSuperAdmin } from '@/lib/auth-helpers';
+import { prisma } from '@/lib/prisma';
 
 jest.mock('@/lib/prisma', () => ({
   prisma: {
@@ -38,6 +39,10 @@ jest.mock('@/lib/prisma', () => ({
       findFirst: jest.fn().mockResolvedValue({ id: 'cfg1', nomeIgreja: 'Igreja Teste' }),
       create: jest.fn(),
       update: jest.fn(),
+      upsert: jest.fn().mockResolvedValue({ id: 'cfg1', nomeIgreja: 'Igreja Teste' }),
+    },
+    organizacao: {
+      findMany: jest.fn().mockResolvedValue([{ id: 'org1' }]),
     },
     user: {
       count: jest.fn().mockResolvedValue(0),
@@ -158,6 +163,34 @@ describe('rotas agora protegidas por sessao', () => {
     mockAuth.mockImplementation(UNAUTH);
     const res = await liderDELETE(jsonRequest('http://localhost/api/lideranca/x', 'DELETE'), idParams());
     expect(res.status).toBe(401);
+  });
+});
+
+describe('PUT /api/configuracoes - escopo de organizacao', () => {
+  it('resolve a organizacao automaticamente quando o corpo nao envia organizacaoId', async () => {
+    const res = await configPUT(
+      jsonRequest('http://localhost/api/configuracoes', 'PUT', { nomeIgreja: 'Nova Igreja' })
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toHaveProperty('id');
+  });
+
+  it('retorna 400 quando existem varias organizacoes e nenhuma foi informada', async () => {
+    (prisma.usuarioOrganizacao.findMany as jest.Mock).mockResolvedValueOnce([
+      { organizacaoId: 'org1' },
+      { organizacaoId: 'org2' },
+    ]);
+    (prisma.organizacao.findMany as jest.Mock).mockResolvedValueOnce([
+      { id: 'org1' },
+      { id: 'org2' },
+    ]);
+    const res = await configPUT(
+      jsonRequest('http://localhost/api/configuracoes', 'PUT', { nomeIgreja: 'Nova Igreja' })
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body).toHaveProperty('error');
   });
 });
 

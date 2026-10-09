@@ -10,6 +10,7 @@ import Footer from '@/components/layout/Footer';
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
+  const isAdmin = pathname.startsWith('/admin');
 
   return (
     <SessionProvider>
@@ -17,7 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <ToastProvider>
           {!isLoginPage && <Navbar />}
           <main>{children}</main>
-          {!isLoginPage && <Footer />}
+          {!isAdmin && <Footer />}
         </ToastProvider>
       </ThemeProvider>
     </SessionProvider>

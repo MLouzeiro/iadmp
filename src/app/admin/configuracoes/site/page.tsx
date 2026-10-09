@@ -49,6 +49,7 @@ export default function ConfiguracoesSitePage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [organizacaoId, setOrganizacaoId] = useState<string | null>(null);
   const [form, setForm] = useState<SiteConfig>({
     anoFundacao: '',
     statMembros: false,
@@ -70,6 +71,7 @@ export default function ConfiguracoesSitePage() {
     fetch('/api/configuracoes')
       .then((r) => r.json())
       .then((data) => {
+        setOrganizacaoId(data.organizacaoId || null);
         setForm({
           anoFundacao: data.anoFundacao != null ? String(data.anoFundacao) : '',
           statMembros: data.statMembros ?? false,
@@ -102,6 +104,7 @@ export default function ConfiguracoesSitePage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          ...(organizacaoId ? { organizacaoId } : {}),
           anoFundacao: form.anoFundacao ? parseInt(form.anoFundacao, 10) : null,
           statMembros: form.statMembros,
           statCongregacoes: form.statCongregacoes,

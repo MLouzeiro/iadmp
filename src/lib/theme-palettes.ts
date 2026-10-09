@@ -188,7 +188,7 @@ function lightenColor(hex: string, percent: number): string {
     .join('')}`;
 }
 
-function darkenColor(hex: string, percent: number): string {
+export function darkenColor(hex: string, percent: number): string {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
   const amount = Math.round(255 * (percent / 100));
