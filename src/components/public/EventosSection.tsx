@@ -81,32 +81,34 @@ export default function EventosSection({ organizacaoId }: { organizacaoId?: stri
         {eventos.length > 0 ? (
           <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
             {eventos.map(ev => (
-              <div key={ev.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  <Calendar size={14} />
-                  {formatDate(ev.dataEvento)}
+              <Link key={ev.id} href={`/eventos/${ev.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+                <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    <Calendar size={14} />
+                    {formatDate(ev.dataEvento)}
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem' }}>{ev.nome}</h3>
+                  {ev.tema && <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>{ev.tema}</p>}
+                  {ev.local && (
+                    <p style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      <MapPin size={12} /> {ev.local}
+                    </p>
+                  )}
+                  {ev.preletores.length > 0 && (
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {ev.preletores.join(', ')}
+                    </p>
+                  )}
+                  <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
+                    <CountdownBadge
+                      dataEvento={ev.dataEvento}
+                      inscricoesAbremEm={ev.inscricoesAbremEm}
+                      inscricoesFechamEm={ev.inscricoesFechamEm}
+                      aceitaInscricoes={ev.aceitaInscricoes}
+                    />
+                  </div>
                 </div>
-                <h3 style={{ fontSize: '1.1rem' }}>{ev.nome}</h3>
-                {ev.tema && <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>{ev.tema}</p>}
-                {ev.local && (
-                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    <MapPin size={12} /> {ev.local}
-                  </p>
-                )}
-                {ev.preletores.length > 0 && (
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    {ev.preletores.join(', ')}
-                  </p>
-                )}
-                <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
-                  <CountdownBadge
-                    dataEvento={ev.dataEvento}
-                    inscricoesAbremEm={ev.inscricoesAbremEm}
-                    inscricoesFechamEm={ev.inscricoesFechamEm}
-                    aceitaInscricoes={ev.aceitaInscricoes}
-                  />
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
