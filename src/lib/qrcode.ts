@@ -1,15 +1,16 @@
 /**
  * Gerador de QR Code (modo byte, correção de erro L) renderizado como SVG.
- * Implementação própria — sem dependências externas.
+ * Implementação própria — sem dependências externas (ISO/IEC 18004).
  *
- * Suporta payloads até ~600 bytes (mais que suficiente para BR Code PIX,
+ * Suporta payloads até ~271 bytes (mais que suficiente para BR Code PIX,
  * que fica tipicamente entre 150 e 300 bytes).
  */
 
-// Tabelas do padrão QR (ISO/IEC 18004)
-const RS_BLOCKS_L: Record<number, number[][]> = {
-  1: [[26, 19]], 2: [[44, 34]], 3: [[70, 55]], 4: [[100, 80]], 5: [[134, 108]],
-  6: [[172, 136]], 7: [[196, 156]], 8: [[242, 194]], 9: [[292, 232]], 10: [[346, 274]],
+// Nível L: grupos de [data por bloco, ec por bloco, quantidade de blocos]
+const RS_BLOCKS_L: Record<number, [number, number, number][]> = {
+  1: [[19, 7, 1]], 2: [[34, 10, 1]], 3: [[55, 15, 1]], 4: [[80, 20, 1]], 5: [[108, 26, 1]],
+  6: [[68, 18, 2]], 7: [[78, 20, 2]], 8: [[97, 24, 2]], 9: [[116, 30, 2]],
+  10: [[68, 18, 2], [69, 18, 2]],
 };
 
 const ALIGN_POS: Record<number, number[]> = {
@@ -62,9 +63,14 @@ function rsEncode(data: number[], ecLen: number): number[] {
   return res;
 }
 
+/** Terminador (até 4 zeros), alinhamento de byte e bytes de preenchimento 0xEC/0x11. */
 function pad(bits: number[], total: number): number[] {
-  while (bits.length < total && bits.length + 4 <= total) {
-    bits.push(0, 0, 0, 0);
+  for (let i = 0; i < 4 && bits.length < total; i++) bits.push(0);
+  while (bits.length < total && bits.length % 8 !== 0) bits.push(0);
+  let b = 0xec;
+  while (bits.length + 8 <= total) {
+    for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1);
+    b = b === 0xec ? 0x11 : 0xec;
   }
   while (bits.length < total) bits.push(0);
   return bits;
@@ -86,12 +92,48 @@ function utf8Bytes(s: string): number[] {
 
 function chooseVersion(byteLen: number): number {
   for (let v = 1; v <= 10; v++) {
-    const [[total, data]] = RS_BLOCKS_L[v];
+    const totalData = RS_BLOCKS_L[v].reduce((acc, [k, , n]) => acc + k * n, 0);
     const cci = v <= 9 ? 8 : 16;
-    const capacityBits = data * 8 - 4 - cci;
+    const capacityBits = totalData * 8 - 4 - cci;
     if (byteLen <= Math.floor(capacityBits / 8)) return v;
   }
-  throw new Error('Payload longo demais para QR (limite ~600 bytes)');
+  throw new Error('Payload longo demais para QR (limite ~271 bytes)');
+}
+
+/** Codewords de dados + EC com blocos intercalados, conforme ISO/IEC 18004. */
+function codewordsInterleaved(version: number, bytes: number[]): number[] {
+  const groups = RS_BLOCKS_L[version];
+  const totalData = groups.reduce((acc, [k, , n]) => acc + k * n, 0);
+  const ecLen = groups[0][1];
+
+  const buf = bitBuffer();
+  buf.push(0b0100, 4); // modo byte
+  buf.push(bytes.length, version <= 9 ? 8 : 16);
+  for (const b of bytes) buf.push(b, 8);
+  const bits = pad(buf.bits, totalData * 8);
+
+  const data: number[] = [];
+  for (let i = 0; i < bits.length; i += 8) {
+    let v = 0;
+    for (let j = 0; j < 8; j++) v = (v << 1) | bits[i + j];
+    data.push(v);
+  }
+
+  const dataBlocks: number[][] = [];
+  let off = 0;
+  for (const [k, , n] of groups) {
+    for (let b = 0; b < n; b++) {
+      dataBlocks.push(data.slice(off, off + k));
+      off += k;
+    }
+  }
+  const ecBlocks = dataBlocks.map((b) => rsEncode(b, ecLen));
+
+  const out: number[] = [];
+  const maxK = Math.max(...dataBlocks.map((b) => b.length));
+  for (let i = 0; i < maxK; i++) for (const b of dataBlocks) if (i < b.length) out.push(b[i]);
+  for (let i = 0; i < ecLen; i++) for (const b of ecBlocks) out.push(b[i]);
+  return out;
 }
 
 function buildMatrix(dataBits: number[], version: number): number[][] {
@@ -124,19 +166,39 @@ function buildMatrix(dataBits: number[], version: number): number[][] {
     reserved[i][6] = true;
   }
 
-  // Alignment
+  // Alignment — pula apenas os 3 que colidem com os finders (6,6), (6,last), (last,6);
+  // os que cruzam o timing devem ser desenhados e reservados.
   const pos = ALIGN_POS[version] || [];
-  for (const r of pos) {
-    for (const c of pos) {
-      if (reserved[r][c]) continue;
-      for (let dr = -2; dr <= 2; dr++) {
-        for (let dc = -2; dc <= 2; dc++) {
-          const rr = r + dr, cc = c + dc;
-          const ring = Math.max(Math.abs(dr), Math.abs(dc));
-          matrix[rr][cc] = ring === 1 ? 0 : 1;
-          reserved[rr][cc] = true;
+  if (pos.length) {
+    const last = pos[pos.length - 1];
+    for (const r of pos) {
+      for (const c of pos) {
+        if ((r === 6 && c === 6) || (r === 6 && c === last) || (r === last && c === 6)) continue;
+        for (let dr = -2; dr <= 2; dr++) {
+          for (let dc = -2; dc <= 2; dc++) {
+            const rr = r + dr, cc = c + dc;
+            const ring = Math.max(Math.abs(dr), Math.abs(dc));
+            matrix[rr][cc] = ring === 1 ? 0 : 1;
+            reserved[rr][cc] = true;
+          }
         }
       }
+    }
+  }
+
+  // Version information (versões >= 7): 18 bits com BCH(18,6), dois blocos espelhados
+  if (version >= 7) {
+    let rem = version;
+    for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1f25);
+    const vBits = (version << 12) | rem;
+    for (let i = 0; i < 18; i++) {
+      const bit = (vBits >> i) & 1;
+      const a = size - 11 + (i % 3);
+      const b = Math.floor(i / 3);
+      matrix[b][a] = bit;
+      reserved[b][a] = true;
+      matrix[a][b] = bit;
+      reserved[a][b] = true;
     }
   }
 
@@ -168,7 +230,7 @@ function buildMatrix(dataBits: number[], version: number): number[][] {
     up = !up;
   }
 
-  // Máscara 0 (alternância) + informação de formato (EC level L = 01, mask 0)
+  // Máscara 0 (alternância) — só em módulos de dados
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (reserved[r][c]) continue;
@@ -176,54 +238,43 @@ function buildMatrix(dataBits: number[], version: number): number[][] {
     }
   }
 
-  const fmt = 0b011011110100101; // L + mask 0
-  for (let i = 0; i < 15; i++) {
-    const bit = (fmt >> (14 - i)) & 1;
-    if (i < 6) matrix[8][i] = bit;
-    else if (i < 8) matrix[8][i + 1] = bit;
-    else if (i === 8) matrix[7][8] = bit;
-    else matrix[14 - i][8] = bit;
-
-    if (i < 8) matrix[size - 1 - i][8] = bit;
-    else matrix[8][size - 15 + i] = bit;
-  }
+  // Informação de formato: EC level L (01) + máscara 0 — BCH(15,5) com máscara 0x5412
+  const fmt = 0b111011111000100;
+  const fb = (i: number) => (fmt >> i) & 1;
+  // Cópia 1 (topo-esquerda)
+  for (let i = 0; i <= 5; i++) matrix[i][8] = fb(i);
+  matrix[7][8] = fb(6);
+  matrix[8][8] = fb(7);
+  matrix[8][7] = fb(8);
+  for (let i = 9; i < 15; i++) matrix[8][14 - i] = fb(i);
+  // Cópia 2 (linha 8 à direita + coluna 8 embaixo)
+  for (let i = 0; i < 8; i++) matrix[8][size - 1 - i] = fb(i);
+  for (let i = 8; i < 15; i++) matrix[size - 15 + i][8] = fb(i);
+  // Dark module — sempre escuro
+  matrix[size - 8][8] = 1;
 
   return matrix;
 }
 
-/** Gera o QR do payload e devolve um SVG pronto para injetar no DOM. */
-export function gerarQRSvg(payload: string, tamanho = 240): string {
+/** Gera a matriz de módulos do QR (0 = claro, 1 = escuro), sem quiet zone. */
+export function gerarQrMatriz(payload: string): number[][] {
   const bytes = utf8Bytes(payload);
   const version = chooseVersion(bytes.length);
-  const [[total, dataLen]] = RS_BLOCKS_L[version];
-  const ecLen = total - dataLen;
-
-  const buf = bitBuffer();
-  buf.push(0b0100, 4); // modo byte
-  buf.push(bytes.length, version <= 9 ? 8 : 16);
-  for (const b of bytes) buf.push(b, 8);
-  const bits = pad(buf.bits, dataLen * 8);
-
-  const codewords: number[] = [];
-  for (let i = 0; i < bits.length; i += 8) {
-    let v = 0;
-    for (let j = 0; j < 8; j++) v = (v << 1) | bits[i + j];
-    codewords.push(v);
-  }
-  const ec = rsEncode(codewords, ecLen);
-
-  const all: number[] = [];
-  for (const c of codewords) all.push(c);
-  for (const e of ec) all.push(e);
+  const all = codewordsInterleaved(version, bytes);
 
   const dataBits: number[] = [];
   for (const c of all) {
     for (let i = 7; i >= 0; i--) dataBits.push((c >> i) & 1);
   }
 
-  const matrix = buildMatrix(dataBits, version);
+  return buildMatrix(dataBits, version);
+}
+
+/** Gera o QR do payload e devolve um SVG pronto para injetar no DOM. */
+export function gerarQRSvg(payload: string, tamanho = 240): string {
+  const matrix = gerarQrMatriz(payload);
   const size = matrix.length;
-  const quiet = 2;
+  const quiet = 4;
   const totalSize = size + quiet * 2;
   const px = tamanho / totalSize;
 
