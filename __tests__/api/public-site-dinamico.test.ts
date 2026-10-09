@@ -76,6 +76,19 @@ describe('GET /api/public/hero-stats', () => {
     });
   });
 
+  it('mantem o valor de producao (5) quando nao ha congregacoes cadastradas', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org-a' });
+    mockConfigFindUnique.mockResolvedValue(null);
+    mockCongregacaoCount.mockResolvedValue(0);
+
+    const res = await heroStatsGET(new NextRequest('http://localhost/api/public/hero-stats'));
+    const body = await res.json();
+
+    expect(body.congregacoes).toBe(5);
+    expect(body.lideres).toBe(0);
+    expect(body.ministerios).toBe(0);
+  });
+
   it('calcula anos de historia pelo ano de fundacao', async () => {
     const anoFundacao = new Date().getFullYear() - 10;
     mockOrgFindFirst.mockResolvedValue({ id: 'org-a' });

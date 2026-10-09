@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 const ANOS_HISTORIA_PADRAO = 12;
+const CONGREGACOES_PADRAO = 5;
 
 async function resolverOrganizacaoId(request: NextRequest): Promise<string | null> {
   const { searchParams } = new URL(request.url);
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       membros,
-      congregacoes,
+      congregacoes: congregacoes > 0 ? congregacoes : CONGREGACOES_PADRAO,
       lideres,
       anosHistoria,
       ministerios,
