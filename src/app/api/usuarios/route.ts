@@ -8,7 +8,7 @@ import { assertOrgAccess, resolveOrgScope, orgFilter, ORG_FORBIDDEN, orgForbidde
 const criarUsuarioSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   email: z.string().email('E-mail inválido'),
-  telefone: z.string().optional(),
+  telefone: z.string().nullable().optional(),
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
   confirmPassword: z.string(),
   role: z.string().min(1, 'Perfil é obrigatório'),

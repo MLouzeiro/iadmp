@@ -31,7 +31,7 @@ export default function Navbar() {
         <div className="container">
           <Link href="/" className="navbar-logo">
             <img src="/images/logo.png" alt="IADMP" />
-            ADMP
+            IADMP
           </Link>
 
           <div className="navbar-links">

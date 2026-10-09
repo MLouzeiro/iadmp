@@ -64,7 +64,14 @@ export async function PUT(request: NextRequest) {
 
     await assertOrgAccess(user.id, organizacaoId, request);
 
-    const data = {
+    const parseAno = (valor: unknown): number | null | undefined => {
+      if (valor === undefined) return undefined;
+      if (valor === null || valor === '') return null;
+      const n = Number(valor);
+      return Number.isInteger(n) && n > 0 && n < 3000 ? n : undefined;
+    };
+
+    const data: Record<string, unknown> = {
       nomeIgreja: body.nomeIgreja,
       logoUrl: body.logoUrl,
       logoDarkUrl: body.logoDarkUrl,
@@ -79,7 +86,25 @@ export async function PUT(request: NextRequest) {
       corTextoSecundario: body.corTextoSecundario,
       corBorda: body.corBorda,
       tema: body.tema,
+      anoFundacao: parseAno(body.anoFundacao),
+      rodapeDescricao: body.rodapeDescricao,
+      rodapeEndereco: body.rodapeEndereco,
+      rodapeTelefone: body.rodapeTelefone,
+      rodapeEmail: body.rodapeEmail,
+      rodapeWhatsapp: body.rodapeWhatsapp,
+      rodapeYoutube: body.rodapeYoutube,
+      rodapeInstagram: body.rodapeInstagram,
+      rodapeFacebook: body.rodapeFacebook,
+      statMembros: body.statMembros,
+      statCongregacoes: body.statCongregacoes,
+      statLideres: body.statLideres,
+      statAnosHistoria: body.statAnosHistoria,
+      statMinisterios: body.statMinisterios,
     };
+
+    for (const chave of Object.keys(data)) {
+      if (data[chave] === undefined) delete data[chave];
+    }
 
     const config = await prisma.configuracoesIgreja.upsert({
       where: { organizacaoId },

@@ -252,3 +252,36 @@ describe('POST /api/usuarios valida organizacoes do corpo', () => {
     expect(res.status).toBe(403);
   });
 });
+
+describe('PUT /api/usuarios/[id] aceita telefone null', () => {
+  beforeEach(() => {
+    mockUserFindUnique.mockResolvedValue({
+      id: 'alvo',
+      role: 'MEMBER',
+      email: 'alvo@a.com',
+      organizacoes: [{ organizacaoId: 'org-a' }],
+    });
+  });
+
+  it('salva telefone null sem retornar 400', async () => {
+    const mockTx = {
+      user: { update: jest.fn().mockResolvedValue({ id: 'alvo', name: 'Alvo', telefone: null }) },
+      usuarioOrganizacao: { deleteMany: jest.fn(), create: jest.fn() },
+      usuarioPermissao: { deleteMany: jest.fn(), create: jest.fn() },
+      permissao: { findMany: jest.fn().mockResolvedValue([]) },
+      auditLog: { create: jest.fn() },
+    };
+    (prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) => fn(mockTx));
+
+    const res = await usuarioPUT(
+      jsonRequest('http://localhost/api/usuarios/alvo', 'PUT', { telefone: null }),
+      idParams('alvo')
+    );
+    expect(res.status).toBe(200);
+    expect(mockTx.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ telefone: null }),
+      })
+    );
+  });
+});

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images,
   Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate,
-  Radio, Mic, BarChart3, Menu, X, ClipboardList,
+  Radio, Mic, BarChart3, Menu, X, ClipboardList, Image,
 } from 'lucide-react';
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
@@ -53,6 +53,7 @@ const grupos: { label: string; itens: NavItem[] }[] = [
       { name: 'Financeiro', path: '/admin/financeiro', icon: DollarSign },
       { name: 'Avisos', path: '/admin/avisos', icon: Bell },
       { name: 'Galeria', path: '/admin/galeria', icon: Images },
+      { name: 'Banners', path: '/admin/banners', icon: Image },
       { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
     ],
   },
@@ -77,6 +78,7 @@ const grupos: { label: string; itens: NavItem[] }[] = [
         sub: [
           { name: 'Geral', path: '/admin/configuracoes', icon: Settings },
           { name: 'Aparência', path: '/admin/configuracoes/aparencia', icon: Palette },
+          { name: 'Rodapé e Home', path: '/admin/configuracoes/site', icon: LayoutTemplate },
         ],
       },
     ],

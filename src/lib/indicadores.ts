@@ -558,4 +558,47 @@ export async function indicadoresComunicacaoLegado(filtros: FiltrosIndicador) {
   };
 }
 
+const MS_POR_DIA = 1000 * 60 * 60 * 24;
+
+function diasEntre(inicio: Date, fim: Date): number {
+  return Math.max(0, Math.round((fim.getTime() - inicio.getTime()) / MS_POR_DIA));
+}
+
+/**
+ * Gestão de liderança: ativos, tempo médio de mandato (ativos),
+ * quantos passaram e tempo médio dos mandatos encerrados.
+ * Fallback de datas: sem `dataInicio` usa `createdAt`; encerrado sem `dataFim` usa `updatedAt`.
+ */
+export async function indicadoresLideranca(organizacaoIds: string[]) {
+  const where: Record<string, unknown> = {};
+  if (organizacaoIds.length > 0) {
+    where.organizacaoId = { in: organizacaoIds };
+  }
+
+  const liderancas = await prisma.lideranca.findMany({
+    where,
+    select: { ativo: true, dataInicio: true, dataFim: true, createdAt: true, updatedAt: true },
+  });
+
+  const hoje = new Date();
+  const ativos = liderancas.filter(l => l.ativo);
+  const encerrados = liderancas.filter(l => !l.ativo);
+
+  const somaAtivos = ativos.reduce(
+    (acc, l) => acc + diasEntre(l.dataInicio ?? l.createdAt, hoje),
+    0
+  );
+  const somaEncerrados = encerrados.reduce(
+    (acc, l) => acc + diasEntre(l.dataInicio ?? l.createdAt, l.dataFim ?? l.updatedAt),
+    0
+  );
+
+  return {
+    ativos: ativos.length,
+    tempoMedioAtivosDias: ativos.length > 0 ? Math.round(somaAtivos / ativos.length) : 0,
+    passaram: encerrados.length,
+    tempoMedioPassouDias: encerrados.length > 0 ? Math.round(somaEncerrados / encerrados.length) : 0,
+  };
+}
+
 export { INDICADORES };

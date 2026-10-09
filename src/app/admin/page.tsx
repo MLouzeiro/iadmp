@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Calendar, DollarSign, TrendingUp, Users, AlertTriangle, Clock,
-  ArrowRight, BarChart3, Wallet,
+  ArrowRight, BarChart3, Wallet, UserCheck,
 } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
 import Badge, { statusBadgeVariant } from '@/components/ui/Badge';
@@ -30,6 +30,13 @@ interface Evento {
   status: string;
 }
 
+interface IndicadoresLideranca {
+  ativos: number;
+  tempoMedioAtivosDias: number;
+  passaram: number;
+  tempoMedioPassouDias: number;
+}
+
 function dataBR(iso: string) {
   return formatarDataBR(iso);
 }
@@ -37,16 +44,19 @@ function dataBR(iso: string) {
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [eventos, setEventos] = useState<Evento[]>([]);
+  const [indLideranca, setIndLideranca] = useState<IndicadoresLideranca | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/dashboard').then((r) => r.json()).catch(() => null),
       fetch('/api/eventos').then((r) => r.json()).catch(() => null),
-    ]).then(([dash, ev]) => {
+      fetch('/api/lideranca/indicadores').then((r) => r.json()).catch(() => null),
+    ]).then(([dash, ev, ind]) => {
       setData(dash);
       const lista = Array.isArray(ev) ? ev : ev?.eventos || [];
       setEventos(lista.slice(0, 5));
+      setIndLideranca(ind && typeof ind.ativos === 'number' ? ind : null);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -80,6 +90,53 @@ export default function AdminDashboard() {
         <KpiCard label="Avisos Ativos" value={data?.avisosAtivos || 0} icon={<AlertTriangle size={22} />} />
         <KpiCard label="Saldo do Período" value="—" icon={<Wallet size={22} />} />
       </KpiGrid>
+
+      <div
+        style={{
+          marginTop: '1.5rem',
+          padding: '1.25rem 1.5rem',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-card)',
+          borderLeft: '3px solid var(--color-primary)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <UserCheck size={20} style={{ color: 'var(--color-primary)' }} />
+            <h3 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>Gestão de Liderança</h3>
+          </div>
+          <Link href="/admin/lideranca" style={{ textDecoration: 'none' }}>
+            <Button variant="secondary" icon={<ArrowRight size={15} />} size="sm">Abrir Liderança</Button>
+          </Link>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+          {[
+            { label: 'Ativos', valor: String(indLideranca?.ativos ?? 0), detalhe: 'Mandatos em curso' },
+            {
+              label: 'Tempo médio (ativos)',
+              valor: `${indLideranca?.tempoMedioAtivosDias ?? 0} dias`,
+              detalhe: 'Em curso',
+            },
+            { label: 'Passaram', valor: String(indLideranca?.passaram ?? 0), detalhe: 'Mandatos encerrados' },
+            {
+              label: 'Tempo médio (encerrados)',
+              valor: `${indLideranca?.tempoMedioPassouDias ?? 0} dias`,
+              detalhe: 'Duração média',
+            },
+          ].map((item) => (
+            <div key={item.label}>
+              <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)' }}>
+                {item.label}
+              </p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+                {item.valor}
+              </p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{item.detalhe}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
         <div>

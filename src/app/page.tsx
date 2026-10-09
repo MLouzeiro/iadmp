@@ -1,11 +1,16 @@
 import Link from 'next/link';
-import { Heart, ArrowRight, MapPin, Phone, Mail } from 'lucide-react';
-import { programs, values, leaders, congregations, churchData } from '@/data/site-data';
+import { Heart, ArrowRight } from 'lucide-react';
+import { programs, values, leaders, congregations } from '@/data/site-data';
 import PublicSections from '@/components/public/PublicSections';
+import BannerCarousel from '@/components/public/BannerCarousel';
+import HeroStats from '@/components/public/HeroStats';
 
 export default function Home() {
   return (
     <>
+      {/* Banners e flyers (carrossel do topo) */}
+      <BannerCarousel />
+
       {/* Hero */}
       <section className="hero">
         <div className="hero-bg" style={{ backgroundImage: 'url(/images/iadmp/Slide/image1.jpg)' }} />
@@ -23,24 +28,7 @@ export default function Home() {
               Próximas Programações
             </Link>
           </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="hero-stat-value">5</span>
-              <span className="hero-stat-label">Congregações</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-value">11</span>
-              <span className="hero-stat-label">Líderes</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-value">32</span>
-              <span className="hero-stat-label">Anos de História</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-value">6</span>
-              <span className="hero-stat-label">Ministérios</span>
-            </div>
-          </div>
+          <HeroStats />
         </div>
       </section>
 

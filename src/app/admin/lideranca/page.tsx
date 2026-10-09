@@ -21,14 +21,29 @@ interface Lider {
   publico: boolean;
   ativo: boolean;
   ordemExibicao: number;
+  dataInicio?: string | null;
+  dataFim?: string | null;
   congregacao?: { id: string; nome: string } | null;
   ministerio: { nome: string } | null;
+}
+
+interface IndicadoresLideranca {
+  ativos: number;
+  tempoMedioAtivosDias: number;
+  passaram: number;
+  tempoMedioPassouDias: number;
+}
+
+function paraInputDate(valor: string | null | undefined): string {
+  if (!valor) return '';
+  return valor.slice(0, 10);
 }
 
 export default function LiderancaPage() {
   const { toast, confirm } = useToast();
   const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
   const [lideres, setLideres] = useState<Lider[]>([]);
+  const [indicadores, setIndicadores] = useState<IndicadoresLideranca | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,6 +57,8 @@ export default function LiderancaPage() {
     publico: true,
     ativo: true,
     ordemExibicao: '',
+    dataInicio: '',
+    dataFim: '',
   });
 
   const fetchLideres = useCallback(() => {
@@ -50,13 +67,17 @@ export default function LiderancaPage() {
       .then((d) => setLideres(Array.isArray(d) ? d : d.lideres || []))
       .catch(() => setLideres([]))
       .finally(() => setLoading(false));
+    fetch('/api/lideranca/indicadores')
+      .then((r) => r.json())
+      .then((d) => setIndicadores(d && typeof d.ativos === 'number' ? d : null))
+      .catch(() => setIndicadores(null));
   }, []);
 
   useEffect(() => { fetchLideres(); }, [fetchLideres]);
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', cargo: '', congregacao: '', biografia: '', publico: true, ativo: true, ordemExibicao: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', cargo: '', congregacao: '', biografia: '', publico: true, ativo: true, ordemExibicao: '', dataInicio: '', dataFim: '' });
     setModalOpen(true);
   };
 
@@ -71,6 +92,8 @@ export default function LiderancaPage() {
       publico: l.publico,
       ativo: l.ativo,
       ordemExibicao: String(l.ordemExibicao),
+      dataInicio: paraInputDate(l.dataInicio),
+      dataFim: paraInputDate(l.dataFim),
     });
     setModalOpen(true);
   };
@@ -93,6 +116,8 @@ export default function LiderancaPage() {
       publico: form.publico,
       ativo: form.ativo,
       ordemExibicao: form.ordemExibicao ? parseInt(form.ordemExibicao) : 0,
+      dataInicio: form.dataInicio || undefined,
+      dataFim: form.dataFim || undefined,
     };
 
     const res = await fetch(editando ? `/api/lideranca/${editando.id}` : '/api/lideranca', {
@@ -139,6 +164,8 @@ export default function LiderancaPage() {
     { name: 'congregacao', label: 'Congregação', value: form.congregacao, placeholder: 'Ex: Matriz' },
     { name: 'ordemExibicao', label: 'Ordem de exibição', type: 'number', value: form.ordemExibicao, min: 0 },
     { name: 'biografia', label: 'Biografia', type: 'textarea', value: form.biografia, full: true },
+    { name: 'dataInicio', label: 'Início do mandato', type: 'date', value: form.dataInicio },
+    { name: 'dataFim', label: 'Fim do mandato', type: 'date', value: form.dataFim },
     { name: 'publico', label: 'Público no site', type: 'checkbox', value: form.publico, placeholder: 'Exibir no site público' },
     { name: 'ativo', label: 'Ativo', type: 'checkbox', value: form.ativo, placeholder: 'Líder ativo' },
   ];
@@ -160,6 +187,51 @@ export default function LiderancaPage() {
         subtitle="Ordem de exibição no site público · vinculação com membro e ministério"
         actions={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Novo Líder</Button>}
       />
+
+      {indicadores && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+            gap: '0.75rem',
+            marginBottom: '1.25rem',
+          }}
+        >
+          {[
+            { label: 'Líderes ativos', valor: String(indicadores.ativos), detalhe: 'Com mandato em curso' },
+            {
+              label: 'Tempo médio (ativos)',
+              valor: `${indicadores.tempoMedioAtivosDias} dias`,
+              detalhe: indicadores.tempoMedioAtivosDias > 0 ? 'Desde o início do mandato' : 'Sem dados',
+            },
+            { label: 'Já passaram', valor: String(indicadores.passaram), detalhe: 'Mandatos encerrados' },
+            {
+              label: 'Tempo médio (encerrados)',
+              valor: `${indicadores.tempoMedioPassouDias} dias`,
+              detalhe: indicadores.tempoMedioPassouDias > 0 ? 'Duração média do mandato' : 'Sem dados',
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                padding: '0.9rem 1rem',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-color)',
+                background: 'var(--bg-card)',
+                borderLeft: '3px solid var(--color-primary)',
+              }}
+            >
+              <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                {item.label}
+              </p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                {item.valor}
+              </p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{item.detalhe}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.toolbar}>
         <SearchBar value={search} onChange={setSearch} placeholder="Buscar líder..." />

@@ -8,7 +8,7 @@ import { assertTargetUserScope, ORG_FORBIDDEN, orgForbiddenResponse } from '@/li
 const editarUsuarioSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
-  telefone: z.string().optional(),
+  telefone: z.string().nullable().optional(),
   password: z.string().min(6).optional(),
   confirmPassword: z.string().optional(),
   role: z.string().optional(),

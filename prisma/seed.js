@@ -12,6 +12,7 @@ const MODULOS = [
   { nome: 'Liturgia', permissoes: ['visualizar', 'criar', 'editar', 'excluir', 'publicar', 'imprimir', 'gerenciar_musicas', 'gerenciar_modelos', 'iniciar_culto', 'finalizar_culto'] },
   { nome: 'Avisos', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
   { nome: 'Galeria', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
+  { nome: 'Banners', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
   { nome: 'Oportunidades', permissoes: ['visualizar', 'criar', 'editar', 'excluir'] },
   { nome: 'Configuracoes', permissoes: ['visualizar', 'editar'] },
   { nome: 'Usuarios', permissoes: ['visualizar', 'criar', 'editar', 'excluir', 'ver_auditoria'] },
@@ -34,6 +35,7 @@ const PERFIS_CONFIG = {
       'liturgia:visualizar', 'liturgia:criar', 'liturgia:editar', 'liturgia:excluir',
       'avisos:visualizar', 'avisos:criar', 'avisos:editar', 'avisos:excluir',
       'galeria:visualizar', 'galeria:criar', 'galeria:editar', 'galeria:excluir',
+      'banners:visualizar', 'banners:criar', 'banners:editar', 'banners:excluir',
       'oportunidades:visualizar', 'oportunidades:criar', 'oportunidades:editar', 'oportunidades:excluir',
       'configuracoes:visualizar', 'configuracoes:editar',
       'usuarios:visualizar', 'usuarios:criar', 'usuarios:editar', 'usuarios:ver_auditoria',
@@ -48,6 +50,7 @@ const PERFIS_CONFIG = {
       'lideranca:visualizar', 'eventos:visualizar', 'eventos:criar', 'eventos:editar',
       'liturgia:visualizar', 'liturgia:criar', 'liturgia:editar',
       'avisos:visualizar', 'avisos:criar', 'galeria:visualizar', 'galeria:criar',
+      'banners:visualizar', 'banners:criar',
       'comunicacao:visualizar', 'comunicacao:criar', 'comunicacao:editar',
       'pregacoes:visualizar', 'pregacoes:criar', 'pregacoes:editar',
     ],
@@ -59,6 +62,7 @@ const PERFIS_CONFIG = {
       'eventos:visualizar', 'eventos:criar', 'eventos:editar',
       'liturgia:visualizar', 'liturgia:criar',
       'avisos:visualizar', 'galeria:visualizar', 'galeria:criar',
+      'banners:visualizar', 'banners:criar',
       'comunicacao:visualizar', 'comunicacao:criar',
       'pregacoes:visualizar', 'pregacoes:criar',
     ],
@@ -171,7 +175,7 @@ async function main() {
   for (const m of ministeriosData) {
     let ministerio = await prisma.ministerio.findFirst({ where: { nome: m.nome } });
     if (!ministerio) {
-      ministerio = await prisma.ministerio.create({ data: m });
+      ministerio = await prisma.ministerio.create({ data: { ...m, organizacaoId: organizacao.id } });
     }
     createdMinisterios[m.nome] = ministerio;
   }
@@ -187,7 +191,7 @@ async function main() {
   for (const d of departamentosData) {
     const existing = await prisma.departamento.findFirst({ where: { nome: d.nome } });
     if (!existing) {
-      await prisma.departamento.create({ data: d });
+      await prisma.departamento.create({ data: { ...d, organizacaoId: organizacao.id } });
     }
   }
   console.log('Departamentos created:', departamentosData.length);
@@ -219,6 +223,7 @@ async function main() {
           ordemExibicao: l.ordemExibicao,
           publico: true,
           ativo: true,
+          organizacaoId: organizacao.id,
         },
       });
     }
@@ -236,7 +241,7 @@ async function main() {
   for (const c of categorias) {
     const existing = await prisma.categoriaEvento.findFirst({ where: { nome: c.nome } });
     if (!existing) {
-      await prisma.categoriaEvento.create({ data: c });
+      await prisma.categoriaEvento.create({ data: { ...c, organizacaoId: organizacao.id } });
     }
   }
   console.log('Categorias created:', categorias.length);
@@ -292,7 +297,7 @@ async function main() {
   for (const e of eventos) {
     const existing = await prisma.evento.findFirst({ where: { nome: e.nome } });
     if (!existing) {
-      await prisma.evento.create({ data: e });
+      await prisma.evento.create({ data: { ...e, organizacaoId: organizacao.id } });
       console.log('Evento created:', e.nome);
     }
   }
@@ -307,6 +312,7 @@ async function main() {
         urgencia: 'NORMAL',
         publicarSite: true,
         destaque: true,
+        organizacaoId: organizacao.id,
       },
     });
     console.log('Aviso created');

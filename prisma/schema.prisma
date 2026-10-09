@@ -81,6 +81,7 @@ model Organizacao {
   aprovacoes      Aprovacao[]
   auditLogs       AuditLog[]
   contatos        ContatoMensagem[]
+  banners         Banner[]
 }
 
 model UsuarioOrganizacao {
@@ -732,11 +733,43 @@ model ConfiguracoesIgreja {
   corTextoSecundario String @default("#C8C2B6")
   corBorda         String   @default("rgba(201, 168, 76, 0.12)")
   tema             String   @default("dark")
+  anoFundacao      Int?
+  rodapeDescricao  String?
+  rodapeEndereco   String?
+  rodapeTelefone   String?
+  rodapeEmail      String?
+  rodapeWhatsapp   String?
+  rodapeYoutube    String?
+  rodapeInstagram  String?
+  rodapeFacebook   String?
+  statMembros      Boolean  @default(false)
+  statCongregacoes Boolean  @default(true)
+  statLideres      Boolean  @default(true)
+  statAnosHistoria Boolean  @default(true)
+  statMinisterios  Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   organizacao      Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
 
   @@index([organizacaoId])
+}
+
+model Banner {
+  id             String    @id @default(cuid())
+  organizacaoId  String
+  titulo         String?
+  imagemUrl      String
+  tipo           String    @default("BANNER")
+  link           String?
+  ordem          Int       @default(0)
+  ativo          Boolean   @default(true)
+  dataInicio     DateTime?
+  dataFim        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  organizacao    Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId, ativo])
 }
 
 model CanalOficial {
