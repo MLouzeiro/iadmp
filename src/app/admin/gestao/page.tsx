@@ -45,8 +45,6 @@ interface Indicador {
   periodoAnterior: number | null;
   variacaoPercentual: number | null;
   media6Meses: number | null;
-  formula: string;
-  origem: string;
   unidade: 'unidade' | 'moeda';
   filtrosAplicados: Record<string, unknown>;
 }
@@ -196,8 +194,6 @@ function InfoKpi({ ind }: { ind: Indicador }) {
           }}
         >
           <p style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.4rem' }}>{ind.titulo}</p>
-          <p><strong>Fórmula:</strong> {ind.formula}</p>
-          <p><strong>Origem:</strong> {ind.origem}</p>
           <p>
             <strong>Período:</strong> {String(ind.filtrosAplicados.periodo)}
           </p>
@@ -286,7 +282,7 @@ export default function GestaoPage() {
   const exportarCSV = useCallback(() => {
     if (!dados) return;
     const linhas: string[][] = [
-      ['Indicador', 'Grupo', 'Valor', 'Período anterior', 'Variacao %', 'Média 6m', 'Formula', 'Origem'],
+      ['Indicador', 'Grupo', 'Valor', 'Período anterior', 'Variacao %', 'Média 6m'],
       ...dados.indicadores.map(ind => [
         ind.titulo,
         ind.grupo,
@@ -294,8 +290,6 @@ export default function GestaoPage() {
         ind.periodoAnterior === null ? '' : String(ind.periodoAnterior),
         ind.variacaoPercentual === null ? '' : String(ind.variacaoPercentual),
         ind.media6Meses === null ? '' : String(ind.media6Meses),
-        ind.formula,
-        ind.origem,
       ]),
     ];
     baixarCSV(`indicadores-${new Date().toISOString().slice(0, 10)}.csv`, linhas);
@@ -434,7 +428,6 @@ export default function GestaoPage() {
                 <th style={{ padding: '0.6rem', textAlign: 'right' }}>Período anterior</th>
                 <th style={{ padding: '0.6rem', textAlign: 'right' }}>Variação</th>
                 <th style={{ padding: '0.6rem', textAlign: 'right' }}>Média 6m</th>
-                <th style={{ padding: '0.6rem' }}>Fórmula</th>
               </tr>
             </thead>
             <tbody>
@@ -450,7 +443,6 @@ export default function GestaoPage() {
                     <Variacao valor={ind.variacaoPercentual} />
                   </td>
                   <td style={{ padding: '0.6rem', textAlign: 'right', color: 'var(--text-muted)' }}>{formatarMedia(ind)}</td>
-                  <td style={{ padding: '0.6rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>{ind.formula}</td>
                 </tr>
               ))}
             </tbody>

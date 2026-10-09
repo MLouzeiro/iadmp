@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
+import { Plus, Pencil, Trash2, UserCheck, Eye } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
 import Button from '@/components/ui/Button';
 import Badge, { statusBadgeVariant } from '@/components/ui/Badge';
@@ -12,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
 import styles from '@/components/ui/form.module.css';
 import { useOrganizacoes } from '@/hooks/useOrganizacoes';
+import { formatarDataBR } from '@/lib/datas';
 
 interface Lider {
   id: string;
@@ -27,11 +28,19 @@ interface Lider {
   ministerio: { nome: string } | null;
 }
 
+interface IndicadorLiderDetalhe {
+  liderancaId: string;
+  tempoDias: number;
+  tempoLabel: string;
+  desempenho: { eventos: number; liturgias: number; pregacoes: number; total: number };
+}
+
 interface IndicadoresLideranca {
   ativos: number;
   tempoMedioAtivosDias: number;
   passaram: number;
   tempoMedioPassouDias: number;
+  lideres: IndicadorLiderDetalhe[];
 }
 
 function paraInputDate(valor: string | null | undefined): string {
@@ -47,6 +56,7 @@ export default function LiderancaPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [detalhe, setDetalhe] = useState<Lider | null>(null);
   const [editando, setEditando] = useState<Lider | null>(null);
   const [form, setForm] = useState({
     organizacaoId: '',
@@ -180,6 +190,10 @@ export default function LiderancaPage() {
     l.cargo.toLowerCase().includes(search.toLowerCase())
   );
 
+  const indDetalhe = detalhe
+    ? indicadores?.lideres?.find((d) => d.liderancaId === detalhe.id) ?? null
+    : null;
+
   return (
     <div>
       <PageHead
@@ -264,6 +278,7 @@ export default function LiderancaPage() {
               <div className={styles.listItemActions}>
                 <Badge variant={statusBadgeVariant(l.ativo ? 'ATIVO' : 'INATIVO')}>{l.ativo ? 'ATIVO' : 'INATIVO'}</Badge>
                 <Badge variant={l.publico ? 'gold' : 'mut'}>{l.publico ? 'PÚBLICO' : 'PRIVADO'}</Badge>
+                <Button size="sm" variant="secondary" icon={<Eye size={14} />} onClick={() => setDetalhe(l)}>Detalhes</Button>
                 <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => openEditar(l)}>Editar</Button>
                 <Button size="sm" variant="danger" icon={<Trash2 size={14} />} onClick={() => excluir(l)}>Excluir</Button>
               </div>
@@ -283,6 +298,77 @@ export default function LiderancaPage() {
         onSave={salvar}
         saveLabel={editando ? 'Salvar alterações' : 'Criar líder'}
       />
+
+      <Modal
+        open={!!detalhe}
+        title={detalhe ? `Detalhes — ${detalhe.nome}` : 'Detalhes do líder'}
+        description="Mandato e desempenho no ano corrente"
+        onClose={() => setDetalhe(null)}
+      >
+        {detalhe && (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem' }}>
+              {[
+                { rot: 'Cargo', val: detalhe.cargo },
+                { rot: 'Congregação', val: detalhe.congregacao?.nome || '—' },
+                { rot: 'Ministério', val: detalhe.ministerio?.nome || '—' },
+                { rot: 'Situação', val: detalhe.ativo ? 'Ativo' : 'Inativo' },
+                { rot: 'Público no site', val: detalhe.publico ? 'Sim' : 'Não' },
+                { rot: 'Início do mandato', val: formatarDataBR(detalhe.dataInicio) || '—' },
+                {
+                  rot: 'Fim do mandato',
+                  val: detalhe.dataFim
+                    ? formatarDataBR(detalhe.dataFim)
+                    : detalhe.ativo ? 'Em curso' : 'Não informado',
+                },
+                { rot: 'Tempo de mandato', val: indDetalhe ? indDetalhe.tempoLabel : '—' },
+              ].map((item) => (
+                <div key={item.rot}>
+                  <p style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                    {item.rot}
+                  </p>
+                  <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>{item.val}</p>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                padding: '0.9rem 1rem',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-color)',
+                background: 'var(--bg-card)',
+                borderLeft: '3px solid var(--color-primary)',
+              }}
+            >
+              <p style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
+                Desempenho no ano corrente
+              </p>
+              {indDetalhe ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.6rem' }}>
+                  {[
+                    { rot: 'Eventos', val: indDetalhe.desempenho.eventos },
+                    { rot: 'Liturgias', val: indDetalhe.desempenho.liturgias },
+                    { rot: 'Pregações', val: indDetalhe.desempenho.pregacoes },
+                    { rot: 'Total', val: indDetalhe.desempenho.total },
+                  ].map((item) => (
+                    <div key={item.rot}>
+                      <p style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                        {item.val}
+                      </p>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{item.rot}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Indicadores indisponíveis para este líder.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

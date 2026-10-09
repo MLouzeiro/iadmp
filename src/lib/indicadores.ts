@@ -564,10 +564,67 @@ function diasEntre(inicio: Date, fim: Date): number {
   return Math.max(0, Math.round((fim.getTime() - inicio.getTime()) / MS_POR_DIA));
 }
 
+/** Minúsculas, sem acentos e só [a-z0-9] separado por espaço. */
+function normalizarNome(valor: string): string {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+/**
+ * Coincide nomes de líder com nomes de registros (responsáveis, pregadores...)
+ * em ambas as direções, apenas em fronteira de palavra e com mínimo de 4
+ * caracteres normalizados — evita "Jose" casar com "Josefa" ou "Ana" com "Anderson".
+ */
+function nomesCoincidem(nomeLider: string, nomeRegistro: string | null | undefined): boolean {
+  const na = normalizarNome(nomeLider);
+  const nb = normalizarNome(nomeRegistro ?? '');
+  if (na.length < 4 || nb.length < 4) return false;
+  if (na === nb) return true;
+  const contem = (a: string, b: string) => new RegExp(`(?:^| )${a}(?: |$)`).test(b);
+  return contem(na, nb) || contem(nb, na);
+}
+
+function rotuloTempo(dias: number): string {
+  if (dias < 1) return 'Início recente';
+  if (dias < 30) return `${dias} dia${dias === 1 ? '' : 's'}`;
+  if (dias < 365) {
+    const meses = Math.floor(dias / 30);
+    return `${dias} dias (~${meses} ${meses === 1 ? 'mês' : 'meses'})`;
+  }
+  const anos = Math.floor(dias / 365);
+  return `${dias} dias (~${anos} ${anos === 1 ? 'ano' : 'anos'})`;
+}
+
+export interface DesempenhoLider {
+  eventos: number;
+  liturgias: number;
+  pregacoes: number;
+  total: number;
+}
+
+export interface IndicadorLiderDetalhe {
+  liderancaId: string;
+  nome: string;
+  cargo: string;
+  ativo: boolean;
+  tempoDias: number;
+  tempoLabel: string;
+  desempenho: DesempenhoLider;
+}
+
 /**
  * Gestão de liderança: ativos, tempo médio de mandato (ativos),
  * quantos passaram e tempo médio dos mandatos encerrados.
  * Fallback de datas: sem `dataInicio` usa `createdAt`; encerrado sem `dataFim` usa `updatedAt`.
+ *
+ * Retorna também `lideres[]` com tempo individual e desempenho por nome no
+ * ano corrente (`resolvePeriodo('ano')`): eventos CONCLUIDO (responsavelGeral /
+ * preletores), liturgias REALIZADA (pregador / responsavel / dirigente) e
+ * pregações PUBLICADA (pregadorNome).
  */
 export async function indicadoresLideranca(organizacaoIds: string[]) {
   const where: Record<string, unknown> = {};
@@ -577,7 +634,17 @@ export async function indicadoresLideranca(organizacaoIds: string[]) {
 
   const liderancas = await prisma.lideranca.findMany({
     where,
-    select: { ativo: true, dataInicio: true, dataFim: true, createdAt: true, updatedAt: true },
+    orderBy: { nome: 'asc' },
+    select: {
+      id: true,
+      nome: true,
+      cargo: true,
+      ativo: true,
+      dataInicio: true,
+      dataFim: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 
   const hoje = new Date();
@@ -593,11 +660,61 @@ export async function indicadoresLideranca(organizacaoIds: string[]) {
     0
   );
 
+  const periodo = resolvePeriodo('ano');
+  const janela = { gte: periodo.atual.inicio, lte: periodo.atual.fim };
+
+  const [eventos, liturgias, pregacoes] = await Promise.all([
+    prisma.evento.findMany({
+      where: { ...where, status: 'CONCLUIDO', dataEvento: janela },
+      select: { responsavelGeral: true, preletores: true },
+    }),
+    prisma.liturgia.findMany({
+      where: { ...where, status: 'REALIZADA', data: janela },
+      select: { pregador: true, responsavel: true, dirigente: true },
+    }),
+    prisma.pregacao.findMany({
+      where: { ...where, status: 'PUBLICADA', data: janela },
+      select: { pregadorNome: true },
+    }),
+  ]);
+
+  const lideres: IndicadorLiderDetalhe[] = liderancas.map(l => {
+    const tempoDias = l.ativo
+      ? diasEntre(l.dataInicio ?? l.createdAt, hoje)
+      : diasEntre(l.dataInicio ?? l.createdAt, l.dataFim ?? l.updatedAt);
+
+    const qtdEventos = eventos.filter(
+      e =>
+        nomesCoincidem(l.nome, e.responsavelGeral) ||
+        (e.preletores ?? []).some(p => nomesCoincidem(l.nome, p))
+    ).length;
+    const qtdLiturgias = liturgias.filter(g =>
+      [g.pregador, g.responsavel, g.dirigente].some(v => nomesCoincidem(l.nome, v))
+    ).length;
+    const qtdPregacoes = pregacoes.filter(p => nomesCoincidem(l.nome, p.pregadorNome)).length;
+
+    return {
+      liderancaId: l.id,
+      nome: l.nome,
+      cargo: l.cargo,
+      ativo: l.ativo,
+      tempoDias,
+      tempoLabel: rotuloTempo(tempoDias),
+      desempenho: {
+        eventos: qtdEventos,
+        liturgias: qtdLiturgias,
+        pregacoes: qtdPregacoes,
+        total: qtdEventos + qtdLiturgias + qtdPregacoes,
+      },
+    };
+  });
+
   return {
     ativos: ativos.length,
     tempoMedioAtivosDias: ativos.length > 0 ? Math.round(somaAtivos / ativos.length) : 0,
     passaram: encerrados.length,
     tempoMedioPassouDias: encerrados.length > 0 ? Math.round(somaEncerrados / encerrados.length) : 0,
+    lideres,
   };
 }
 
