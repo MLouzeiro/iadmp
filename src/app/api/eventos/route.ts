@@ -40,6 +40,13 @@ export async function GET(request: NextRequest) {
         avaliacao: true,
         congregacao: { select: { id: true, nome: true } },
         organizacao: { select: { id: true, nome: true } },
+        organizadores: {
+          include: {
+            lideranca: { select: { id: true, nome: true, cargo: true } },
+            membro: { select: { id: true, nome: true } },
+            user: { select: { id: true, name: true } },
+          },
+        },
       },
       orderBy: { dataEvento: 'desc' },
     });
@@ -67,35 +74,54 @@ export async function POST(request: NextRequest) {
       congregacao: body.congregacao,
     });
 
-    const evento = await prisma.evento.create({
-      data: {
-        organizacaoId,
-        congregacaoId,
-        nome: validated.nome,
-        categoriaId: validated.categoriaId || null,
-        dataInicio: parseDataDateOnly(validated.dataInicio),
-        dataEvento: parseDataDateOnly(validated.dataEvento),
-        dataFim: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
-        inscricoesAbremEm: validated.inscricoesAbremEm ? parseDataDateOnly(validated.inscricoesAbremEm) : null,
-        inscricoesFechamEm: validated.inscricoesFechamEm ? parseDataDateOnly(validated.inscricoesFechamEm) : null,
-        tema: validated.tema || null,
-        preletores: validated.preletores || [],
-        diasDuracao: validated.diasDuracao || null,
-        status: validated.status || 'PLANEJADO',
-        observacoes: validated.observacoes || null,
-        local: validated.local || null,
-        responsavelGeral: validated.responsavelGeral || null,
-        publicarNoSite: validated.publicarNoSite ?? false,
-        orcamentoPrevisto: validated.orcamentoPrevisto || null,
-        aceitaInscricoes: validated.aceitaInscricoes ?? false,
-        limiteInscricoes: validated.limiteInscricoes ?? null,
-        taxaInscricao: validated.taxaInscricao ?? null,
-        chavePix: validated.chavePix || null,
-        tipoChavePix: validated.tipoChavePix || null,
-        nomeRecebedor: validated.nomeRecebedor || null,
-        cidadeRecebedor: validated.cidadeRecebedor || null,
-      },
-      include: { categoria: true, congregacao: { select: { id: true, nome: true } } },
+    const evento = await prisma.$transaction(async (tx) => {
+      const created = await tx.evento.create({
+        data: {
+          organizacaoId,
+          congregacaoId,
+          nome: validated.nome,
+          categoriaId: validated.categoriaId || null,
+          dataInicio: parseDataDateOnly(validated.dataInicio),
+          dataEvento: parseDataDateOnly(validated.dataEvento),
+          dataFim: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
+          inscricoesAbremEm: validated.inscricoesAbremEm ? parseDataDateOnly(validated.inscricoesAbremEm) : null,
+          inscricoesFechamEm: validated.inscricoesFechamEm ? parseDataDateOnly(validated.inscricoesFechamEm) : null,
+          tema: validated.tema || null,
+          preletores: validated.preletores || [],
+          diasDuracao: validated.diasDuracao || null,
+          status: validated.status || 'PLANEJADO',
+          observacoes: validated.observacoes || null,
+          local: validated.local || null,
+          responsavelGeral: validated.responsavelGeral || null,
+          publicarNoSite: validated.publicarNoSite ?? false,
+          orcamentoPrevisto: validated.orcamentoPrevisto || null,
+          aceitaInscricoes: validated.aceitaInscricoes ?? false,
+          limiteInscricoes: validated.limiteInscricoes ?? null,
+          taxaInscricao: validated.taxaInscricao ?? null,
+          chavePix: validated.chavePix || null,
+          tipoChavePix: validated.tipoChavePix || null,
+          nomeRecebedor: validated.nomeRecebedor || null,
+          cidadeRecebedor: validated.cidadeRecebedor || null,
+        },
+        include: { categoria: true, congregacao: { select: { id: true, nome: true } } },
+      });
+
+      if (body.organizadores && Array.isArray(body.organizadores)) {
+        for (const org of body.organizadores) {
+          await tx.eventoOrganizador.create({
+            data: {
+              eventoId: created.id,
+              liderancaId: org.liderancaId || null,
+              membroId: org.membroId || null,
+              userId: org.userId || null,
+              funcao: org.funcao || 'APOIO',
+              principal: org.principal || false,
+            },
+          });
+        }
+      }
+
+      return created;
     });
 
     await writeAudit({

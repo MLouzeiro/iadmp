@@ -1,21 +1,25 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
     const organizacaoId = searchParams.get('organizacaoId');
     const limit = parseInt(searchParams.get('limit') || '6');
 
-    if (!organizacaoId) {
-      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o do registro' }, { status: 400 });
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
+
+    if (!orgId) {
+      return NextResponse.json({ pregacoes: [] });
     }
 
     const pregacoes = await prisma.pregacao.findMany({
       where: {
-        organizacaoId,
+        organizacaoId: orgId,
         status: 'PUBLICADA',
       },
       select: {

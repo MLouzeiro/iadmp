@@ -1,0 +1,279 @@
+- generic [active] [ref=f11e1]:
+  - navigation [ref=f11e2]:
+    - generic [ref=f11e3]:
+      - link [ref=f11e4] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f11e5]
+        - text: IADMP
+      - generic [ref=f11e6]:
+        - link "Início" [ref=f11e7] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f11e8] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f11e9] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f11e10] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f11e11] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f11e12] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f11e13] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f11e14]:
+          - link "YouTube" [ref=f11e15] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f11e18] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [ref=f11e21] [cursor=pointer]
+        - link "Entrar" [ref=f11e24] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f11e25]:
+    - generic [ref=f11e26]:
+      - complementary [ref=f11e27]:
+        - navigation [ref=f11e28]:
+          - generic [ref=f11e29]:
+            - generic [ref=f11e30]: Visão
+            - link "Dashboard" [ref=f11e31] [cursor=pointer]:
+              - /url: /admin
+            - link "Centro de Gestão" [ref=f11e37] [cursor=pointer]:
+              - /url: /admin/gestao
+            - link "Auditoria" [ref=f11e40] [cursor=pointer]:
+              - /url: /admin/gestao?aba=auditoria
+          - generic [ref=f11e44]:
+            - generic [ref=f11e45]: Pessoas
+            - link "Membros" [ref=f11e46] [cursor=pointer]:
+              - /url: /admin/membros
+            - link "Liderança" [ref=f11e52] [cursor=pointer]:
+              - /url: /admin/lideranca
+            - link "Usuários" [ref=f11e57] [cursor=pointer]:
+              - /url: /admin/usuarios
+          - generic [ref=f11e60]:
+            - generic [ref=f11e61]: Operação
+            - button "Liturgia" [ref=f11e63] [cursor=pointer]
+            - link "Eventos" [ref=f11e68] [cursor=pointer]:
+              - /url: /admin/eventos
+            - link "Financeiro" [ref=f11e71] [cursor=pointer]:
+              - /url: /admin/financeiro
+            - link "Avisos" [ref=f11e74] [cursor=pointer]:
+              - /url: /admin/avisos
+            - link "Galeria" [ref=f11e78] [cursor=pointer]:
+              - /url: /admin/galeria
+            - link "Banners" [ref=f11e84] [cursor=pointer]:
+              - /url: /admin/banners
+            - link "Oportunidades" [ref=f11e89] [cursor=pointer]:
+              - /url: /admin/oportunidades
+          - generic [ref=f11e92]:
+            - generic [ref=f11e93]: Comunicação
+            - button "Comunicação" [ref=f11e95] [cursor=pointer]
+            - button "Configurações" [ref=f11e105] [cursor=pointer]
+          - link "Voltar ao site" [ref=f11e112] [cursor=pointer]:
+            - /url: /
+          - button "Sair" [ref=f11e116] [cursor=pointer]
+      - main [ref=f11e120]:
+        - generic [ref=f11e121]:
+          - generic [ref=f11e122]:
+            - generic [ref=f11e123]:
+              - heading "Liderança" [level=2] [ref=f11e124]
+              - paragraph [ref=f11e125]: Ordem de exibição no site público · vinculação com membro e ministério
+            - button "Novo Líder" [ref=f11e127] [cursor=pointer]
+          - generic [ref=f11e134]:
+            - generic [ref=f11e135]:
+              - paragraph [ref=f11e136]: Líderes ativos
+              - paragraph [ref=f11e137]: "12"
+              - paragraph [ref=f11e138]: Com mandato em curso
+            - generic [ref=f11e139]:
+              - paragraph [ref=f11e140]: Tempo médio (ativos)
+              - paragraph [ref=f11e141]: 40 dias
+              - paragraph [ref=f11e142]: Desde o início do mandato
+            - generic [ref=f11e143]:
+              - paragraph [ref=f11e144]: Já passaram
+              - paragraph [ref=f11e145]: "3"
+              - paragraph [ref=f11e146]: Mandatos encerrados
+            - generic [ref=f11e147]:
+              - paragraph [ref=f11e148]: Tempo médio (encerrados)
+              - paragraph [ref=f11e149]: 43 dias
+              - paragraph [ref=f11e150]: Duração média do mandato
+          - textbox "Buscar líder..." [ref=f11e131]
+          - generic [ref=f11e132]:
+            - generic [ref=f11e151]:
+              - generic [ref=f11e152]:
+                - generic [ref=f11e153]: PB
+                - generic [ref=f11e154]:
+                  - heading "Pr. Cleiginaldo Barros" [level=4] [ref=f11e155]
+                  - paragraph [ref=f11e156]: Pastor Presidente
+              - generic [ref=f11e157]:
+                - generic [ref=f11e158]: ATIVO
+                - generic [ref=f11e159]: PÚBLICO
+                - button "Detalhes" [ref=f11e160] [cursor=pointer]
+                - button "Editar" [ref=f11e164] [cursor=pointer]
+                - button "Excluir" [ref=f11e168] [cursor=pointer]
+            - generic [ref=f11e172]:
+              - generic [ref=f11e173]:
+                - generic [ref=f11e174]: PW
+                - generic [ref=f11e175]:
+                  - heading "Pr. Walmorio" [level=4] [ref=f11e176]
+                  - paragraph [ref=f11e177]: Pastor da Vila Sarney
+              - generic [ref=f11e178]:
+                - generic [ref=f11e179]: ATIVO
+                - generic [ref=f11e180]: PÚBLICO
+                - button "Detalhes" [ref=f11e181] [cursor=pointer]
+                - button "Editar" [ref=f11e185] [cursor=pointer]
+                - button "Excluir" [ref=f11e189] [cursor=pointer]
+            - generic [ref=f11e193]:
+              - generic [ref=f11e194]:
+                - generic [ref=f11e195]: PM
+                - generic [ref=f11e196]:
+                  - heading "Pr. Melquesedeque" [level=4] [ref=f11e197]
+                  - paragraph [ref=f11e198]: Pastor
+              - generic [ref=f11e199]:
+                - generic [ref=f11e200]: ATIVO
+                - generic [ref=f11e201]: PÚBLICO
+                - button "Detalhes" [ref=f11e202] [cursor=pointer]
+                - button "Editar" [ref=f11e206] [cursor=pointer]
+                - button "Excluir" [ref=f11e210] [cursor=pointer]
+            - generic [ref=f11e214]:
+              - generic [ref=f11e215]:
+                - generic [ref=f11e216]: DL
+                - generic [ref=f11e217]:
+                  - heading "Dc. Marcio Louzeiro" [level=4] [ref=f11e218]
+                  - paragraph [ref=f11e219]: 1 Dirigente
+              - generic [ref=f11e220]:
+                - generic [ref=f11e221]: ATIVO
+                - generic [ref=f11e222]: PÚBLICO
+                - button "Detalhes" [ref=f11e223] [cursor=pointer]
+                - button "Editar" [ref=f11e227] [cursor=pointer]
+                - button "Excluir" [ref=f11e231] [cursor=pointer]
+            - generic [ref=f11e235]:
+              - generic [ref=f11e236]:
+                - generic [ref=f11e237]: PL
+                - generic [ref=f11e238]:
+                  - heading "Pb. Marcio Louzeiro" [level=4] [ref=f11e239]
+                  - paragraph [ref=f11e240]: 1 Dirigente
+              - generic [ref=f11e241]:
+                - generic [ref=f11e242]: ATIVO
+                - generic [ref=f11e243]: PÚBLICO
+                - button "Detalhes" [ref=f11e244] [cursor=pointer]
+                - button "Editar" [ref=f11e248] [cursor=pointer]
+                - button "Excluir" [ref=f11e252] [cursor=pointer]
+            - generic [ref=f11e256]:
+              - generic [ref=f11e257]:
+                - generic [ref=f11e258]: MC
+                - generic [ref=f11e259]:
+                  - heading "Missionario Cristiano" [level=4] [ref=f11e260]
+                  - paragraph [ref=f11e261]: 2 Dirigente
+              - generic [ref=f11e262]:
+                - generic [ref=f11e263]: ATIVO
+                - generic [ref=f11e264]: PÚBLICO
+                - button "Detalhes" [ref=f11e265] [cursor=pointer]
+                - button "Editar" [ref=f11e269] [cursor=pointer]
+                - button "Excluir" [ref=f11e273] [cursor=pointer]
+            - generic [ref=f11e277]:
+              - generic [ref=f11e278]:
+                - generic [ref=f11e279]: AS
+                - generic [ref=f11e280]:
+                  - heading "Ayton Sena" [level=4] [ref=f11e281]
+                  - paragraph [ref=f11e282]: Lider de Jovens
+              - generic [ref=f11e283]:
+                - generic [ref=f11e284]: ATIVO
+                - generic [ref=f11e285]: PÚBLICO
+                - button "Detalhes" [ref=f11e286] [cursor=pointer]
+                - button "Editar" [ref=f11e290] [cursor=pointer]
+                - button "Excluir" [ref=f11e294] [cursor=pointer]
+            - generic [ref=f11e298]:
+              - generic [ref=f11e299]:
+                - generic [ref=f11e300]: AC
+                - generic [ref=f11e301]:
+                  - heading "Ana Caroline" [level=4] [ref=f11e302]
+                  - paragraph [ref=f11e303]: Lider de Jovens
+              - generic [ref=f11e304]:
+                - generic [ref=f11e305]: ATIVO
+                - generic [ref=f11e306]: PÚBLICO
+                - button "Detalhes" [ref=f11e307] [cursor=pointer]
+                - button "Editar" [ref=f11e311] [cursor=pointer]
+                - button "Excluir" [ref=f11e315] [cursor=pointer]
+            - generic [ref=f11e319]:
+              - generic [ref=f11e320]:
+                - generic [ref=f11e321]: MB
+                - generic [ref=f11e322]:
+                  - heading "Missionaria Suenne Baros" [level=4] [ref=f11e323]
+                  - paragraph [ref=f11e324]: 1 Dirigente do Circulo de Oracao
+              - generic [ref=f11e325]:
+                - generic [ref=f11e326]: ATIVO
+                - generic [ref=f11e327]: PÚBLICO
+                - button "Detalhes" [ref=f11e328] [cursor=pointer]
+                - button "Editar" [ref=f11e332] [cursor=pointer]
+                - button "Excluir" [ref=f11e336] [cursor=pointer]
+            - generic [ref=f11e340]:
+              - generic [ref=f11e341]:
+                - generic [ref=f11e342]: DL
+                - generic [ref=f11e343]:
+                  - heading "Dc. Thiane Louzeiro" [level=4] [ref=f11e344]
+                  - paragraph [ref=f11e345]: Regente das Heroinas da Fe
+              - generic [ref=f11e346]:
+                - generic [ref=f11e347]: ATIVO
+                - generic [ref=f11e348]: PÚBLICO
+                - button "Detalhes" [ref=f11e349] [cursor=pointer]
+                - button "Editar" [ref=f11e353] [cursor=pointer]
+                - button "Excluir" [ref=f11e357] [cursor=pointer]
+            - generic [ref=f11e361]:
+              - generic [ref=f11e362]:
+                - generic [ref=f11e363]: DD
+                - generic [ref=f11e364]:
+                  - heading "Dc. Dayane" [level=4] [ref=f11e365]
+                  - paragraph [ref=f11e366]: Regente das Heroinas da Fe
+              - generic [ref=f11e367]:
+                - generic [ref=f11e368]: ATIVO
+                - generic [ref=f11e369]: PÚBLICO
+                - button "Detalhes" [ref=f11e370] [cursor=pointer]
+                - button "Editar" [ref=f11e374] [cursor=pointer]
+                - button "Excluir" [ref=f11e378] [cursor=pointer]
+            - generic [ref=f11e382]:
+              - generic [ref=f11e383]:
+                - generic [ref=f11e384]: DF
+                - generic [ref=f11e385]:
+                  - heading "Dc. Janaina Freitas" [level=4] [ref=f11e386]
+                  - paragraph [ref=f11e387]: Lider do Dep. de Criancas
+              - generic [ref=f11e388]:
+                - generic [ref=f11e389]: INATIVO
+                - generic [ref=f11e390]: PRIVADO
+                - button "Detalhes" [ref=f11e391] [cursor=pointer]
+                - button "Editar" [ref=f11e395] [cursor=pointer]
+                - button "Excluir" [ref=f11e399] [cursor=pointer]
+            - generic [ref=f11e403]:
+              - generic [ref=f11e404]:
+                - generic [ref=f11e405]: JU
+                - generic [ref=f11e406]:
+                  - heading "Julia" [level=4] [ref=f11e407]
+                  - paragraph [ref=f11e408]: Lider do Dep. de Criancas
+              - generic [ref=f11e409]:
+                - generic [ref=f11e410]: INATIVO
+                - generic [ref=f11e411]: PRIVADO
+                - button "Detalhes" [ref=f11e412] [cursor=pointer]
+                - button "Editar" [ref=f11e416] [cursor=pointer]
+                - button "Excluir" [ref=f11e420] [cursor=pointer]
+            - generic [ref=f11e424]:
+              - generic [ref=f11e425]:
+                - generic [ref=f11e426]: JA
+                - generic [ref=f11e427]:
+                  - heading "Jannes" [level=4] [ref=f11e428]
+                  - paragraph [ref=f11e429]: Tesoureiro
+              - generic [ref=f11e430]:
+                - generic [ref=f11e431]: ATIVO
+                - generic [ref=f11e432]: PÚBLICO
+                - button "Detalhes" [ref=f11e433] [cursor=pointer]
+                - button "Editar" [ref=f11e437] [cursor=pointer]
+                - button "Excluir" [ref=f11e441] [cursor=pointer]
+            - generic [ref=f11e445]:
+              - generic [ref=f11e446]:
+                - generic [ref=f11e447]: EL
+                - generic [ref=f11e448]:
+                  - heading "Erica Lopes" [level=4] [ref=f11e449]
+                  - paragraph [ref=f11e450]: Tesoureira
+              - generic [ref=f11e451]:
+                - generic [ref=f11e452]: INATIVO
+                - generic [ref=f11e453]: PRIVADO
+                - button "Detalhes" [ref=f11e454] [cursor=pointer]
+                - button "Editar" [ref=f11e458] [cursor=pointer]
+                - button "Excluir" [ref=f11e462] [cursor=pointer]
+  - alert [ref=f11e133]

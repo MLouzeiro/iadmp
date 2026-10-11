@@ -158,6 +158,20 @@
   cursor: pointer;
 }
 
+.multiselect {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.multiselect select {
+  min-height: 100px;
+}
+
+.multiselect option {
+  padding: 0.35rem 0.6rem;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

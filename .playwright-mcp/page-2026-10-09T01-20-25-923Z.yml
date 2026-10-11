@@ -1,0 +1,241 @@
+- generic [ref=f3e1]:
+  - navigation [ref=f3e2]:
+    - generic [ref=f3e3]:
+      - link [ref=f3e4] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f3e5]
+        - text: IADMP
+      - generic [ref=f3e6]:
+        - link "Início" [ref=f3e7] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f3e8] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f3e9] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f3e10] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f3e11] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f3e12] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f3e13] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f3e14]:
+          - link "YouTube" [ref=f3e15] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f3e18] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [active] [ref=f3e21] [cursor=pointer]
+        - link "Entrar" [ref=f3e24] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f3e25]:
+    - generic [ref=f3e28]:
+      - heading "Uma igreja para viver, servir e transformar" [level=1] [ref=f3e29]: Uma igreja para viver,servir e transformar
+      - paragraph [ref=f3e30]: Comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.
+      - generic [ref=f3e31]:
+        - link "Conheca Nossa História" [ref=f3e32] [cursor=pointer]:
+          - /url: /sobre
+        - link "Próximas Programações" [ref=f3e35] [cursor=pointer]:
+          - /url: /eventos
+      - generic [ref=f3e36]:
+        - generic [ref=f3e37]:
+          - generic [ref=f3e38]: "5"
+          - generic [ref=f3e39]: Congregações
+        - generic [ref=f3e40]:
+          - generic [ref=f3e41]: "12"
+          - generic [ref=f3e42]: Líderes
+        - generic [ref=f3e43]:
+          - generic [ref=f3e44]: "12"
+          - generic [ref=f3e45]: Anos de História
+        - generic [ref=f3e46]:
+          - generic [ref=f3e47]: "6"
+          - generic [ref=f3e48]: Ministérios de Louvor
+    - generic [ref=f3e245]:
+      - text: “
+      - generic [ref=f3e246]:
+        - generic [ref=f3e247]: Versículo do Momento
+        - generic [ref=f3e250]:
+          - paragraph [ref=f3e251]: Efesios 3:20
+          - paragraph [ref=f3e252]: “Aquele que e poderoso para fazer tudo muito mais abundantemente daquilo que pedimos ou pensamos, segundo o poder que em nos opera.”
+          - generic [ref=f3e253]:
+            - generic [ref=f3e254]: Reflexão
+            - text: Nossos sonhos e oracoes sao pequenos perto do que Deus pode fazer. Ele nao age apenas nos limites da nossa imaginacao - seu poder ultrapassa qualquer pedido que ousamos fazer.
+          - generic [ref=f3e255]: Proximo versiculo em 10h 40min
+    - generic [ref=f3e257]:
+      - generic [ref=f3e258]:
+        - generic [ref=f3e259]: Próximas Programações
+        - heading "Eventos" [level=2] [ref=f3e260]
+        - paragraph [ref=f3e261]: Confira nossas próximas programações e participe conosco.
+      - generic [ref=f3e263]:
+        - generic [ref=f3e264]:
+          - generic [ref=f3e265]: 20 de junho de 2025
+          - heading "Festa Junina 2025" [level=3] [ref=f3e268]
+          - paragraph [ref=f3e269]: Tradicao e Fe
+          - paragraph [ref=f3e270]: Igreja IADMP
+          - generic [ref=f3e274]: Encerrado
+        - generic [ref=f3e279]:
+          - generic [ref=f3e280]: 11 de outubro de 2026
+          - heading "Santa Ceia" [level=3] [ref=f3e283]
+          - paragraph [ref=f3e284]: Templo Sede
+          - generic [ref=f3e288]: Faltam 2 dias
+      - link "Ver todos os eventos" [ref=f3e294] [cursor=pointer]:
+        - /url: /eventos
+    - generic [ref=f3e50]:
+      - generic [ref=f3e51]:
+        - generic [ref=f3e52]: Programacao Semanal
+        - heading "Nossos Cultos" [level=2] [ref=f3e53]
+        - paragraph [ref=f3e54]: Confira nossa agenda semanal e participe conosco.
+      - generic [ref=f3e56]:
+        - generic [ref=f3e57]:
+          - paragraph [ref=f3e58]: Quarta e Domingo
+          - heading "Consagrações" [level=3] [ref=f3e59]
+          - paragraph [ref=f3e60]: As 06:00
+          - paragraph [ref=f3e61]: Tempo de oração e consagração diante do Senhor.
+        - generic [ref=f3e62]:
+          - paragraph [ref=f3e63]: Terça-feira
+          - heading "Culto de Doutrina" [level=3] [ref=f3e64]
+          - paragraph [ref=f3e65]: As 19:30
+          - paragraph [ref=f3e66]: Estudo aprofundado da Palavra de Deus.
+        - generic [ref=f3e67]:
+          - paragraph [ref=f3e68]: Quarta-feira
+          - heading "Culto no Res. Tiradentes" [level=3] [ref=f3e69]
+          - paragraph [ref=f3e70]: As 19:30
+          - paragraph [ref=f3e71]: Estudo aprofundado da Palavra de Deus.
+        - generic [ref=f3e72]:
+          - paragraph [ref=f3e73]: Sexta-feira
+          - heading "Círculo de Oração" [level=3] [ref=f3e74]
+          - paragraph [ref=f3e75]: As 19:30
+          - paragraph [ref=f3e76]: Momento de intercessão e busca por Deus.
+        - generic [ref=f3e77]:
+          - paragraph [ref=f3e78]: Domingo
+          - heading "Culto de Adoração" [level=3] [ref=f3e79]
+          - paragraph [ref=f3e80]: As 18:30
+          - paragraph [ref=f3e81]: Adoração, palavra e comunhão.
+    - generic [ref=f3e83]:
+      - generic [ref=f3e84]:
+        - generic [ref=f3e85]: Nossas Congregações
+        - heading "Encontre uma Congregação" [level=2] [ref=f3e86]
+        - paragraph [ref=f3e87]: Conheca nossas congregações e participe de uma perto de você.
+      - generic [ref=f3e89]:
+        - generic [ref=f3e90] [cursor=pointer]:
+          - img "Cohabiano" [ref=f3e91]
+          - generic [ref=f3e92]:
+            - heading "Cohabiano" [level=3] [ref=f3e93]
+            - paragraph [ref=f3e94]: Congregação Cohabiano
+        - generic [ref=f3e95] [cursor=pointer]:
+          - img "Res. Tiradentes" [ref=f3e96]
+          - generic [ref=f3e97]:
+            - heading "Res. Tiradentes" [level=3] [ref=f3e98]
+            - paragraph [ref=f3e99]: "-"
+        - generic [ref=f3e100] [cursor=pointer]:
+          - img "Novo Renascer" [ref=f3e101]
+          - generic [ref=f3e102]:
+            - heading "Novo Renascer" [level=3] [ref=f3e103]
+            - paragraph [ref=f3e104]: Novo Renascer (Albino Soero)
+        - generic [ref=f3e105] [cursor=pointer]:
+          - img "Vila Sarney" [ref=f3e106]
+          - generic [ref=f3e107]:
+            - heading "Vila Sarney" [level=3] [ref=f3e108]
+            - paragraph [ref=f3e109]: Vila Sarney
+    - generic [ref=f3e111]:
+      - generic [ref=f3e112]:
+        - generic [ref=f3e113]: Nossos Valores
+        - heading "Fundamentos da Nossa Fé" [level=2] [ref=f3e114]
+        - paragraph [ref=f3e115]: Valores que guiam nossa caminhada espiritual.
+      - generic [ref=f3e117]:
+        - generic [ref=f3e122]:
+          - heading "Adoração" [level=3] [ref=f3e123]
+          - paragraph [ref=f3e124]: Exaltem o nome do Senhor em espírito e verdade.
+          - paragraph [ref=f3e125]: 1 Crônicas 16:29
+        - generic [ref=f3e130]:
+          - heading "Comunhão" [level=3] [ref=f3e131]
+          - paragraph [ref=f3e132]: Unidos em Cristo, fortalecemos a fé juntos.
+          - paragraph [ref=f3e133]: Salmo 27:4
+        - generic [ref=f3e138]:
+          - heading "Obediência" [level=3] [ref=f3e139]
+          - paragraph [ref=f3e140]: Seguindo a Palavra de Deus em todas as coisas.
+          - paragraph [ref=f3e141]: Deuteronômio 11:1
+        - generic [ref=f3e146]:
+          - heading "Transformação" [level=3] [ref=f3e147]
+          - paragraph [ref=f3e148]: Renovados pela renovação da mente.
+          - paragraph [ref=f3e149]: Romanos 12:2
+    - generic [ref=f3e151]:
+      - generic [ref=f3e152]:
+        - generic [ref=f3e153]: Nossa Liderança
+        - heading "Servos de Deus" [level=2] [ref=f3e154]
+        - paragraph [ref=f3e155]: Conheca aqueles que guiem nossa comunidade com amor e dedicao.
+      - generic [ref=f3e157]:
+        - generic [ref=f3e158]:
+          - img "Pr. Cleiginaldo Barros" [ref=f3e159]
+          - heading "Pr. Cleiginaldo Barros" [level=3] [ref=f3e160]
+          - paragraph [ref=f3e161]: Pastor Presidente
+        - generic [ref=f3e162]:
+          - img "Pr. Walmorio" [ref=f3e163]
+          - heading "Pr. Walmorio" [level=3] [ref=f3e164]
+          - paragraph [ref=f3e165]: Pastor da Vila Sarney
+        - generic [ref=f3e166]:
+          - img "Pr. Melquesedeque" [ref=f3e167]
+          - heading "Pr. Melquesedeque" [level=3] [ref=f3e168]
+          - paragraph [ref=f3e169]: Pastor
+        - generic [ref=f3e170]:
+          - img "Pb. Márcio Louzeiro" [ref=f3e171]
+          - heading "Pb. Márcio Louzeiro" [level=3] [ref=f3e172]
+          - paragraph [ref=f3e173]: 1º Dirigente
+      - link "Ver Toda Liderança" [ref=f3e175] [cursor=pointer]:
+        - /url: /lideranca
+    - generic [ref=f3e179]:
+      - heading "Venha fazer parte da nossa comunidade" [level=2] [ref=f3e180]
+      - paragraph [ref=f3e181]: Somos uma família de fé que te acolhe com amor. Venha nos conhecer!
+      - generic [ref=f3e182]:
+        - link "Conheca Nossa Igreja" [ref=f3e183] [cursor=pointer]:
+          - /url: /sobre
+        - link "Fale Conosco" [ref=f3e184] [cursor=pointer]:
+          - /url: /contato
+  - contentinfo [ref=f3e185]:
+    - generic [ref=f3e186]:
+      - generic [ref=f3e187]:
+        - generic [ref=f3e188]:
+          - link "IADMP" [ref=f3e189] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=f3e190]: Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.
+          - generic [ref=f3e191]:
+            - link "YouTube" [ref=f3e192] [cursor=pointer]:
+              - /url: https://www.youtube.com/@iadmpma
+            - link "Instagram" [ref=f3e195] [cursor=pointer]:
+              - /url: https://www.instagram.com/iadmpma
+        - generic [ref=f3e198]:
+          - heading "Links Rapidos" [level=4] [ref=f3e199]
+          - generic [ref=f3e200]:
+            - link "Início" [ref=f3e201] [cursor=pointer]:
+              - /url: /
+            - link "A Igreja" [ref=f3e202] [cursor=pointer]:
+              - /url: /sobre
+            - link "Programações" [ref=f3e203] [cursor=pointer]:
+              - /url: /eventos
+            - link "Pregações" [ref=f3e204] [cursor=pointer]:
+              - /url: /pregacoes
+            - link "Galeria" [ref=f3e205] [cursor=pointer]:
+              - /url: /galeria
+            - link "Liderança" [ref=f3e206] [cursor=pointer]:
+              - /url: /lideranca
+            - link "Contato" [ref=f3e207] [cursor=pointer]:
+              - /url: /contato
+            - link "Galeria" [ref=f3e208] [cursor=pointer]:
+              - /url: /galeria
+            - link "Liderança" [ref=f3e209] [cursor=pointer]:
+              - /url: /lideranca
+        - generic [ref=f3e210]:
+          - heading "Congregações" [level=4] [ref=f3e211]
+          - generic [ref=f3e212]:
+            - generic [ref=f3e213]: Cohabiano
+            - generic [ref=f3e214]: Vila Sarney
+            - generic [ref=f3e215]: Novo Renascer
+        - generic [ref=f3e216]:
+          - heading "Contato" [level=4] [ref=f3e217]
+          - generic [ref=f3e218]: Maranhão, Brasil
+          - generic [ref=f3e223]: +55 98 98803-5646
+          - generic [ref=f3e227]: márcio@codemed.com.br
+          - link "WhatsApp" [ref=f3e235] [cursor=pointer]:
+            - /url: https://wa.me/+5598988035646
+      - paragraph [ref=f3e237]: © 2026 Igreja Assembleia de Deus Missão da Promessa. Todos os direitos reservados.
+  - alert [ref=f3e238]

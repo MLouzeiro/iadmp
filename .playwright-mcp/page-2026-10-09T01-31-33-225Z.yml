@@ -1,0 +1,75 @@
+- generic [active] [ref=f5e1]:
+  - navigation [ref=f5e2]:
+    - generic [ref=f5e3]:
+      - link [ref=f5e4] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f5e5]
+        - text: IADMP
+      - generic [ref=f5e6]:
+        - link "Início" [ref=f5e7] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f5e8] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f5e9] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f5e10] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f5e11] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f5e12] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f5e13] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f5e14]:
+          - link "YouTube" [ref=f5e15] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f5e18] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [ref=f5e21] [cursor=pointer]
+        - link "Entrar" [ref=f5e24] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f5e25]:
+    - generic [ref=f5e26]:
+      - complementary [ref=f5e27]:
+        - navigation [ref=f5e28]:
+          - generic [ref=f5e29]:
+            - generic [ref=f5e30]: Visão
+            - link "Dashboard" [ref=f5e31] [cursor=pointer]:
+              - /url: /admin
+            - link "Centro de Gestão" [ref=f5e37] [cursor=pointer]:
+              - /url: /admin/gestao
+            - link "Auditoria" [ref=f5e40] [cursor=pointer]:
+              - /url: /admin/gestao?aba=auditoria
+          - generic [ref=f5e44]:
+            - generic [ref=f5e45]: Pessoas
+            - link "Membros" [ref=f5e46] [cursor=pointer]:
+              - /url: /admin/membros
+            - link "Liderança" [ref=f5e52] [cursor=pointer]:
+              - /url: /admin/lideranca
+            - link "Usuários" [ref=f5e57] [cursor=pointer]:
+              - /url: /admin/usuarios
+          - generic [ref=f5e60]:
+            - generic [ref=f5e61]: Operação
+            - button "Liturgia" [ref=f5e63] [cursor=pointer]
+            - link "Eventos" [ref=f5e68] [cursor=pointer]:
+              - /url: /admin/eventos
+            - link "Financeiro" [ref=f5e71] [cursor=pointer]:
+              - /url: /admin/financeiro
+            - link "Avisos" [ref=f5e74] [cursor=pointer]:
+              - /url: /admin/avisos
+            - link "Galeria" [ref=f5e78] [cursor=pointer]:
+              - /url: /admin/galeria
+            - link "Banners" [ref=f5e84] [cursor=pointer]:
+              - /url: /admin/banners
+            - link "Oportunidades" [ref=f5e89] [cursor=pointer]:
+              - /url: /admin/oportunidades
+          - generic [ref=f5e92]:
+            - generic [ref=f5e93]: Comunicação
+            - button "Comunicação" [ref=f5e95] [cursor=pointer]
+            - button "Configurações" [ref=f5e105] [cursor=pointer]
+          - link "Voltar ao site" [ref=f5e112] [cursor=pointer]:
+            - /url: /
+          - button "Sair" [ref=f5e116] [cursor=pointer]
+      - main [ref=f5e120]:
+        - generic [ref=f5e121]: Carregando dashboard...
+  - alert [ref=f5e122]

@@ -24,6 +24,7 @@ export async function GET(
         membro: true,
         congregacao: { select: { id: true, nome: true } },
         organizacao: { select: { id: true, nome: true } },
+        historico: { orderBy: { createdAt: 'desc' } },
       },
     });
     if (!lider) {
@@ -56,6 +57,7 @@ export async function PUT(
 
     const body = await request.json();
     const data: Record<string, unknown> = {};
+
     if (body.nome !== undefined) data.nome = body.nome;
     if (body.cargo !== undefined) data.cargo = body.cargo;
     if (body.foto !== undefined) data.foto = body.foto;
@@ -76,10 +78,31 @@ export async function PUT(
       });
     }
 
-    const lider = await prisma.lideranca.update({
-      where: { id },
-      data,
-      include: { congregacao: { select: { id: true, nome: true } } },
+    const isCargoChange = body.cargo !== undefined && body.cargo !== existing.cargo;
+    const cargoAnterior = existing.cargo;
+
+    const lider = await prisma.$transaction(async (tx) => {
+      const updated = await tx.lideranca.update({
+        where: { id },
+        data,
+        include: { congregacao: { select: { id: true, nome: true } } },
+      });
+
+      if (isCargoChange) {
+        await tx.liderancaHistorico.create({
+          data: {
+            liderancaId: id,
+            cargoAnterior,
+            cargoNovo: body.cargo,
+            dataInicio: body.dataInicio ? parseDataDateOnly(body.dataInicio) : existing.dataInicio,
+            dataFim: body.dataFim ? parseDataDateOnly(body.dataFim) : existing.dataFim,
+            motivo: body.motivoCargo || null,
+            autorId: user.id,
+          },
+        });
+      }
+
+      return updated;
     });
 
     await writeAudit({

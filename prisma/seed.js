@@ -134,12 +134,37 @@ async function main() {
   const permissoesMap = await seedPermissoes();
   const perfisMap = await seedPerfis(permissoesMap);
 
+  function slugify(str) {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+
   let organizacao = await prisma.organizacao.findFirst({ where: { nome: 'IADMP - Igreja Assembleia de Deus Ministerio da Promessa' } });
   if (!organizacao) {
     organizacao = await prisma.organizacao.create({
-      data: { nome: 'IADMP - Igreja Assembleia de Deus Ministerio da Promessa', descricao: 'Igreja principal' },
+      data: { 
+        nome: 'IADMP - Igreja Assembleia de Deus Ministerio da Promessa', 
+        descricao: 'Igreja principal',
+        slug: 'iadmp-central',
+      },
     });
     console.log('Organizacao criada:', organizacao.nome);
+  } else if (!organizacao.slug) {
+    const baseSlug = slugify(organizacao.nome);
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+    while (await prisma.organizacao.findUnique({ where: { slug: uniqueSlug } })) {
+      uniqueSlug = `${baseSlug}-${counter++}`;
+    }
+    organizacao = await prisma.organizacao.update({
+      where: { id: organizacao.id },
+      data: { slug: uniqueSlug },
+    });
+    console.log('Slug atualizado para organizacao existente:', organizacao.slug);
   }
 
   const adminPasswordHash = await bcrypt.hash('admin123', 10);
@@ -320,6 +345,8 @@ async function main() {
 
   await seedLiturgiaData(organizacao.id, admin.id);
   await seedVersiculos(organizacao.id);
+  await seedPaginaPublica(organizacao.id);
+  await seedPublicacaoDemo(organizacao.id, admin.id);
 
   console.log('Seed concluido com sucesso!');
 }
@@ -669,6 +696,52 @@ async function seedVersiculos(organizacaoId) {
     }
   }
   console.log('  Versiculos criados:', count);
+}
+
+async function seedPaginaPublica(organizacaoId) {
+  const existing = await prisma.paginaPublica.findUnique({ where: { organizacaoId } });
+  if (!existing) {
+    await prisma.paginaPublica.create({
+      data: {
+        organizacaoId,
+        conteudo: {},
+        secaoHero: { titulo: 'Bem-vindos à nossa Igreja', subtitulo: 'Uma comunidade de fé, amor e esperança' },
+        secaoSobre: { titulo: 'Sobre Nós', texto: 'Somos uma igreja comprometida com o Evangelho.' },
+        secaoEventos: { titulo: 'Próximos Eventos', exibir: true },
+        secaoLideranca: { titulo: 'Nossa Liderança', exibir: true },
+        secaoGaleria: { titulo: 'Galeria', exibir: true },
+        secaoContato: { titulo: 'Contato', exibir: true },
+        secaoPregacoes: { titulo: 'Pregações Recentes', exibir: true },
+      },
+    });
+    console.log('PaginaPublica criada');
+  }
+}
+
+async function seedPublicacaoDemo(organizacaoId, autorId) {
+  const existing = await prisma.publicacao.findFirst({ where: { titulo: 'Boas-vindas ao Sistema Multi-Igrejas' } });
+  if (!existing) {
+    const pub = await prisma.publicacao.create({
+      data: {
+        titulo: 'Boas-vindas ao Sistema Multi-Igrejas',
+        conteudo: 'Este é um aviso de demonstração do sistema de publicação centralizada.',
+        tipo: 'AVISO',
+        autorId,
+        status: 'PUBLICADA',
+        publicadoEm: new Date(),
+        publicadoPorId: autorId,
+        destinos: {
+          create: {
+            organizacaoId,
+            status: 'PUBLICADO',
+            publicadoEm: new Date(),
+            publicadoPorId: autorId,
+          },
+        },
+      },
+    });
+    console.log('Publicacao demo criada:', pub.id);
+  }
 }
 
 main()

@@ -1,0 +1,39 @@
+- generic [active] [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - generic [ref=f1e5]:
+          - generic [ref=f1e6]:
+            - img "IADMP" [ref=f1e8]
+            - generic [ref=f1e9]: IADMP
+          - heading "Organize seu ministério com excelência" [level=1] [ref=f1e10]:
+            - text: Organize seuministério com
+            - generic [ref=f1e11]: excelência
+          - paragraph [ref=f1e12]: Gerencie escalas, repertórios e membros do seu ministério de louvor em um só lugar.
+          - generic [ref=f1e13]:
+            - generic [ref=f1e14]: Gestão de membros
+            - generic [ref=f1e22]: Escalas inteligentes
+            - generic [ref=f1e27]: Repertório completo
+            - generic [ref=f1e34]: Seguro e confiável
+        - generic [ref=f1e39]: © 2026 IADMP. Todos os direitos reservados.
+      - generic [ref=f1e41]:
+        - generic [ref=f1e42]:
+          - heading "Bem-vindo de volta" [level=2] [ref=f1e48]
+          - paragraph [ref=f1e49]: Entre na sua conta para continuar
+        - generic [ref=f1e50]:
+          - generic [ref=f1e51]:
+            - generic [ref=f1e52]: Email
+            - textbox "Email" [ref=f1e54]:
+              - /placeholder: seu@email.com
+          - generic [ref=f1e55]:
+            - generic [ref=f1e56]:
+              - generic [ref=f1e57]: Senha
+              - link "Esqueci minha senha" [ref=f1e58] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=f1e59]:
+              - textbox "Senha" [ref=f1e60]:
+                - /placeholder: Sua senha
+              - button "Mostrar senha" [ref=f1e61] [cursor=pointer]
+          - button "Entrar" [ref=f1e65] [cursor=pointer]
+        - paragraph [ref=f1e69]: Problemas com acesso? Fale com o administrador
+  - alert [ref=f1e70]

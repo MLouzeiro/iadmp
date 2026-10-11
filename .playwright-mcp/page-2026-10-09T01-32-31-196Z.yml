@@ -1,0 +1,144 @@
+- generic [ref=f7e1]:
+  - navigation [ref=f7e2]:
+    - generic [ref=f7e3]:
+      - link [ref=f7e4] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f7e5]
+        - text: IADMP
+      - generic [ref=f7e6]:
+        - link "Início" [ref=f7e7] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f7e8] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f7e9] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f7e10] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f7e11] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f7e12] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f7e13] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f7e14]:
+          - link "YouTube" [ref=f7e15] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f7e18] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [ref=f7e21] [cursor=pointer]
+        - link "Entrar" [ref=f7e24] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f7e25]:
+    - generic [ref=f7e26]:
+      - complementary [ref=f7e27]:
+        - navigation [ref=f7e28]:
+          - generic [ref=f7e29]:
+            - generic [ref=f7e30]: Visão
+            - link "Dashboard" [ref=f7e31] [cursor=pointer]:
+              - /url: /admin
+            - link "Centro de Gestão" [ref=f7e37] [cursor=pointer]:
+              - /url: /admin/gestao
+            - link "Auditoria" [ref=f7e40] [cursor=pointer]:
+              - /url: /admin/gestao?aba=auditoria
+          - generic [ref=f7e44]:
+            - generic [ref=f7e45]: Pessoas
+            - link "Membros" [ref=f7e46] [cursor=pointer]:
+              - /url: /admin/membros
+            - link "Liderança" [ref=f7e52] [cursor=pointer]:
+              - /url: /admin/lideranca
+            - link "Usuários" [ref=f7e57] [cursor=pointer]:
+              - /url: /admin/usuarios
+          - generic [ref=f7e60]:
+            - generic [ref=f7e61]: Operação
+            - button "Liturgia" [ref=f7e63] [cursor=pointer]
+            - link "Eventos" [ref=f7e68] [cursor=pointer]:
+              - /url: /admin/eventos
+            - link "Financeiro" [ref=f7e71] [cursor=pointer]:
+              - /url: /admin/financeiro
+            - link "Avisos" [ref=f7e74] [cursor=pointer]:
+              - /url: /admin/avisos
+            - link "Galeria" [ref=f7e78] [cursor=pointer]:
+              - /url: /admin/galeria
+            - link "Banners" [ref=f7e84] [cursor=pointer]:
+              - /url: /admin/banners
+            - link "Oportunidades" [ref=f7e89] [cursor=pointer]:
+              - /url: /admin/oportunidades
+          - generic [ref=f7e92]:
+            - generic [ref=f7e93]: Comunicação
+            - button "Comunicação" [ref=f7e95] [cursor=pointer]
+            - button "Configurações" [ref=f7e105] [cursor=pointer]
+          - link "Voltar ao site" [ref=f7e112] [cursor=pointer]:
+            - /url: /
+          - button "Sair" [ref=f7e116] [cursor=pointer]
+      - main [ref=f7e120]:
+        - generic [ref=f7e121]:
+          - generic [ref=f7e122]:
+            - generic [ref=f7e123]:
+              - heading "Avisos" [level=2] [ref=f7e124]
+              - paragraph [ref=f7e125]: Comunicados internos e publicação no site · urgência · validade
+            - button "Novo Aviso" [active] [ref=f7e127] [cursor=pointer]
+          - textbox "Buscar aviso..." [ref=f7e131]
+          - generic [ref=f7e134]:
+            - generic [ref=f7e140]:
+              - heading "Bem-vindos ao novo site!" [level=4] [ref=f7e141]
+              - paragraph [ref=f7e142]: Estamos felizes em apresentar o novo site da IADMP. Confira as novidades! · válido até —
+            - generic [ref=f7e143]:
+              - generic [ref=f7e144]: NORMAL
+              - generic [ref=f7e145]: ATIVO
+              - generic [ref=f7e146]: SITE
+              - generic [ref=f7e147]: DESTAQUE
+              - button "Editar" [ref=f7e148] [cursor=pointer]
+              - button "Excluir" [ref=f7e152] [cursor=pointer]
+          - dialog [ref=f7e157]:
+            - generic [ref=f7e158]:
+              - heading "Novo Aviso" [level=3] [ref=f7e159]
+              - button "Fechar" [ref=f7e160] [cursor=pointer]: ✕
+            - paragraph [ref=f7e161]: POST /api/avisos · schema Zod avisoSchema · escopo por organização
+            - generic [ref=f7e163]:
+              - generic [ref=f7e164]:
+                - generic [ref=f7e165]: Título*
+                - textbox [ref=f7e166]
+              - generic [ref=f7e167]:
+                - generic [ref=f7e168]: Descrição*
+                - textbox [ref=f7e169]
+              - generic [ref=f7e170]:
+                - generic [ref=f7e171]: Categoria
+                - 'textbox "Ex: Culto, Congresso..." [ref=f7e172]'
+              - generic [ref=f7e173]:
+                - generic [ref=f7e174]: Urgência
+                - combobox [ref=f7e175]:
+                  - option "Baixa"
+                  - option "Normal" [selected]
+                  - option "Alta"
+                  - option "Urgente"
+              - generic [ref=f7e176]:
+                - generic [ref=f7e177]: Situação
+                - combobox [ref=f7e178]:
+                  - option "Ativo" [selected]
+                  - option "Inativo"
+                  - option "Expirado"
+              - generic [ref=f7e179]:
+                - generic [ref=f7e180]: Válido até
+                - textbox [ref=f7e181]
+              - generic [ref=f7e182]:
+                - generic [ref=f7e183]: Público-alvo
+                - 'textbox "Ex: Jovens, Líderes..." [ref=f7e184]'
+              - generic [ref=f7e185]:
+                - generic [ref=f7e186]: Publicar no site
+                - generic [ref=f7e187] [cursor=pointer]:
+                  - checkbox "Exibir no site público" [ref=f7e188]
+                  - generic [ref=f7e189]: Exibir no site público
+              - generic [ref=f7e190]:
+                - generic [ref=f7e191]: Mostrar no painel
+                - generic [ref=f7e192] [cursor=pointer]:
+                  - checkbox "Exibir no painel admin" [checked] [ref=f7e193]
+                  - generic [ref=f7e194]: Exibir no painel admin
+              - generic [ref=f7e195]:
+                - generic [ref=f7e196]: Destaque
+                - generic [ref=f7e197] [cursor=pointer]:
+                  - checkbox "Marcar como destaque" [ref=f7e198]
+                  - generic [ref=f7e199]: Marcar como destaque
+            - generic [ref=f7e200]:
+              - button "Cancelar" [ref=f7e201] [cursor=pointer]
+              - button "Criar aviso" [ref=f7e202] [cursor=pointer]
+  - alert [ref=f7e133]

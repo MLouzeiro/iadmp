@@ -9,27 +9,31 @@ datasource db {
 }
 
 model User {
-  id              String              @id @default(cuid())
-  name            String
-  email           String              @unique
-  passwordHash    String
-  telefone        String?
-  role            Role                @default(MEMBER)
-  perfilId        String?
-  perfil          Perfil?             @relation(fields: [perfilId], references: [id])
-  ativo           Boolean             @default(true)
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  avaliacoes      Avaliacao[]
-  membro          Membro?
-  organizacoes    UsuarioOrganizacao[]
-  permissoes      UsuarioPermissao[]
-  auditLogs       AuditLog[]
-  pregacoes       Pregacao[]
-  inscricoes      Inscricao[]
-  pagamentos      Pagamento[]
-  aprovacoesSolicitadas Aprovacao[]   @relation("Solicitante")
-  aprovacoesDecididas   Aprovacao[]   @relation("Aprovador")
+  id                      String              @id @default(cuid())
+  name                    String
+  email                   String              @unique
+  passwordHash            String
+  telefone                String?
+  role                    Role                @default(MEMBER)
+  perfilId                String?
+  perfil                  Perfil?             @relation(fields: [perfilId], references: [id])
+  ativo                   Boolean             @default(true)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  avaliacoes              Avaliacao[]
+  membro                  Membro?
+  organizacoes            UsuarioOrganizacao[]
+  permissoes              UsuarioPermissao[]
+  auditLogs               AuditLog[]
+  pregacoes               Pregacao[]
+  inscricoes              Inscricao[]
+  pagamentos              Pagamento[]
+  aprovacoesSolicitadas       Aprovacao[]         @relation("Solicitante")
+  aprovacoesDecididas         Aprovacao[]         @relation("Aprovador")
+  publicacoes                 Publicacao[]        @relation("PublicacaoAutor")
+  publicacoesPublicadas       Publicacao[]        @relation("PublicacaoPublicadoPor")
+  liderancaHistoricoAutor     LiderancaHistorico[] @relation("LiderancaHistoricoAutor")
+  eventoOrganizadorUser       EventoOrganizador[] @relation("EventoOrganizadorUser")
 }
 
 enum Role {
@@ -48,40 +52,47 @@ enum Role {
 }
 
 model Organizacao {
-  id              String                @id @default(cuid())
-  nome            String
-  descricao       String?
-  ativo           Boolean               @default(true)
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  usuarios        UsuarioOrganizacao[]
-  congregacoes    Congregacao[]
-  configuracoes   ConfiguracoesIgreja[]
-  liturgias       Liturgia[]
-  musicas         LiturgiaMusica[]
-  modelos         LiturgiaModelo[]
-  canaisOficiais  CanalOficial[]
-  pregacoes       Pregacao[]
-  versiculos      VersiculoDiario[]
-  membros         Membro[]
-  liderancas      Lideranca[]
-  ministerios     Ministerio[]
-  departamentos   Departamento[]
-  eventos         Evento[]
-  campanhas       Campanha[]
-  financeiro      EventoFinanceiro[]
-  categorias      CategoriaFinanceira[]
-  avisos          Aviso[]
-  galeriaAlbuns   GaleriaAlbum[]
-  galeriaItens    GaleriaItem[]
-  oportunidades   Oportunidade[]
-  agendas         Agenda[]
-  inscricoes      Inscricao[]
-  pagamentos      Pagamento[]
-  aprovacoes      Aprovacao[]
-  auditLogs       AuditLog[]
-  contatos        ContatoMensagem[]
-  banners         Banner[]
+  id                 String                @id @default(cuid())
+  nome               String
+  slug               String?               @unique
+  descricao          String?
+  ativo              Boolean               @default(true)
+  dominioPersonalizado String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  usuarios           UsuarioOrganizacao[]
+  congregacoes       Congregacao[]
+  configuracoes      ConfiguracoesIgreja[]
+  liturgias          Liturgia[]
+  musicas            LiturgiaMusica[]
+  modelos            LiturgiaModelo[]
+  canaisOficiais     CanalOficial[]
+  pregacoes          Pregacao[]
+  versiculos         VersiculoDiario[]
+  membros            Membro[]
+  liderancas         Lideranca[]
+  ministerios        Ministerio[]
+  departamentos      Departamento[]
+  eventos            Evento[]
+  campanhas          Campanha[]
+  financeiro         EventoFinanceiro[]
+  categorias         CategoriaFinanceira[]
+  avisos             Aviso[]
+  galeriaAlbuns      GaleriaAlbum[]
+  galeriaItens       GaleriaItem[]
+  oportunidades      Oportunidade[]
+  agendas            Agenda[]
+  inscricoes         Inscricao[]
+  pagamentos         Pagamento[]
+  aprovacoes         Aprovacao[]
+  auditLogs          AuditLog[]
+  contatos           ContatoMensagem[]
+  banners            Banner[]
+  paginaPublica      PaginaPublica?
+  publicacoesDestino PublicacaoOrganizacao[]
+
+  @@index([ativo])
+  @@index([slug])
 }
 
 model UsuarioOrganizacao {
@@ -198,31 +209,32 @@ model AuditLog {
 }
 
 model Membro {
-  id             String        @id @default(cuid())
-  organizacaoId  String
-  congregacaoId  String?
-  nome           String
-  email          String?
-  telefone       String?
-  whatsapp       String?
-  dataNascimento DateTime?
-  endereco       String?
-  foto           String?
-  dataEntrada    DateTime      @default(now())
-  status         StatusMembro  @default(ATIVO)
-  observacoes    String?
-  userId         String?        @unique
-  user           User?           @relation(fields: [userId], references: [id])
-  ministerioId   String?
-  ministerio     Ministerio?   @relation(fields: [ministerioId], references: [id])
-  departamentoId String?
-  departamento   Departamento? @relation(fields: [departamentoId], references: [id])
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  organizacao    Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
-  congregacao    Congregacao?  @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
-  lideranca      Lideranca[]
-  inscricoes     Inscricao[]
+  id                 String        @id @default(cuid())
+  organizacaoId      String
+  congregacaoId      String?
+  nome               String
+  email              String?
+  telefone           String?
+  whatsapp           String?
+  dataNascimento     DateTime?
+  endereco           String?
+  foto               String?
+  dataEntrada        DateTime      @default(now())
+  status             StatusMembro  @default(ATIVO)
+  observacoes        String?
+  userId             String?        @unique
+  user               User?           @relation(fields: [userId], references: [id])
+  ministerioId       String?
+  ministerio         Ministerio?   @relation(fields: [ministerioId], references: [id])
+  departamentoId     String?
+  departamento       Departamento? @relation(fields: [departamentoId], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  organizacao        Organizacao   @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  congregacao        Congregacao?  @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  lideranca          Lideranca[]
+  inscricoes         Inscricao[]
+  eventoOrganizador  EventoOrganizador[] @relation("EventoOrganizadorMembro")
 
   @@index([organizacaoId])
   @@index([congregacaoId])
@@ -289,6 +301,8 @@ model Lideranca {
   ministerio    Ministerio? @relation(fields: [ministerioId], references: [id])
   organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
   congregacao   Congregacao? @relation(fields: [congregacaoId], references: [id], onDelete: SetNull)
+  historico     LiderancaHistorico[]
+  eventoOrganizador EventoOrganizador[] @relation("EventoOrganizadorLideranca")
 
   @@index([organizacaoId])
   @@index([congregacaoId])
@@ -337,6 +351,7 @@ model Evento {
   agenda            Agenda[]
   tarefas           TarefaEvento[]
   inscricoes        Inscricao[]
+  organizadores     EventoOrganizador[]
 
   @@index([organizacaoId])
   @@index([congregacaoId])
@@ -999,4 +1014,96 @@ model ContatoMensagem {
 
   @@index([organizacaoId])
   @@index([createdAt])
+}
+
+model PaginaPublica {
+  id             String    @id @default(cuid())
+  organizacaoId  String    @unique
+  conteudo       Json      @default("{}")
+  secaoHero      Json?
+  secaoSobre     Json?
+  secaoEventos   Json?
+  secaoLideranca Json?
+  secaoGaleria   Json?
+  secaoContato   Json?
+  secaoPregacoes Json?
+  updatedAt      DateTime  @updatedAt
+  organizacao    Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId])
+}
+
+model Publicacao {
+  id                  String    @id @default(cuid())
+  titulo              String
+  conteudo            String
+  tipo                String    @default("AVISO")
+  autorId             String
+  status              String    @default("RASCUNHO")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  publicadoEm         DateTime?
+  publicadoPorId      String?
+  autor               User      @relation("PublicacaoAutor", fields: [autorId], references: [id], onDelete: Cascade)
+  publicadoPor        User?     @relation("PublicacaoPublicadoPor", fields: [publicadoPorId], references: [id], onDelete: SetNull)
+  destinos            PublicacaoOrganizacao[]
+
+  @@index([autorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PublicacaoOrganizacao {
+  id              String    @id @default(cuid())
+  publicacaoId    String
+  organizacaoId   String
+  status          String    @default("PENDENTE")
+  publicadoEm     DateTime?
+  publicadoPorId  String?
+  erro            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  publicacao      Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+  organizacao     Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@unique([publicacaoId, organizacaoId])
+  @@index([organizacaoId])
+  @@index([status])
+}
+
+model LiderancaHistorico {
+  id            String    @id @default(cuid())
+  liderancaId   String
+  cargoAnterior String?
+  cargoNovo     String
+  dataInicio    DateTime?
+  dataFim       DateTime?
+  motivo        String?
+  autorId       String
+  createdAt     DateTime  @default(now())
+  lideranca     Lideranca @relation(fields: [liderancaId], references: [id], onDelete: Cascade)
+  autor         User      @relation("LiderancaHistoricoAutor", fields: [autorId], references: [id], onDelete: Cascade)
+
+  @@index([liderancaId])
+  @@index([createdAt])
+}
+
+model EventoOrganizador {
+  id            String    @id @default(cuid())
+  eventoId      String
+  liderancaId   String?
+  membroId      String?
+  userId        String?
+  funcao        String    @default("APOIO")
+  principal     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  evento        Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  lideranca     Lideranca? @relation("EventoOrganizadorLideranca", fields: [liderancaId], references: [id], onDelete: SetNull)
+  membro        Membro?   @relation("EventoOrganizadorMembro", fields: [membroId], references: [id], onDelete: SetNull)
+  user          User?     @relation("EventoOrganizadorUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([eventoId])
+  @@index([liderancaId])
+  @@index([membroId])
+  @@index([userId])
 }

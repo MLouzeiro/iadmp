@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 const SLOT_DURATION_MS = 12 * 60 * 60 * 1000;
 
@@ -27,16 +28,23 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
     const organizacaoId = searchParams.get('organizacaoId');
 
-    if (!organizacaoId) {
-      return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o do registro' }, { status: 400 });
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
+
+    if (!orgId) {
+      return NextResponse.json({
+        versiculo: null,
+        proximoEm: getNextSlotStart().toISOString(),
+        slot: getCurrentSlot(),
+      });
     }
 
     const currentSlot = getCurrentSlot();
 
     const versiculosAtivos = await prisma.versiculoDiario.findMany({
-      where: { organizacaoId, ativo: true },
+      where: { organizacaoId: orgId, ativo: true },
       select: { id: true },
     });
 
@@ -60,7 +68,7 @@ export async function GET(request: NextRequest) {
 
     let versiculoSelecionado = await prisma.versiculoDiario.findFirst({
       where: {
-        organizacaoId,
+        organizacaoId: orgId,
         ativo: true,
         id: { notIn: Array.from(idsRecentes) },
       },
@@ -69,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     if (!versiculoSelecionado) {
       versiculoSelecionado = await prisma.versiculoDiario.findFirst({
-        where: { organizacaoId, ativo: true },
+        where: { organizacaoId: orgId, ativo: true },
         orderBy: { createdAt: 'asc' },
       });
     }

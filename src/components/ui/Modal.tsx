@@ -6,8 +6,8 @@ import styles from './modal.module.css';
 export interface ModalField {
   name: string;
   label: string;
-  type?: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'checkbox' | 'time' | 'url' | 'tel';
-  value?: string | number | boolean;
+  type?: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'checkbox' | 'multiselect' | 'time' | 'url' | 'tel';
+  value?: string | number | boolean | string[];
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
@@ -106,6 +106,25 @@ export default function Modal({
                         />
                         <span>{f.placeholder || 'Ativo'}</span>
                       </label>
+                    ) : f.type === 'multiselect' ? (
+                      <div className={styles.multiselect}>
+                        <select
+                          className={styles.select}
+                          multiple
+                          value={(Array.isArray(val) ? val : []) as string[]}
+                          onChange={(e) => {
+                            const selected = Array.from(e.target.selectedOptions).map(o => o.value);
+                            set(selected);
+                          }}
+                        >
+                          {(f.options || []).map((o) => (
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                          ))}
+                        </select>
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.7rem', display: 'block', marginTop: '0.25rem' }}>
+                          Segure Ctrl/Cmd para selecionar múltiplos
+                        </small>
+                      </div>
                     ) : (
                       <input
                         className={styles.input}

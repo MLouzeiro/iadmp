@@ -28,6 +28,13 @@ export async function GET(
         tarefas: true,
         congregacao: { select: { id: true, nome: true } },
         organizacao: { select: { id: true, nome: true } },
+        organizadores: {
+          include: {
+            lideranca: { select: { id: true, nome: true, cargo: true } },
+            membro: { select: { id: true, nome: true } },
+            user: { select: { id: true, name: true } },
+          },
+        },
       },
     });
     if (!evento) {
@@ -53,7 +60,10 @@ export async function PUT(
     if (!podeEditar) return NextResponse.json({ error: 'Sem permissão para editar eventos' }, { status: 403 });
 
     const { id } = await params;
-    const existing = await prisma.evento.findUnique({ where: { id } });
+    const existing = await prisma.evento.findUnique({
+      where: { id },
+      include: { organizadores: true },
+    });
     if (!existing) return NextResponse.json({ error: 'Evento não encontrado' }, { status: 404 });
 
     await assertOrgAccess(user.id, existing.organizacaoId, request);
@@ -90,10 +100,30 @@ export async function PUT(
       });
     }
 
-    const evento = await prisma.evento.update({
-      where: { id },
-      data,
-      include: { categoria: true, congregacao: { select: { id: true, nome: true } } },
+    const evento = await prisma.$transaction(async (tx) => {
+      const updated = await tx.evento.update({
+        where: { id },
+        data,
+        include: { categoria: true, congregacao: { select: { id: true, nome: true } } },
+      });
+
+      if (body.organizadores && Array.isArray(body.organizadores)) {
+        await tx.eventoOrganizador.deleteMany({ where: { eventoId: id } });
+        for (const org of body.organizadores) {
+          await tx.eventoOrganizador.create({
+            data: {
+              eventoId: id,
+              liderancaId: org.liderancaId || null,
+              membroId: org.membroId || null,
+              userId: org.userId || null,
+              funcao: org.funcao || 'APOIO',
+              principal: org.principal || false,
+            },
+          });
+        }
+      }
+
+      return updated;
     });
 
     await writeAudit({

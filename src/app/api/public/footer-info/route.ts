@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,24 +11,17 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizacaoIdParam = searchParams.get('organizacaoId');
+    const slug = searchParams.get('slug');
+    const organizacaoId = searchParams.get('organizacaoId');
 
-    let organizacaoId = organizacaoIdParam;
-    if (!organizacaoId) {
-      const padrao = await prisma.organizacao.findFirst({
-        where: { ativo: true },
-        select: { id: true },
-        orderBy: { createdAt: 'asc' },
-      });
-      organizacaoId = padrao?.id || null;
-    }
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
 
-    if (!organizacaoId) {
+    if (!orgId) {
       return NextResponse.json({});
     }
 
     const config = await prisma.configuracoesIgreja.findUnique({
-      where: { organizacaoId },
+      where: { organizacaoId: orgId },
       select: {
         nomeIgreja: true,
         anoFundacao: true,

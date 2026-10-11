@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,26 +11,19 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
     const organizacaoIdParam = searchParams.get('organizacaoId');
 
-    let organizacaoId = organizacaoIdParam;
-    if (!organizacaoId) {
-      const padrao = await prisma.organizacao.findFirst({
-        where: { ativo: true },
-        select: { id: true },
-        orderBy: { createdAt: 'asc' },
-      });
-      organizacaoId = padrao?.id || null;
-    }
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId: organizacaoIdParam });
 
-    if (!organizacaoId) {
+    if (!orgId) {
       return NextResponse.json([]);
     }
 
     const agora = new Date();
     const banners = await prisma.banner.findMany({
       where: {
-        organizacaoId,
+        organizacaoId: orgId,
         ativo: true,
         AND: [
           { OR: [{ dataInicio: null }, { dataInicio: { lte: agora } }] },

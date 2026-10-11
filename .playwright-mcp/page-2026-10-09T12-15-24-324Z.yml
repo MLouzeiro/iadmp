@@ -1,0 +1,82 @@
+- generic [active] [ref=f11e1]:
+  - navigation [ref=f11e2]:
+    - generic [ref=f11e3]:
+      - link [ref=f11e4] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f11e5]
+        - text: IADMP
+      - generic [ref=f11e6]:
+        - link "Início" [ref=f11e7] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f11e8] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f11e9] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f11e10] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f11e11] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f11e12] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f11e13] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f11e14]:
+          - link "YouTube" [ref=f11e15] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f11e18] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [ref=f11e21] [cursor=pointer]
+        - link "Entrar" [ref=f11e24] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f11e25]:
+    - generic [ref=f11e26]:
+      - complementary [ref=f11e27]:
+        - navigation [ref=f11e28]:
+          - generic [ref=f11e29]:
+            - generic [ref=f11e30]: Visão
+            - link "Dashboard" [ref=f11e31] [cursor=pointer]:
+              - /url: /admin
+            - link "Centro de Gestão" [ref=f11e37] [cursor=pointer]:
+              - /url: /admin/gestao
+            - link "Auditoria" [ref=f11e40] [cursor=pointer]:
+              - /url: /admin/gestao?aba=auditoria
+          - generic [ref=f11e44]:
+            - generic [ref=f11e45]: Pessoas
+            - link "Membros" [ref=f11e46] [cursor=pointer]:
+              - /url: /admin/membros
+            - link "Liderança" [ref=f11e52] [cursor=pointer]:
+              - /url: /admin/lideranca
+            - link "Usuários" [ref=f11e57] [cursor=pointer]:
+              - /url: /admin/usuarios
+          - generic [ref=f11e60]:
+            - generic [ref=f11e61]: Operação
+            - button "Liturgia" [ref=f11e63] [cursor=pointer]
+            - link "Eventos" [ref=f11e68] [cursor=pointer]:
+              - /url: /admin/eventos
+            - link "Financeiro" [ref=f11e71] [cursor=pointer]:
+              - /url: /admin/financeiro
+            - link "Avisos" [ref=f11e74] [cursor=pointer]:
+              - /url: /admin/avisos
+            - link "Galeria" [ref=f11e78] [cursor=pointer]:
+              - /url: /admin/galeria
+            - link "Banners" [ref=f11e84] [cursor=pointer]:
+              - /url: /admin/banners
+            - link "Oportunidades" [ref=f11e89] [cursor=pointer]:
+              - /url: /admin/oportunidades
+          - generic [ref=f11e92]:
+            - generic [ref=f11e93]: Comunicação
+            - button "Comunicação" [ref=f11e95] [cursor=pointer]
+            - button "Configurações" [ref=f11e105] [cursor=pointer]
+          - link "Voltar ao site" [ref=f11e112] [cursor=pointer]:
+            - /url: /
+          - button "Sair" [ref=f11e116] [cursor=pointer]
+      - main [ref=f11e120]:
+        - generic [ref=f11e121]:
+          - generic [ref=f11e122]:
+            - generic [ref=f11e123]:
+              - heading "Liderança" [level=2] [ref=f11e124]
+              - paragraph [ref=f11e125]: Ordem de exibição no site público · vinculação com membro e ministério
+            - button "Novo Líder" [ref=f11e127] [cursor=pointer]
+          - textbox "Buscar líder..." [ref=f11e131]
+          - generic [ref=f11e132]: Carregando liderança...
+  - alert [ref=f11e133]

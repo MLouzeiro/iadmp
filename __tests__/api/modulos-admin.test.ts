@@ -74,6 +74,7 @@ jest.mock('@/lib/tenant', () => ({
   resolveTargetOrgId: jest.fn().mockResolvedValue('org1'),
   resolveCongregacaoId: jest.fn().mockResolvedValue('cong1'),
   assertOrgAccess: jest.fn().mockResolvedValue(undefined),
+  resolvePublicOrganizacaoId: jest.fn().mockResolvedValue('org1'),
   ORG_FORBIDDEN: 'ORG_FORBIDDEN',
   ORG_REQUIRED: 'ORG_REQUIRED',
   orgForbiddenResponse: () => new Response(JSON.stringify({ error: 'Acesso negado' }), { status: 403 }),

@@ -1,30 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
 const ANOS_HISTORIA_PADRAO = 12;
 const CONGREGACOES_PADRAO = 5;
-
-async function resolverOrganizacaoId(request: NextRequest): Promise<string | null> {
-  const { searchParams } = new URL(request.url);
-  const organizacaoId = searchParams.get('organizacaoId');
-
-  if (organizacaoId) {
-    const org = await prisma.organizacao.findFirst({
-      where: { id: organizacaoId, ativo: true },
-      select: { id: true },
-    });
-    return org?.id || null;
-  }
-
-  const padrao = await prisma.organizacao.findFirst({
-    where: { ativo: true },
-    select: { id: true },
-    orderBy: { createdAt: 'asc' },
-  });
-  return padrao?.id || null;
-}
 
 /**
  * Estatisticas do hero do site publico.
@@ -32,13 +13,17 @@ async function resolverOrganizacaoId(request: NextRequest): Promise<string | nul
  */
 export async function GET(request: NextRequest) {
   try {
-    const organizacaoId = await resolverOrganizacaoId(request);
-    if (!organizacaoId) {
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+    const organizacaoId = searchParams.get('organizacaoId');
+
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
+    if (!orgId) {
       return NextResponse.json({ exibir: {} });
     }
 
     const config = await prisma.configuracoesIgreja.findUnique({
-      where: { organizacaoId },
+      where: { organizacaoId: orgId },
       select: {
         anoFundacao: true,
         statMembros: true,
@@ -53,10 +38,10 @@ export async function GET(request: NextRequest) {
     const anoAtual = hoje.getFullYear();
 
     const [membros, congregacoes, lideres, ministerios] = await Promise.all([
-      prisma.membro.count({ where: { organizacaoId, status: 'ATIVO' } }),
-      prisma.congregacao.count({ where: { organizacaoId, ativo: true } }),
-      prisma.lideranca.count({ where: { organizacaoId, ativo: true } }),
-      prisma.ministerio.count({ where: { organizacaoId, ativo: true } }),
+      prisma.membro.count({ where: { organizacaoId: orgId, status: 'ATIVO' } }),
+      prisma.congregacao.count({ where: { organizacaoId: orgId, ativo: true } }),
+      prisma.lideranca.count({ where: { organizacaoId: orgId, ativo: true } }),
+      prisma.ministerio.count({ where: { organizacaoId: orgId, ativo: true } }),
     ]);
 
     const anosHistoria =

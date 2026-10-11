@@ -208,3 +208,40 @@ export async function resolveCongregacaoId(
   });
   return criada.id;
 }
+
+/**
+ * Resolve organização por slug (para APIs públicas).
+ * Retorna null se não encontrar ou se a organização não estiver ativa.
+ */
+export async function resolveOrgBySlug(slug: string | null): Promise<string | null> {
+  if (!slug) return null;
+  const org = await prisma.organizacao.findFirst({
+    where: { slug, ativo: true },
+    select: { id: true },
+  });
+  return org?.id || null;
+}
+
+/**
+ * Resolve organização para APIs públicas.
+ * Prioridade: slug > organizacaoId > fallback (primeira ativa).
+ */
+export async function resolvePublicOrganizacaoId(params: { slug?: string | null; organizacaoId?: string | null }): Promise<string | null> {
+  if (params.slug) {
+    const bySlug = await resolveOrgBySlug(params.slug);
+    if (bySlug) return bySlug;
+  }
+  if (params.organizacaoId) {
+    const byId = await prisma.organizacao.findFirst({
+      where: { id: params.organizacaoId, ativo: true },
+      select: { id: true },
+    });
+    if (byId) return byId.id;
+  }
+  const padrao = await prisma.organizacao.findFirst({
+    where: { ativo: true },
+    select: { id: true },
+    orderBy: { createdAt: 'asc' },
+  });
+  return padrao?.id || null;
+}

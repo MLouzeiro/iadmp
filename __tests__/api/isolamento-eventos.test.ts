@@ -30,6 +30,11 @@ jest.mock('@/lib/prisma', () => ({
       findUnique: jest.fn().mockResolvedValue(null),
     },
     auditLog: { create: jest.fn().mockResolvedValue({}) },
+    eventoOrganizador: {
+      create: jest.fn().mockResolvedValue({}),
+      deleteMany: jest.fn().mockResolvedValue({}),
+    },
+    $transaction: jest.fn((cb) => cb(prisma)),
   },
 }));
 

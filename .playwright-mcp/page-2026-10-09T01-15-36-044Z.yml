@@ -1,0 +1,229 @@
+- generic [active] [ref=f1e1]:
+  - navigation [ref=f1e74]:
+    - generic [ref=f1e75]:
+      - link [ref=f1e76] [cursor=pointer]:
+        - /url: /
+        - img "IADMP" [ref=f1e77]
+        - text: IADMP
+      - generic [ref=f1e78]:
+        - link "Início" [ref=f1e79] [cursor=pointer]:
+          - /url: /
+        - link "A Igreja" [ref=f1e80] [cursor=pointer]:
+          - /url: /sobre
+        - link "Programações" [ref=f1e81] [cursor=pointer]:
+          - /url: /eventos
+        - link "Pregações" [ref=f1e82] [cursor=pointer]:
+          - /url: /pregacoes
+        - link "Galeria" [ref=f1e83] [cursor=pointer]:
+          - /url: /galeria
+        - link "Liderança" [ref=f1e84] [cursor=pointer]:
+          - /url: /lideranca
+        - link "Contato" [ref=f1e85] [cursor=pointer]:
+          - /url: /contato
+        - generic [ref=f1e86]:
+          - link "YouTube" [ref=f1e87] [cursor=pointer]:
+            - /url: https://www.youtube.com/@iadmpma
+          - link "Instagram" [ref=f1e90] [cursor=pointer]:
+            - /url: https://www.instagram.com/iadmpma
+        - button "Alternar tema" [ref=f1e93] [cursor=pointer]
+        - link "Entrar" [ref=f1e96] [cursor=pointer]:
+          - /url: /admin/login
+  - main [ref=f1e2]:
+    - generic [ref=f1e97]:
+      - complementary [ref=f1e98]:
+        - navigation [ref=f1e99]:
+          - generic [ref=f1e100]:
+            - generic [ref=f1e101]: Visão
+            - link "Dashboard" [ref=f1e102] [cursor=pointer]:
+              - /url: /admin
+            - link "Centro de Gestão" [ref=f1e108] [cursor=pointer]:
+              - /url: /admin/gestao
+            - link "Auditoria" [ref=f1e111] [cursor=pointer]:
+              - /url: /admin/gestao?aba=auditoria
+          - generic [ref=f1e115]:
+            - generic [ref=f1e116]: Pessoas
+            - link "Membros" [ref=f1e117] [cursor=pointer]:
+              - /url: /admin/membros
+            - link "Liderança" [ref=f1e123] [cursor=pointer]:
+              - /url: /admin/lideranca
+            - link "Usuários" [ref=f1e128] [cursor=pointer]:
+              - /url: /admin/usuarios
+          - generic [ref=f1e131]:
+            - generic [ref=f1e132]: Operação
+            - button "Liturgia" [ref=f1e134] [cursor=pointer]
+            - link "Eventos" [ref=f1e139] [cursor=pointer]:
+              - /url: /admin/eventos
+            - link "Financeiro" [ref=f1e142] [cursor=pointer]:
+              - /url: /admin/financeiro
+            - link "Avisos" [ref=f1e145] [cursor=pointer]:
+              - /url: /admin/avisos
+            - link "Galeria" [ref=f1e149] [cursor=pointer]:
+              - /url: /admin/galeria
+            - link "Banners" [ref=f1e155] [cursor=pointer]:
+              - /url: /admin/banners
+            - link "Oportunidades" [ref=f1e160] [cursor=pointer]:
+              - /url: /admin/oportunidades
+          - generic [ref=f1e163]:
+            - generic [ref=f1e164]: Comunicação
+            - button "Comunicação" [ref=f1e166] [cursor=pointer]
+            - button "Configurações" [ref=f1e176] [cursor=pointer]
+          - link "Voltar ao site" [ref=f1e183] [cursor=pointer]:
+            - /url: /
+          - button "Sair" [ref=f1e187] [cursor=pointer]
+      - main [ref=f1e191]:
+        - generic [ref=f1e192]:
+          - generic [ref=f1e193]:
+            - generic [ref=f1e194]:
+              - heading "Dashboard" [level=2] [ref=f1e195]
+              - paragraph [ref=f1e196]: Visão geral da igreja · indicadores consolidados
+            - link [ref=f1e198] [cursor=pointer]:
+              - /url: /admin/gestao
+              - button "Abrir Centro de Gestão" [ref=f1e199]
+          - generic [ref=f1e202]:
+            - generic [ref=f1e210]:
+              - generic [ref=f1e211]: Total de Membros
+              - generic [ref=f1e212]: "0"
+            - generic [ref=f1e218]:
+              - generic [ref=f1e219]: Líderes
+              - generic [ref=f1e220]: "12"
+            - generic [ref=f1e225]:
+              - generic [ref=f1e226]: Eventos Realizados
+              - generic [ref=f1e227]: "0"
+            - generic [ref=f1e233]:
+              - generic [ref=f1e234]: Eventos Futuros
+              - generic [ref=f1e235]: "2"
+            - generic [ref=f1e240]:
+              - generic [ref=f1e241]: Avisos Ativos
+              - generic [ref=f1e242]: "1"
+            - generic [ref=f1e248]:
+              - generic [ref=f1e249]: Saldo do Período
+              - generic [ref=f1e250]: —
+          - generic [ref=f1e251]:
+            - generic [ref=f1e252]:
+              - heading "Gestão de Liderança" [level=3] [ref=f1e258]
+              - link [ref=f1e259] [cursor=pointer]:
+                - /url: /admin/lideranca
+                - button "Abrir Liderança" [ref=f1e260]
+            - generic [ref=f1e263]:
+              - generic [ref=f1e264]:
+                - paragraph [ref=f1e265]: Ativos
+                - paragraph [ref=f1e266]: "12"
+                - paragraph [ref=f1e267]: Mandatos em curso
+              - generic [ref=f1e268]:
+                - paragraph [ref=f1e269]: Tempo médio (ativos)
+                - paragraph [ref=f1e270]: 39 dias
+                - paragraph [ref=f1e271]: Em curso
+              - generic [ref=f1e272]:
+                - paragraph [ref=f1e273]: Passaram
+                - paragraph [ref=f1e274]: "3"
+                - paragraph [ref=f1e275]: Mandatos encerrados
+              - generic [ref=f1e276]:
+                - paragraph [ref=f1e277]: Tempo médio (encerrados)
+                - paragraph [ref=f1e278]: 43 dias
+                - paragraph [ref=f1e279]: Duração média
+          - generic [ref=f1e280]:
+            - generic [ref=f1e281]:
+              - heading "Últimos Eventos" [level=3] [ref=f1e282]
+              - table [ref=f1e284]:
+                - rowgroup [ref=f1e285]:
+                  - row [ref=f1e286]:
+                    - columnheader "Evento" [ref=f1e287]
+                    - columnheader "Data" [ref=f1e288]
+                    - columnheader "Status" [ref=f1e289]
+                - rowgroup [ref=f1e290]:
+                  - row [ref=f1e291]:
+                    - cell "Santa Ceia Templo Sede" [ref=f1e292]:
+                      - generic [ref=f1e293]: Santa Ceia
+                      - generic [ref=f1e294]: Templo Sede
+                    - cell "11/10/2026" [ref=f1e295]
+                    - cell "PLANEJADO" [ref=f1e296]
+                  - row [ref=f1e298]:
+                    - cell "Consagração Sede" [ref=f1e299]:
+                      - generic [ref=f1e300]: Consagração
+                      - generic [ref=f1e301]: Sede
+                    - cell "27/09/2026" [ref=f1e302]
+                    - cell "EM ANDAMENTO" [ref=f1e303]
+                  - row [ref=f1e305]:
+                    - cell "Festa Junina 2025 Igreja IADMP" [ref=f1e306]:
+                      - generic [ref=f1e307]: Festa Junina 2025
+                      - generic [ref=f1e308]: Igreja IADMP
+                    - cell "20/06/2025" [ref=f1e309]
+                    - cell "PLANEJADO" [ref=f1e310]
+                  - row [ref=f1e312]:
+                    - cell "Retiro de Jovens 2025 Acampamento" [ref=f1e313]:
+                      - generic [ref=f1e314]: Retiro de Jovens 2025
+                      - generic [ref=f1e315]: Acampamento
+                    - cell "10/05/2025" [ref=f1e316]
+                    - cell "CONCLUIDO" [ref=f1e317]
+                  - row [ref=f1e319]:
+                    - cell "Culto de Pascoa 2025 Igreja IADMP" [ref=f1e320]:
+                      - generic [ref=f1e321]: Culto de Pascoa 2025
+                      - generic [ref=f1e322]: Igreja IADMP
+                    - cell "20/04/2025" [ref=f1e323]
+                    - cell "CONCLUIDO" [ref=f1e324]
+            - generic [ref=f1e326]:
+              - heading "Pendências Críticas" [level=3] [ref=f1e327]
+              - generic [ref=f1e328]:
+                - generic [ref=f1e329]:
+                  - heading "Membros sem congregação definida" [level=4] [ref=f1e331]
+                  - generic [ref=f1e332]: ALTA
+                - generic [ref=f1e334]:
+                  - heading "Eventos sem orçamento registrado" [level=4] [ref=f1e336]
+                  - generic [ref=f1e337]: NORMAL
+                - generic [ref=f1e339]:
+                  - heading "Pregações em rascunho" [level=4] [ref=f1e341]
+                  - generic [ref=f1e342]: BAIXA
+                - generic [ref=f1e344]:
+                  - heading "Avisos expirados para revisar" [level=4] [ref=f1e346]
+                  - generic [ref=f1e347]: NORMAL
+              - link [ref=f1e350] [cursor=pointer]:
+                - /url: /admin/gestao?aba=pendencias
+                - button "Ver todas as pendências" [ref=f1e351]
+  - contentinfo [ref=f1e354]:
+    - generic [ref=f1e355]:
+      - generic [ref=f1e356]:
+        - generic [ref=f1e357]:
+          - link "IADMP" [ref=f1e358] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=f1e359]: Uma comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.
+          - generic [ref=f1e360]:
+            - link "YouTube" [ref=f1e361] [cursor=pointer]:
+              - /url: https://www.youtube.com/@iadmpma
+            - link "Instagram" [ref=f1e364] [cursor=pointer]:
+              - /url: https://www.instagram.com/iadmpma
+        - generic [ref=f1e367]:
+          - heading "Links Rapidos" [level=4] [ref=f1e368]
+          - generic [ref=f1e369]:
+            - link "Início" [ref=f1e370] [cursor=pointer]:
+              - /url: /
+            - link "A Igreja" [ref=f1e371] [cursor=pointer]:
+              - /url: /sobre
+            - link "Programações" [ref=f1e372] [cursor=pointer]:
+              - /url: /eventos
+            - link "Pregações" [ref=f1e373] [cursor=pointer]:
+              - /url: /pregacoes
+            - link "Galeria" [ref=f1e374] [cursor=pointer]:
+              - /url: /galeria
+            - link "Liderança" [ref=f1e375] [cursor=pointer]:
+              - /url: /lideranca
+            - link "Contato" [ref=f1e376] [cursor=pointer]:
+              - /url: /contato
+            - link "Galeria" [ref=f1e377] [cursor=pointer]:
+              - /url: /galeria
+            - link "Liderança" [ref=f1e378] [cursor=pointer]:
+              - /url: /lideranca
+        - generic [ref=f1e379]:
+          - heading "Congregações" [level=4] [ref=f1e380]
+          - generic [ref=f1e381]:
+            - generic [ref=f1e382]: Cohabiano
+            - generic [ref=f1e383]: Vila Sarney
+            - generic [ref=f1e384]: Novo Renascer
+        - generic [ref=f1e385]:
+          - heading "Contato" [level=4] [ref=f1e386]
+          - generic [ref=f1e387]: Maranhão, Brasil
+          - generic [ref=f1e392]: +55 98 98803-5646
+          - generic [ref=f1e396]: márcio@codemed.com.br
+          - link "WhatsApp" [ref=f1e404] [cursor=pointer]:
+            - /url: https://wa.me/+5598988035646
+      - paragraph [ref=f1e406]: © 2026 Igreja Assembleia de Deus Missão da Promessa. Todos os direitos reservados.
+  - alert [ref=f1e70]

@@ -16,8 +16,8 @@ export default function Home() {
         <div className="hero-bg" style={{ backgroundImage: 'url(/images/iadmp/Slide/image1.jpg)' }} />
         <div className="hero-content fade-in">
           <h1>
-            Uma igreja para viver,<br />
-            <span>servir e transformar</span>
+            Missão, <br />
+            <span>da Promessa</span>
           </h1>
           <p>Comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.</p>
           <div className="hero-buttons">

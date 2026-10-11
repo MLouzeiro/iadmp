@@ -83,7 +83,7 @@ describe('GET /api/gestao/auditoria', () => {
     expect(mockFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          acao: 'DELETE',
+          acao: { contains: 'DELETE', mode: 'insensitive' },
           entidade: 'Membro',
           createdAt: { gte: new Date('2026-01-01'), lte: new Date('2026-01-31') },
         }),

@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images,
   Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate,
-  Radio, Mic, BarChart3, Menu, X, ClipboardList, Image,
+  Radio, Mic, BarChart3, Menu, X, ClipboardList, Image, Building2, Send, FileText,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
 import { useToast } from '@/components/ui/Toast';
 import styles from './admin.module.css';
@@ -19,15 +19,21 @@ interface NavItem {
   sub?: { name: string; path: string; icon: React.ElementType }[];
 }
 
+interface Organizacao {
+  id: string;
+  nome: string;
+}
+
 const grupos: { label: string; itens: NavItem[] }[] = [
-  {
-    label: 'Visão',
-    itens: [
-      { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-      { name: 'Centro de Gestão', path: '/admin/gestao', icon: BarChart3 },
-      { name: 'Auditoria', path: '/admin/gestao?aba=auditoria', icon: ClipboardList },
-    ],
-  },
+{
+        label: 'Visão',
+        itens: [
+          { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+          { name: 'Centro de Gestão', path: '/admin/gestao', icon: BarChart3 },
+          { name: 'Auditoria', path: '/admin/gestao?aba=auditoria', icon: ClipboardList },
+          { name: 'Relatórios', path: '/admin/relatorios', icon: FileText },
+        ],
+      },
   {
     label: 'Pessoas',
     itens: [
@@ -57,20 +63,21 @@ const grupos: { label: string; itens: NavItem[] }[] = [
       { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
     ],
   },
-  {
-    label: 'Comunicação',
-    itens: [
-      {
-        name: 'Comunicação',
-        path: '/admin/comunicacao',
-        icon: Radio,
-        sub: [
-          { name: 'Dashboard', path: '/admin/comunicacao', icon: LayoutDashboard },
-          { name: 'Canais', path: '/admin/comunicacao/canais', icon: Radio },
-          { name: 'Pregações', path: '/admin/comunicacao/pregacoes', icon: Mic },
-          { name: 'Versículos', path: '/admin/comunicacao/versiculos', icon: BookOpen },
-        ],
-      },
+{
+        label: 'Comunicação',
+        itens: [
+          {
+            name: 'Comunicação',
+            path: '/admin/comunicacao',
+            icon: Radio,
+            sub: [
+              { name: 'Dashboard', path: '/admin/comunicacao', icon: LayoutDashboard },
+              { name: 'Canais', path: '/admin/comunicacao/canais', icon: Radio },
+              { name: 'Pregações', path: '/admin/comunicacao/pregacoes', icon: Mic },
+              { name: 'Versículos', path: '/admin/comunicacao/versiculos', icon: BookOpen },
+            ],
+          },
+          { name: 'Publicações', path: '/admin/publicacoes', icon: Send },
       {
         name: 'Configurações',
         path: '/admin/configuracoes',
@@ -94,6 +101,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     '/admin/configuracoes': pathname.startsWith('/admin/configuracoes'),
   });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [orgs, setOrgs] = useState<Organizacao[]>([]);
+  const [currentOrgId, setCurrentOrgId] = useState<string>('');
+  const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (pathname === '/admin/login') return;
+    let cancelled = false;
+    fetch('/api/organizacoes')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => {
+        if (cancelled) return;
+        const list = Array.isArray(d) ? d : d?.organizacoes || [];
+        setOrgs(list);
+        if (list.length > 0) {
+          const stored = localStorage.getItem('iadmp-current-org');
+          const initialOrg = stored && list.some(o => o.id === stored) ? stored : list[0].id;
+          setCurrentOrgId(initialOrg);
+          localStorage.setItem('iadmp-current-org', initialOrg);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [pathname]);
+
+  const handleOrgChange = (orgId: string) => {
+    setCurrentOrgId(orgId);
+    localStorage.setItem('iadmp-current-org', orgId);
+    setOrgDropdownOpen(false);
+    window.location.reload();
+  };
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
@@ -110,6 +147,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }, { title: 'Sair do painel' });
   };
 
+  const currentOrg = orgs.find(o => o.id === currentOrgId);
+
   return (
     <div className={styles.adminWrap}>
       <div
@@ -118,6 +157,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       />
       <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ''}`}>
         <nav className={styles.nav}>
+          {orgs.length > 1 && (
+            <div className={styles.orgSelector}>
+              <div className={styles.orgSelectorTrigger} onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}>
+                <Building2 size={19} />
+                <span>{currentOrg?.nome || 'Selecione a organização'}</span>
+                <ChevronDown size={15} className={`${styles.chev} ${orgDropdownOpen ? styles.chevOpen : ''}`} />
+              </div>
+              {orgDropdownOpen && (
+                <div className={styles.orgDropdown}>
+                  {orgs.map((org) => (
+                    <button
+                      key={org.id}
+                      type="button"
+                      className={`${styles.orgOption} ${currentOrgId === org.id ? styles.orgOptionActive : ''}`}
+                      onClick={() => handleOrgChange(org.id)}
+                    >
+                      {org.nome}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {grupos.map((g) => (
             <div key={g.label}>
               <div className={styles.sideLabel}>{g.label}</div>

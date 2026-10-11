@@ -718,4 +718,194 @@ export async function indicadoresLideranca(organizacaoIds: string[]) {
   };
 }
 
+export interface FiltrosLiderancaDetalhada {
+  organizacaoIds: string[];
+  cargo?: string;
+  ministerioId?: string;
+  situacao?: 'ativos' | 'encerrados' | 'todos';
+  dataInicio?: string;
+  dataFim?: string;
+}
+
+export interface IndicadorLiderDetalhado {
+  liderancaId: string;
+  nome: string;
+  cargo: string;
+  ministerio?: string | null;
+  congregacao?: string | null;
+  ativo: boolean;
+  dataInicio: Date | null;
+  dataFim: Date | null;
+  tempoDias: number;
+  tempoLabel: string;
+  historico: { cargoAnterior: string | null; cargoNovo: string; dataInicio: Date | null; dataFim: Date | null; motivo: string | null; createdAt: Date }[];
+  desempenho: {
+    eventosOrganizador: number;
+    eventosParticipante: number;
+    liturgias: number;
+    pregacoes: number;
+    total: number;
+  };
+  eventosOrganizados: { id: string; nome: string; dataEvento: Date; funcao: string; principal: boolean }[];
+  liturgiasParticipadas: { id: string; data: Date; papel: string }[];
+  pregacoes: { id: string; titulo: string; data: Date }[];
+}
+
+export interface IndicadoresLiderancaDetalhadaResult {
+  resumo: {
+    totalLideres: number;
+    ativos: number;
+    encerrados: number;
+    tempoMedioAtivosDias: number;
+    tempoMedioEncerradosDias: number;
+  };
+  lideres: IndicadorLiderDetalhado[];
+}
+
+export async function indicadoresLiderancaDetalhada(filtros: FiltrosLiderancaDetalhada): Promise<IndicadoresLiderancaDetalhadaResult> {
+  const where: Record<string, unknown> = {};
+  if (filtros.organizacaoIds.length > 0) {
+    where.organizacaoId = { in: filtros.organizacaoIds };
+  }
+  if (filtros.cargo) where.cargo = { contains: filtros.cargo, mode: 'insensitive' };
+  if (filtros.ministerioId) where.ministerioId = filtros.ministerioId;
+  if (filtros.situacao === 'ativos') where.ativo = true;
+  else if (filtros.situacao === 'encerrados') where.ativo = false;
+  if (filtros.dataInicio) where.dataInicio = { gte: new Date(filtros.dataInicio) };
+  if (filtros.dataFim) where.dataFim = { lte: new Date(filtros.dataFim) };
+
+  const liderancas = await prisma.lideranca.findMany({
+    where,
+    include: {
+      ministerio: { select: { nome: true } },
+      congregacao: { select: { nome: true } },
+      historico: { orderBy: { createdAt: 'asc' } },
+      organizacao: { select: { id: true, nome: true } },
+    },
+    orderBy: { nome: 'asc' },
+  });
+
+  const organizacaoIds = filtros.organizacaoIds.length > 0 ? filtros.organizacaoIds : undefined;
+  const baseWhere: Record<string, unknown> = {};
+  if (organizacaoIds && organizacaoIds.length > 0) {
+    baseWhere.organizacaoId = { in: organizacaoIds };
+  }
+
+  const hoje = new Date();
+
+  const [eventos, liturgias, pregacoes, eventosOrganizadores] = await Promise.all([
+    prisma.evento.findMany({
+      where: { ...baseWhere, status: 'CONCLUIDO' },
+      select: { id: true, nome: true, dataEvento: true, responsavelGeral: true, preletores: true, organizadores: { include: { lideranca: { select: { id: true } } } } },
+    }),
+    prisma.liturgia.findMany({
+      where: { ...baseWhere, status: 'REALIZADA' },
+      select: { id: true, data: true, pregador: true, responsavel: true, dirigente: true },
+    }),
+    prisma.pregacao.findMany({
+      where: { ...baseWhere, status: 'PUBLICADA' },
+      select: { id: true, titulo: true, data: true, pregadorNome: true },
+    }),
+    prisma.eventoOrganizador.findMany({
+      where: { ...baseWhere },
+      include: { lideranca: { select: { id: true } } },
+    }),
+  ]);
+
+  const lideres: IndicadorLiderDetalhado[] = liderancas.map(l => {
+    const tempoDias = l.ativo
+      ? diasEntre(l.dataInicio ?? l.createdAt, hoje)
+      : diasEntre(l.dataInicio ?? l.createdAt, l.dataFim ?? l.updatedAt);
+
+    const eventosOrganizados = eventos.filter(e =>
+      e.organizadores?.some(o => o.lideranca?.id === l.id)
+    );
+    const eventosComoParticipante = eventos.filter(e =>
+      (e.responsavelGeral && nomesCoincidem(l.nome, e.responsavelGeral)) ||
+      (e.preletores ?? []).some(p => nomesCoincidem(l.nome, p)) ||
+      e.organizadores?.some(o => o.lideranca?.id === l.id)
+    );
+
+    const qtdEventosOrganizador = eventosOrganizados.length;
+    const qtdEventosParticipante = eventosComoParticipante.length;
+
+    const qtdLiturgias = liturgias.filter(g =>
+      [g.pregador, g.responsavel, g.dirigente].some(v => nomesCoincidem(l.nome, v))
+    ).length;
+
+    const qtdPregacoes = pregacoes.filter(p => nomesCoincidem(l.nome, p.pregadorNome)).length;
+
+    const eventosOrganizadosDetalhados = eventosOrganizados.map(e => ({
+      id: e.id,
+      nome: e.nome,
+      dataEvento: e.dataEvento,
+      funcao: e.organizadores?.find(o => o.lideranca?.id === l.id)?.funcao || 'ORGANIZADOR',
+      principal: e.organizadores?.find(o => o.lideranca?.id === l.id)?.principal || false,
+    }));
+
+    const liturgiasParticipadas = liturgias.filter(g =>
+      [g.pregador, g.responsavel, g.dirigente].some(v => nomesCoincidem(l.nome, v))
+    ).map(g => ({
+      id: g.id,
+      data: g.data,
+      papel: g.pregador && nomesCoincidem(l.nome, g.pregador) ? 'Pregador'
+        : g.responsavel && nomesCoincidem(l.nome, g.responsavel) ? 'Responsável'
+        : 'Dirigente',
+    }));
+
+    const pregacoesLider = pregacoes.filter(p => nomesCoincidem(l.nome, p.pregadorNome)).map(p => ({
+      id: p.id,
+      titulo: p.titulo,
+      data: p.data,
+    }));
+
+    return {
+      liderancaId: l.id,
+      nome: l.nome,
+      cargo: l.cargo,
+      ministerio: l.ministerio?.nome || null,
+      congregacao: l.congregacao?.nome || null,
+      ativo: l.ativo,
+      dataInicio: l.dataInicio,
+      dataFim: l.dataFim,
+      tempoDias,
+      tempoLabel: rotuloTempo(tempoDias),
+      historico: l.historico.map(h => ({
+        cargoAnterior: h.cargoAnterior,
+        cargoNovo: h.cargoNovo,
+        dataInicio: h.dataInicio,
+        dataFim: h.dataFim,
+        motivo: h.motivo,
+        createdAt: h.createdAt,
+      })),
+      desempenho: {
+        eventosOrganizador: qtdEventosOrganizador,
+        eventosParticipante: qtdEventosParticipante,
+        liturgias: qtdLiturgias,
+        pregacoes: qtdPregacoes,
+        total: qtdEventosOrganizador + qtdLiturgias + qtdPregacoes,
+      },
+      eventosOrganizados: eventosOrganizadosDetalhados,
+      liturgiasParticipadas,
+      pregacoes: pregacoesLider,
+    };
+  });
+
+  const ativos = lideres.filter(l => l.ativo);
+  const encerrados = lideres.filter(l => !l.ativo);
+  const somaAtivos = ativos.reduce((acc, l) => acc + l.tempoDias, 0);
+  const somaEncerrados = encerrados.reduce((acc, l) => acc + l.tempoDias, 0);
+
+  return {
+    resumo: {
+      totalLideres: lideres.length,
+      ativos: ativos.length,
+      encerrados: encerrados.length,
+      tempoMedioAtivosDias: ativos.length > 0 ? Math.round(somaAtivos / ativos.length) : 0,
+      tempoMedioEncerradosDias: encerrados.length > 0 ? Math.round(somaEncerrados / encerrados.length) : 0,
+    },
+    lideres,
+  };
+}
+
 export { INDICADORES };

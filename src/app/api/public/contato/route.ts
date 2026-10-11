@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { resolvePublicOrganizacaoId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,11 +24,11 @@ export async function POST(request: NextRequest) {
 
     const { nome, email, telefone, assunto, mensagem } = parsed.data;
 
-    const org = await prisma.organizacao.findFirst({
-      where: { ativo: true },
-      select: { id: true },
-      orderBy: { createdAt: 'asc' },
-    });
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+    const organizacaoId = searchParams.get('organizacaoId');
+
+    const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
 
     try {
       await prisma.contatoMensagem.create({
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
           telefone: telefone || null,
           assunto: assunto || null,
           mensagem,
-          organizacaoId: org?.id || null,
+          organizacaoId: orgId,
         },
       });
     } catch {
