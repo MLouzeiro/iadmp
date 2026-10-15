@@ -1,158 +1,146 @@
-import Link from 'next/link';
-import { Heart, ArrowRight } from 'lucide-react';
-import { programs, values, leaders, congregations } from '@/data/site-data';
-import PublicSections from '@/components/public/PublicSections';
-import BannerCarousel from '@/components/public/BannerCarousel';
-import HeroStats from '@/components/public/HeroStats';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { churchData, socialLinks } from '@/data/site-data';
+import TopBarSite from '@/components/public/site/TopBarSite';
+import HeaderSite from '@/components/public/site/HeaderSite';
+import HeroSite from '@/components/public/site/HeroSite';
+import PilaresSection from '@/components/public/site/PilaresSection';
+import EventosAvisosSection from '@/components/public/site/EventosAvisosSection';
+import MinisteriosSection from '@/components/public/site/MinisteriosSection';
+import RodapeInfoSection from '@/components/public/site/RodapeInfoSection';
+import BarraFinal from '@/components/public/site/BarraFinal';
+import CongregacoesPublicas from '@/components/public/CongregacoesPublicas';
+import ProgramacaoPublica from '@/components/public/ProgramacaoPublica';
+
+const slugPortal = 'iadmp-igreja-assembleia-de-deus-ministerio-da-promessa';
+
+interface ChurchConfig {
+  nomeIgreja?: string;
+  logoUrl?: string | null;
+  rodapeEndereco?: string | null;
+  rodapeTelefone?: string | null;
+  rodapeWhatsapp?: string | null;
+  rodapeEmail?: string | null;
+}
+
+interface ChurchInfo {
+  nome: string;
+  descricao: string | null;
+  configuracoes: ChurchConfig | null;
+  paginaPublica?: {
+    secaoPilares?: {
+      exibir?: boolean;
+      itens?: { titulo: string; descricao: string; detalhes?: string }[];
+    } | null;
+    secaoPalavraDia?: { exibir?: boolean } | null;
+    secaoRodapeInfo?: {
+      exibir?: boolean;
+      horariosCulto?: { dia: string; horario: string }[];
+    } | null;
+  } | null;
+}
 
 export default function Home() {
+  const [igreja, setIgreja] = useState<ChurchInfo | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/public/church-info?slug=${slugPortal}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.organizacao) {
+          setIgreja({
+            nome: d.organizacao.nome,
+            descricao: d.organizacao.descricao,
+            configuracoes: d.configuracoes,
+            paginaPublica: d.paginaPublica,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const cfg = igreja?.configuracoes;
+  const pp = igreja?.paginaPublica;
+  const nomeOrg = cfg?.nomeIgreja || 'IADMP — Assembleia de Deus';
+  const pilaresExibir = pp?.secaoPilares?.exibir ?? true;
+  const palavraDiaExibir = pp?.secaoPalavraDia?.exibir ?? true;
+
+  const instagram = socialLinks.find((s) => s.name === 'Instagram')?.url;
+  const facebook = socialLinks.find((s) => s.name === 'Facebook')?.url;
+  const youtube = socialLinks.find((s) => s.name === 'YouTube')?.url;
+
   return (
-    <>
-      {/* Banners e flyers (carrossel do topo) */}
-      <BannerCarousel />
+    <div className="siteWrapper" id="topo">
+      <TopBarSite
+        endereco={cfg?.rodapeEndereco || churchData.address}
+        telefone={cfg?.rodapeTelefone || churchData.phone}
+        instagram={instagram}
+        facebook={facebook}
+        youtube={youtube}
+        nomeOrg={nomeOrg}
+      />
+      <HeaderSite slug={slugPortal} logoUrl={cfg?.logoUrl} nomeIgreja={nomeOrg} />
 
-      {/* Hero */}
-      <section className="hero">
-        <div className="hero-bg" style={{ backgroundImage: 'url(/images/iadmp/Slide/image1.jpg)' }} />
-        <div className="hero-content fade-in">
-          <h1>
-            Missão, <br />
-            <span>da Promessa</span>
-          </h1>
-          <p>Comunidade de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus.</p>
-          <div className="hero-buttons">
-            <Link href="/sobre" className="btn btn-primary btn-lg">
-              Conheca Nossa História <ArrowRight size={16} />
-            </Link>
-            <Link href="/eventos" className="btn btn-outline btn-lg">
-              Próximas Programações
-            </Link>
-          </div>
-          <HeroStats />
+      <HeroSite
+        slug={slugPortal}
+        config={null}
+        nomeFallback="IADMP — Missão da Promessa"
+        descricaoFallback="Igreja de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus."
+      />
+
+      {pilaresExibir && (
+        <PilaresSection
+          itens={pp?.secaoPilares?.itens || null}
+          slug={slugPortal}
+          exibirPalavraDia={palavraDiaExibir}
+        />
+      )}
+
+      {/* Sobre */}
+      <section className="sobre" id="sobre">
+        <div className="sobreInner">
+          <h2>Sobre Nós</h2>
+          <p>
+            {igreja?.descricao ||
+              'Somos uma igreja comprometida com o Evangelho, uma comunidade de fé, amor e esperança onde cada pessoa é acolhida e transformada pelo poder de Deus.'}
+          </p>
         </div>
       </section>
 
-      {/* Versiculo + Programacoes + Pregacoes + Canais (do banco) */}
-      <PublicSections />
+      <EventosAvisosSection slug={slugPortal} />
 
-      {/* Programacao Semanal */}
-      <section>
-        <div className="container">
-          <div className="section-heading">
-            <span className="label">Programacao Semanal</span>
-            <h2>Nossos Cultos</h2>
-            <p>Confira nossa agenda semanal e participe conosco.</p>
-            <div className="divider" />
-          </div>
-          <div className="grid-4">
-            {programs.map((p) => (
-              <div key={p.id} className="program-card">
-                <p className="day">{p.day}</p>
-                <h3>{p.title}</h3>
-                <p>As {p.time}</p>
-                <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>{p.description}</p>
-              </div>
-            ))}
-          </div>
+      {/* Programação */}
+      <section className="secaoExtra" id="programacao">
+        <div className="secaoExtraInner">
+          <h2>Programação</h2>
+          <ProgramacaoPublica slug={slugPortal} />
         </div>
       </section>
 
-      {/* Congregacoes */}
-      <section style={{ background: 'var(--bg-secondary)' }}>
-        <div className="container">
-          <div className="section-heading">
-            <span className="label">Nossas Congregações</span>
-            <h2>Encontre uma Congregação</h2>
-            <p>Conheca nossas congregações e participe de uma perto de você.</p>
-            <div className="divider" />
-          </div>
-          <div className="grid-3">
-            {congregations.map((c) => (
-              <div key={c.id} className="congregation-card">
-                <img src={c.image} alt={c.name} />
-                <div className="overlay">
-                  <h3>{c.name}</h3>
-                  <p>{c.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      <MinisteriosSection slug={slugPortal} />
+
+      {/* Congregações */}
+      <section className="secaoExtra">
+        <div className="secaoExtraInner">
+          <h2>Nossas Congregações</h2>
+          <CongregacoesPublicas />
         </div>
       </section>
 
-      {/* Valores */}
-      <section>
-        <div className="container">
-          <div className="section-heading">
-            <span className="label">Nossos Valores</span>
-            <h2>Fundamentos da Nossa Fé</h2>
-            <p>Valores que guiam nossa caminhada espiritual.</p>
-            <div className="divider" />
-          </div>
-          <div className="grid-2">
-            {values.map((v) => (
-              <div key={v.id} className="card" style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--gradient-gold-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Heart size={20} style={{ color: 'var(--color-primary)' }} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{v.title}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{v.description}</p>
-                  <p style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontStyle: 'italic' }}>{v.verse}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <RodapeInfoSection
+        nomeOrg={nomeOrg}
+        endereco={cfg?.rodapeEndereco || churchData.address}
+        telefone={cfg?.rodapeTelefone || churchData.phone}
+        whatsapp={cfg?.rodapeWhatsapp}
+        email={cfg?.rodapeEmail || churchData.email}
+        instagram={instagram}
+        facebook={facebook}
+        youtube={youtube}
+        horariosCulto={pp?.secaoRodapeInfo?.horariosCulto}
+      />
 
-      {/* Lideranca (preview) */}
-      <section style={{ background: 'var(--bg-secondary)' }}>
-        <div className="container">
-          <div className="section-heading">
-            <span className="label">Nossa Liderança</span>
-            <h2>Servos de Deus</h2>
-            <p>Conheca aqueles que guiem nossa comunidade com amor e dedicao.</p>
-            <div className="divider" />
-          </div>
-          <div className="grid-4">
-            {leaders.slice(0, 4).map((l) => (
-              <div key={l.id} className="leader-card">
-                {l.image ? (
-                  <img src={l.image} alt={l.name} className="leader-avatar" />
-                ) : (
-                  <div className="leader-avatar-placeholder">
-                    {l.name.charAt(0)}
-                  </div>
-                )}
-                <h3>{l.name}</h3>
-                <p className="role">{l.role}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <Link href="/lideranca" className="btn btn-outline">
-              Ver Toda Liderança <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="cta-section">
-        <div className="container">
-          <h2>Venha fazer parte da nossa comunidade</h2>
-          <p>Somos uma família de fé que te acolhe com amor. Venha nos conhecer!</p>
-          <div className="cta-buttons">
-            <Link href="/sobre" className="btn btn-dark btn-lg">
-              Conheca Nossa Igreja
-            </Link>
-            <Link href="/contato" className="btn btn-white btn-lg">
-              Fale Conosco
-            </Link>
-          </div>
-        </div>
-      </section>
-    </>
+      <BarraFinal nomeOrg={nomeOrg} />
+    </div>
   );
 }

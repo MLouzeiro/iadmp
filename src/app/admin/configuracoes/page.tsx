@@ -8,6 +8,8 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import EmptyState from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
+import UploadField from '@/components/ui/UploadField';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 import styles from '@/components/ui/form.module.css';
 
 interface Config {
@@ -20,9 +22,11 @@ interface Config {
 
 export default function ConfiguracoesPage() {
   const { toast } = useToast();
+  const { orgs } = useOrganizacoes();
   const [config, setConfig] = useState<Config>({ nomeIgreja: '', logoUrl: '', logoDarkUrl: '', faviconUrl: '', tema: 'dark' });
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const orgId = orgs.length === 1 ? orgs[0].id : orgs[0]?.id || '';
 
   useEffect(() => {
     fetch('/api/configuracoes')
@@ -138,6 +142,26 @@ export default function ConfiguracoesPage() {
               { value: 'auto', label: 'Automático (sistema)' },
             ]}
           />
+          <div className={styles.formGridFull}>
+            <UploadField
+              organizacaoId={orgId}
+              value={config.logoUrl}
+              onChange={(url) => setConfig((p) => ({ ...p, logoUrl: url }))}
+              pasta="config"
+              entityTipo="ConfiguracoesIgreja"
+              label="Enviar logo (tema claro)"
+            />
+          </div>
+          <div className={styles.formGridFull}>
+            <UploadField
+              organizacaoId={orgId}
+              value={config.logoDarkUrl}
+              onChange={(url) => setConfig((p) => ({ ...p, logoDarkUrl: url }))}
+              pasta="config"
+              entityTipo="ConfiguracoesIgreja"
+              label="Enviar logo (tema escuro)"
+            />
+          </div>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ function getTimeUntilNext(proximoEm: string): string {
   return `${minutes}min`;
 }
 
-export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string }) {
+export default function VerseOfTheDay({ organizacaoId, slug }: { organizacaoId?: string; slug?: string }) {
   const [verse, setVerse] = useState<VersiculoData | null>(null);
   const [proximoEm, setProximoEm] = useState('');
   const [countdown, setCountdown] = useState('');
@@ -40,7 +40,11 @@ export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string
 
   const fetchVerse = useCallback(async () => {
     try {
-      const res = await fetch(`/api/public/versiculo?organizacaoId=${organizacaoId}`);
+      const params = new URLSearchParams();
+      if (slug) params.set('slug', slug);
+      else if (organizacaoId) params.set('organizacaoId', organizacaoId);
+      const qs = params.toString();
+      const res = await fetch(`/api/public/versiculo${qs ? `?${qs}` : ''}`);
       if (res.ok) {
         const data: VerseResponse = await res.json();
         if (data.versiculo) {
@@ -57,7 +61,7 @@ export default function VerseOfTheDay({ organizacaoId }: { organizacaoId: string
     } finally {
       setLoading(false);
     }
-  }, [organizacaoId]);
+  }, [organizacaoId, slug]);
 
   useEffect(() => {
     fetchVerse();

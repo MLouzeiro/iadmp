@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protótipo — Nova Home IADMP Congregação Centro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0B2A4A;
+  --blue: #0B5C8E;
+  --blue-light: #F2F7FB;
+  --text: #1F2A37;
+  --text-sec: #5B6B7B;
+  --white: #FFFFFF;
+  --green: #1B7A4E;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --shadow: 0 2px 12px rgba(11,42,74,.08);
+  --shadow-lg: 0 8px 32px rgba(11,42,74,.12);
+  --container: 1200px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; color:var(--text); background:var(--white); line-height:1.6; }
+a { text-decoration:none; color:inherit; }
+img { max-width:100%; display:block; }
+.container { max-width:var(--container); margin:0 auto; padding:0 1.5rem; }
+
+/* ===== TOP BAR ===== */
+.topbar { background:var(--navy); color:#c8d6e5; font-size:.78rem; padding:.55rem 0; }
+.topbar-inner { display:flex; justify-content:space-between; align-items:center; max-width:var(--container); margin:0 auto; padding:0 1.5rem; flex-wrap:wrap; gap:.5rem; }
+.topbar-left { display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; }
+.topbar-item { display:flex; align-items:center; gap:.35rem; }
+.topbar-item svg { width:14px; height:14px; flex-shrink:0; }
+.topbar-social { display:flex; gap:.6rem; align-items:center; }
+.topbar-social a { color:#c8d6e5; transition:color .2s; }
+.topbar-social a:hover { color:#fff; }
+.topbar-social svg { width:15px; height:15px; }
+.topbar-right { display:flex; align-items:center; gap:1.25rem; }
+.topbar-right strong { color:#fff; font-weight:600; }
+.topbar-right a { color:#c8d6e5; display:flex; align-items:center; gap:.3rem; transition:color .2s; }
+.topbar-right a:hover { color:#fff; }
+.topbar-right svg { width:14px; height:14px; }
+
+/* ===== HEADER ===== */
+.header { background:#fff; position:sticky; top:0; z-index:100; border-bottom:1px solid #e8eef4; transition:box-shadow .3s; }
+.header.scrolled { box-shadow:0 2px 16px rgba(11,42,74,.1); }
+.header-inner { display:flex; align-items:center; justify-content:space-between; max-width:var(--container); margin:0 auto; padding:.85rem 1.5rem; gap:1.5rem; }
+.logo { display:flex; align-items:center; gap:.65rem; }
+.logo-icon { width:44px; height:44px; background:var(--navy); border-radius:10px; display:grid; place-items:center; }
+.logo-icon svg { width:26px; height:26px; color:#fff; }
+.logo-text h1 { font-size:1.15rem; font-weight:800; color:var(--navy); line-height:1.1; }
+.logo-text span { font-size:.65rem; font-weight:600; letter-spacing:.12em; color:var(--text-sec); text-transform:uppercase; }
+.nav { display:flex; align-items:center; gap:.25rem; }
+.nav a { padding:.5rem .85rem; font-size:.88rem; font-weight:500; color:var(--text-sec); border-radius:8px; transition:all .2s; position:relative; }
+.nav a:hover { color:var(--navy); background:var(--blue-light); }
+.nav a.active { color:var(--blue); font-weight:600; }
+.nav a.active::after { content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:20px; height:2.5px; background:var(--blue); border-radius:2px; }
+.cta-btn { display:inline-flex; align-items:center; gap:.45rem; background:var(--navy); color:#fff !important; padding:.6rem 1.3rem; border-radius:var(--radius-pill); font-size:.85rem; font-weight:600; transition:all .2s; white-space:nowrap; }
+.cta-btn:hover { background:var(--blue); transform:translateY(-1px); box-shadow:0 4px 16px rgba(11,42,74,.25); }
+.cta-btn svg { width:16px; height:16px; }
+.hamburger { display:none; background:none; border:none; cursor:pointer; padding:.25rem; }
+.hamburger svg { width:28px; height:28px; color:var(--navy); }
+
+/* ===== HERO ===== */
+.hero { position:relative; min-height:520px; display:flex; align-items:center; background:linear-gradient(135deg,#0B2A4A 0%,#0e3d6b 60%,#1a5a8a 100%); overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:url('https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1600&q=80') center/cover; opacity:.25; }
+.hero::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(11,42,74,.92) 0%,rgba(11,42,74,.7) 50%,rgba(11,42,74,.3) 100%); }
+.hero-content { position:relative; z-index:1; max-width:var(--container); margin:0 auto; padding:5rem 1.5rem; width:100%; }
+.hero-eyebrow { font-size:.8rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7eb8e0; margin-bottom:1rem; }
+.hero h2 { font-size:clamp(2.2rem,5vw,3.5rem); font-weight:800; color:#fff; line-height:1.15; margin-bottom:1rem; }
+.hero p { font-size:1.1rem; color:#c8d6e5; max-width:540px; margin-bottom:2rem; line-height:1.7; }
+.hero-btn { display:inline-flex; align-items:center; gap:.5rem; background:var(--blue); color:#fff; padding:.85rem 1.8rem; border-radius:var(--radius-pill); font-size:.95rem; font-weight:600; transition:all .2s; }
+.hero-btn:hover { background:#0a4f7c; transform:translateY(-2px); box-shadow:0 6px 24px rgba(11,92,142,.4); }
+.hero-btn svg { width:18px; height:18px; }
+
+/* ===== PILARES ===== */
+.pilares { background:var(--blue-light); padding:3rem 0; }
+.pilares-grid { display:grid; grid-template-columns:repeat(4,1fr); max-width:var(--container); margin:0 auto; }
+.pilar { text-align:center; padding:1.5rem 2rem; border-right:1px solid #dce8f2; }
+.pilar:last-child { border-right:none; }
+.pilar-icon { width:48px; height:48px; margin:0 auto .85rem; display:grid; place-items:center; }
+.pilar-icon svg { width:36px; height:36px; color:var(--navy); stroke-width:1.8; }
+.pilar h3 { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:.35rem; }
+.pilar p { font-size:.82rem; color:var(--text-sec); }
+
+/* ===== EVENTOS + AVISOS ===== */
+.eventos-avisos { padding:4rem 0; }
+.ea-grid { display:grid; grid-template-columns:1fr 340px; gap:2rem; max-width:var(--container); margin:0 auto; padding:0 1.5rem; }
+.ea-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
+.ea-title { display:flex; align-items:center; gap:.6rem; }
+.ea-title svg { width:22px; height:22px; color:var(--blue); }
+.ea-title h2 { font-size:1.5rem; font-weight:700; color:var(--navy); }
+.ea-link { font-size:.85rem; font-weight:600; color:var(--blue); display:flex; align-items:center; gap:.3rem; transition:gap .2s; }
+.ea-link:hover { gap:.55rem; }
+.ea-link svg { width:15px; height:15px; }
+.eventos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+.evento-card { background:#fff; border:1px solid #e8eef4; border-radius:var(--radius-card); overflow:hidden; transition:all .25s; }
+.evento-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-3px); }
+.evento-img { position:relative; height:160px; background:linear-gradient(135deg,#0B2A4A,#1a5a8a); }
+.evento-img img { width:100%; height:100%; object-fit:cover; }
+.evento-date { position:absolute; top:.75rem; left:.75rem; background:var(--navy); color:#fff; border-radius:8px; padding:.4rem .55rem; text-align:center; min-width:52px; }
+.evento-date .dow { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }
+.evento-date .day { font-size:1.3rem; font-weight:800; line-height:1.1; }
+.evento-date .mon { font-size:.6rem; font-weight:600; text-transform:uppercase; opacity:.8; }
+.evento-body { padding:1rem 1.1rem 1.2rem; }
+.evento-body h3 { font-size:.95rem; font-weight:700; color:var(--navy); margin-bottom:.5rem; }
+.evento-meta { display:flex; align-items:center; gap:.35rem; font-size:.78rem; color:var(--text-sec); margin-bottom:.35rem; }
+.evento-meta svg { width:14px; height:14px; color:var(--blue); flex-shrink:0; }
+.evento-desc { font-size:.78rem; color:var(--text-sec); margin:.5rem 0 .75rem; line-height:1.5; }
+.evento-btn { display:inline-flex; align-items:center; gap:.3rem; font-size:.78rem; font-weight:600; color:var(--blue); transition:gap .2s; }
+.evento-btn:hover { gap:.5rem; }
+.evento-btn svg { width:14px; height:14px; }
+
+.avisos-panel { background:var(--blue-light); border-radius:var(--radius-card); padding:1.5rem; }
+.avisos-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+.avisos-title { display:flex; align-items:center; gap:.5rem; }
+.avisos-title svg { width:20px; height:20px; color:var(--blue); }
+.avisos-title h3 { font-size:1.15rem; font-weight:700; color:var(--navy); }
+.avisos-ver { font-size:.8rem; font-weight:600; color:var(--blue); }
+.aviso-item { display:flex; gap:.85rem; padding:.85rem 0; border-bottom:1px solid #dce8f2; }
+.aviso-item:last-child { border-bottom:none; }
+.aviso-date { background:var(--blue); color:#fff; border-radius:8px; padding:.35rem .5rem; text-align:center; min-width:44px; height:fit-content; flex-shrink:0; }
+.aviso-date .day { font-size:1.05rem; font-weight:800; line-height:1.1; }
+.aviso-date .mon { font-size:.55rem; font-weight:600; text-transform:uppercase; opacity:.85; }
+.aviso-body h4 { font-size:.85rem; font-weight:700; color:var(--navy); margin-bottom:.2rem; }
+.aviso-body p { font-size:.75rem; color:var(--text-sec); line-height:1.45; }
+.avisos-footer { text-align:right; margin-top:1rem; }
+.avisos-footer a { font-size:.8rem; font-weight:600; color:var(--blue); display:inline-flex; align-items:center; gap:.3rem; }
+.avisos-footer svg { width:14px; height:14px; }
+
+/* ===== MINISTÉRIOS ===== */
+.ministerios { position:relative; background:var(--navy); padding:4.5rem 0; overflow:hidden; }
+.ministerios::before { content:''; position:absolute; inset:0; background:url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1600&q=80') center/cover; opacity:.12; }
+.ministerios-grid { position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:3rem; max-width:var(--container); margin:0 auto; padding:0 1.5rem; align-items:center; }
+.ministerios-eyebrow { display:flex; align-items:center; gap:.5rem; font-size:.78rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:#7eb8e0; margin-bottom:.75rem; }
+.ministerios-eyebrow svg { width:18px; height:18px; }
+.ministerios h2 { font-size:clamp(1.6rem,3.5vw,2.2rem); font-weight:800; color:#fff; line-height:1.25; margin-bottom:1rem; }
+.ministerios p { font-size:.95rem; color:#a0b8cc; margin-bottom:1.75rem; max-width:420px; }
+.ministerios-btn { display:inline-flex; align-items:center; gap:.4rem; color:#fff; font-size:.9rem; font-weight:600; border:2px solid rgba(255,255,255,.35); padding:.65rem 1.4rem; border-radius:var(--radius-pill); transition:all .2s; }
+.ministerios-btn:hover { background:rgba(255,255,255,.1); border-color:#fff; }
+.ministerios-btn svg { width:16px; height:16px; }
+.tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; }
+.tile { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-card); padding:1.4rem 1rem; text-align:center; transition:all .25s; cursor:pointer; }
+.tile:hover { background:rgba(255,255,255,.14); transform:translateY(-2px); }
+.tile svg { width:28px; height:28px; color:#7eb8e0; margin:0 auto .6rem; stroke-width:1.8; }
+.tile span { font-size:.8rem; font-weight:600; color:#fff; }
+
+/* ===== FOOTER INFO ===== */
+.footer-info { background:var(--blue-light); padding:3.5rem 0; }
+.footer-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2.5rem; max-width:var(--container); margin:0 auto; padding:0 1.5rem; }
+.footer-col h3 { display:flex; align-items:center; gap:.5rem; font-size:1.05rem; font-weight:700; color:var(--navy); margin-bottom:1.25rem; }
+.footer-col h3 svg { width:20px; height:20px; color:var(--blue); }
+.footer-endereco { display:flex; gap:.5rem; font-size:.85rem; color:var(--text-sec); margin-bottom:1rem; }
+.footer-endereco svg { width:16px; height:16px; color:var(--blue); flex-shrink:0; margin-top:2px; }
+.mapa { width:100%; height:140px; background:#d0dce8; border-radius:var(--radius-card); display:grid; place-items:center; color:var(--text-sec); font-size:.8rem; margin-top:.75rem; position:relative; overflow:hidden; }
+.mapa::after { content:'📍'; font-size:2rem; position:absolute; }
+.mapa-btn { display:inline-flex; align-items:center; gap:.3rem; margin-top:.65rem; font-size:.8rem; font-weight:600; color:var(--blue); }
+.mapa-btn svg { width:14px; height:14px; }
+.horario-item { display:flex; gap:.6rem; margin-bottom:.9rem; }
+.horario-item svg { width:16px; height:16px; color:var(--blue); flex-shrink:0; margin-top:2px; }
+.horario-item strong { display:block; font-size:.85rem; color:var(--navy); }
+.horario-item span { font-size:.78rem; color:var(--text-sec); }
+.footer-contato-item { display:flex; align-items:center; gap:.55rem; font-size:.85rem; color:var(--text-sec); margin-bottom:.7rem; }
+.footer-contato-item svg { width:16px; height:16px; color:var(--blue); flex-shrink:0; }
+.footer-social { display:flex; gap:.75rem; margin:1rem 0 1.25rem; }
+.footer-social a { width:36px; height:36px; border-radius:50%; background:var(--navy); color:#fff; display:grid; place-items:center; transition:all .2s; }
+.footer-social a:hover { background:var(--blue); transform:translateY(-2px); }
+.footer-social svg { width:16px; height:16px; }
+.wpp-btn { display:inline-flex; align-items:center; gap:.5rem; background:var(--green); color:#fff; padding:.7rem 1.4rem; border-radius:var(--radius-pill); font-size:.85rem; font-weight:600; transition:all .2s; }
+.wpp-btn:hover { background:#15633e; transform:translateY(-2px); box-shadow:0 4px 16px rgba(27,122,78,.3); }
+.wpp-btn svg { width:18px; height:18px; }
+
+/* ===== BARRA FINAL ===== */
+.barra-final { background:var(--navy); padding:1.1rem 0; }
+.barra-inner { display:flex; align-items:center; justify-content:space-between; max-width:var(--container); margin:0 auto; padding:0 1.5rem; flex-wrap:wrap; gap:.75rem; }
+.barra-texto { font-size:.82rem; color:#a0b8cc; }
+.barra-texto strong { color:#fff; font-weight:600; }
+.barra-topo { font-size:.82rem; color:#a0b8cc; display:flex; align-items:center; gap:.3rem; transition:color .2s; }
+.barra-topo:hover { color:#fff; }
+.barra-topo svg { width:15px; height:15px; }
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:1024px){
+  .pilares-grid{grid-template-columns:repeat(2,1fr)}
+  .pilar{border-right:none;border-bottom:1px solid #dce8f2}
+  .eventos-grid{grid-template-columns:repeat(2,1fr)}
+  .ea-grid{grid-template-columns:1fr}
+  .ministerios-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .nav{display:none}
+  .hamburger{display:block}
+  .topbar-right{display:none}
+  .eventos-grid{grid-template-columns:1fr}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr}
+  .pilares-grid{grid-template-columns:1fr 1fr}
+  .hero{min-height:400px}
+  .hero-content{padding:3.5rem 1.5rem}
+}
+@media(max-width:480px){
+  .topbar-left{gap:.75rem;font-size:.72rem}
+  .pilares-grid{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <span class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Rua das Flores, 123 - Centro, São Luís - MA
+      </span>
+      <a href="tel:+5598987654321" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        (98) 98765-4321
+      </a>
+    </div>
+    <div class="topbar-left topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+    </div>
+    <div class="topbar-right">
+      <strong>IADMP - Maranhão</strong>
+      <a href="/">
+        Voltar para o site geral
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8 6 4 8 4 12a8 8 0 0016 0c0-4-4-6-8-10z"/><path d="M12 22v-6"/><path d="M8 14h8"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>IADMP</h1>
+        <span>Congregação Centro</span>
+      </div>
+    </a>
+    <nav class="nav">
+      <a href="#" class="active">Início</a>
+      <a href="#sobre">Sobre nós</a>
+      <a href="#eventos">Eventos</a>
+      <a href="#avisos">Avisos</a>
+      <a href="#ministerios">Ministérios</a>
+      <a href="#programacao">Programação</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <a href="#contato" class="cta-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Fale conosco
+    </a>
+    <button class="hamburger" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Bem-vindo à nossa congregação</div>
+    <h2>IADMP<br>Congregação Centro</h2>
+    <p>Uma igreja acolhedora, que ama a Deus, as pessoas e a obra de Cristo. Aqui você é sempre bem-vindo!</p>
+    <a href="#eventos" class="hero-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Conheça nossos eventos
+    </a>
+  </div>
+</section>
+
+<!-- PILARES -->
+<section class="pilares">
+  <div class="pilares-grid">
+    <div class="pilar">
+      <div class="pilar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+      <h3>Palavra de Deus</h3>
+      <p>Estudo, ensino e vida com propósito.</p>
+    </div>
+    <div class="pilar">
+      <div class="pilar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <h3>Comunhão</h3>
+      <p>Juntos na fé, no amor e na missão.</p>
+    </div>
+    <div class="pilar">
+      <div class="pilar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+      <h3>Serviço</h3>
+      <p>Servindo à igreja e à sociedade.</p>
+    </div>
+    <div class="pilar">
+      <div class="pilar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8 6 4 8 4 12a8 8 0 0016 0c0-4-4-6-8-10z"/><path d="M12 22v-6"/></svg></div>
+      <h3>Adoração</h3>
+      <p>Um coração que exalta a Jesus.</p>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTOS + AVISOS -->
+<section class="eventos-avisos" id="eventos">
+  <div class="ea-grid">
+    <div>
+      <div class="ea-header">
+        <div class="ea-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <h2>Próximos Eventos</h2>
+        </div>
+        <a href="#" class="ea-link">Ver todos os eventos <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="eventos-grid">
+        <div class="evento-card">
+          <div class="evento-img">
+            <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&q=80" alt="Encontro de Jovens">
+            <div class="evento-date"><div class="dow">Sáb</div><div class="day">26</div><div class="mon">Abr</div></div>
+          </div>
+          <div class="evento-body">
+            <h3>Encontro de Jovens</h3>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19h00</div>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Templo da Congregação Centro</div>
+            <p class="evento-desc">Momento de comunhão, louvor e palavra para a juventude.</p>
+            <a href="#" class="evento-btn">Mais detalhes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="evento-card">
+          <div class="evento-img">
+            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&q=80" alt="Culto de Celebração">
+            <div class="evento-date"><div class="dow">Dom</div><div class="day">27</div><div class="mon">Abr</div></div>
+          </div>
+          <div class="evento-body">
+            <h3>Culto de Celebração</h3>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18h00</div>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Templo da Congregação Centro</div>
+            <p class="evento-desc">Venha adorar a Deus conosco! Será uma noite especial.</p>
+            <a href="#" class="evento-btn">Mais detalhes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="evento-card">
+          <div class="evento-img">
+            <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80" alt="Encontro de Casais">
+            <div class="evento-date"><div class="dow">Sáb</div><div class="day">03</div><div class="mon">Mai</div></div>
+          </div>
+          <div class="evento-body">
+            <h3>Encontro de Casais</h3>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19h00</div>
+            <div class="evento-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Salão Social</div>
+            <p class="evento-desc">Fortalecendo famílias, edificando lares.</p>
+            <a href="#" class="evento-btn">Mais detalhes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="avisos-panel" id="avisos">
+      <div class="avisos-header">
+        <div class="avisos-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg>
+          <h3>Avisos</h3>
+        </div>
+        <a href="#" class="avisos-ver">Ver todos →</a>
+      </div>
+      <div class="aviso-item">
+        <div class="aviso-date"><div class="day">22</div><div class="mon">Abr</div></div>
+        <div class="aviso-body"><h4>Alimentação do Projeto Social</h4><p>No próximo sábado, não haverá distribuição de alimentos.</p></div>
+      </div>
+      <div class="aviso-item">
+        <div class="aviso-date"><div class="day">18</div><div class="mon">Abr</div></div>
+        <div class="aviso-body"><h4>Reunião de Líderes de Células</h4><p>Será no dia 25/04, às 19h, no templo da congregação.</p></div>
+      </div>
+      <div class="aviso-item">
+        <div class="aviso-date"><div class="day">12</div><div class="mon">Abr</div></div>
+        <div class="aviso-body"><h4>Limpeza do Templo</h4><p>Pedimos a todos os membros que ajudem na limpeza no sábado, às 8h.</p></div>
+      </div>
+      <div class="aviso-item">
+        <div class="aviso-date"><div class="day">05</div><div class="mon">Abr</div></div>
+        <div class="aviso-body"><h4>Campanha de Oração</h4><p>Durante todo o mês de abril, estaremos em oração por nossas famílias.</p></div>
+      </div>
+      <div class="avisos-footer">
+        <a href="#">Ver todos os avisos <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- MINISTÉRIOS -->
+<section class="ministerios" id="ministerios">
+  <div class="ministerios-grid">
+    <div>
+      <div class="ministerios-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Nossos Ministérios
+      </div>
+      <h2>Servindo a Deus com<br>os nossos dons</h2>
+      <p>Conheça os ministérios que fazem parte da nossa congregação e encontre o seu lugar na obra do Senhor.</p>
+      <a href="#" class="ministerios-btn">Conheça os ministérios <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
+    <div class="tiles">
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Louvor e Adoração</span></div>
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Ensino</span></div>
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span>Diaconia</span></div>
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Jovens</span></div>
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 10-16 0"/></svg><span>Infantil</span></div>
+      <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Família</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER INFO -->
+<section class="footer-info" id="contato">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Nossa Localização</h3>
+      <div class="footer-endereco">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Rua das Flores, 123<br>Centro, São Luís - MA</span>
+      </div>
+      <div class="mapa"></div>
+      <a href="#" class="mapa-btn">Ver no mapa <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
+    <div class="footer-col">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Horários dos Cultos</h3>
+      <div class="horario-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><strong>Domingo</strong><span>09h00 - Escola Bíblica Dominical<br>18h00 - Culto de Celebração</span></div>
+      </div>
+      <div class="horario-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><strong>Quarta-feira</strong><span>19h30 - Culto de Oração e Ensino</span></div>
+      </div>
+      <div class="horario-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><strong>Sábado</strong><span>19h00 - Encontro de Jovens</span></div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Fale Conosco</h3>
+      <div class="footer-contato-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        (98) 98765-4321
+      </div>
+      <div class="footer-contato-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        centro@iadmp-ma.vercel.app
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      </div>
+      <a href="https://wa.me/5598987654321" class="wpp-btn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        Fale pelo WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BARRA FINAL -->
+<div class="barra-final">
+  <div class="barra-inner">
+    <p class="barra-texto"><strong>IADMP - Congregação Centro</strong> &nbsp;|&nbsp; Uma igreja, muitas vidas, um só propósito: Jesus Cristo.</p>
+    <a href="#" class="barra-topo">↑ Voltar ao topo</a>
+  </div>
+</div>
+
+<script>
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+</script>
+</body>
+</html>

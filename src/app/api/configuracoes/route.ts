@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { defaultColors } from '@/lib/theme-palettes';
+import { PALETAS_SITE } from '@/lib/site-palettes';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
 import {
@@ -93,6 +94,7 @@ export async function PUT(request: NextRequest) {
       statLideres: body.statLideres,
       statAnosHistoria: body.statAnosHistoria,
       statMinisterios: body.statMinisterios,
+      paletaSite: body.paletaSite && PALETAS_SITE[body.paletaSite] ? body.paletaSite : undefined,
     };
 
     for (const chave of Object.keys(data)) {

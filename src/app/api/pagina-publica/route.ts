@@ -7,12 +7,16 @@ import { resolveTargetOrgId, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/t
 
 const paginaPublicaSchema = z.object({
   secaoHero: z.any().optional(),
+  secaoPalavraDia: z.any().optional(),
   secaoSobre: z.any().optional(),
   secaoEventos: z.any().optional(),
   secaoLideranca: z.any().optional(),
   secaoGaleria: z.any().optional(),
   secaoContato: z.any().optional(),
   secaoPregacoes: z.any().optional(),
+  secaoPilares: z.any().optional(),
+  secaoMinisterios: z.any().optional(),
+  secaoRodapeInfo: z.any().optional(),
   conteudo: z.any().optional(),
 });
 
@@ -60,12 +64,16 @@ export async function PUT(request: NextRequest) {
 
     const data: Record<string, unknown> = {};
     if (validated.secaoHero !== undefined) data.secaoHero = validated.secaoHero;
+    if (validated.secaoPalavraDia !== undefined) data.secaoPalavraDia = validated.secaoPalavraDia;
     if (validated.secaoSobre !== undefined) data.secaoSobre = validated.secaoSobre;
     if (validated.secaoEventos !== undefined) data.secaoEventos = validated.secaoEventos;
     if (validated.secaoLideranca !== undefined) data.secaoLideranca = validated.secaoLideranca;
     if (validated.secaoGaleria !== undefined) data.secaoGaleria = validated.secaoGaleria;
     if (validated.secaoContato !== undefined) data.secaoContato = validated.secaoContato;
     if (validated.secaoPregacoes !== undefined) data.secaoPregacoes = validated.secaoPregacoes;
+    if (validated.secaoPilares !== undefined) data.secaoPilares = validated.secaoPilares;
+    if (validated.secaoMinisterios !== undefined) data.secaoMinisterios = validated.secaoMinisterios;
+    if (validated.secaoRodapeInfo !== undefined) data.secaoRodapeInfo = validated.secaoRodapeInfo;
     if (validated.conteudo !== undefined) data.conteudo = validated.conteudo;
 
     const pagina = await prisma.paginaPublica.upsert({

@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowRight, Heart, Calendar, Users, BookOpen, Music, MapPin, Phone, Mail, Send, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import HeroStats from '@/components/public/HeroStats';
-import BannerCarousel from '@/components/public/BannerCarousel';
-import VerseOfTheDay from '@/components/public/VerseOfTheDay';
-import EventosList from '@/components/public/EventosList';
+import { ArrowRight } from 'lucide-react';
+import TopBarSite from '@/components/public/site/TopBarSite';
+import HeaderSite from '@/components/public/site/HeaderSite';
+import HeroSite from '@/components/public/site/HeroSite';
+import PilaresSection from '@/components/public/site/PilaresSection';
+import EventosAvisosSection from '@/components/public/site/EventosAvisosSection';
+import MinisteriosSection from '@/components/public/site/MinisteriosSection';
+import RodapeInfoSection from '@/components/public/site/RodapeInfoSection';
+import BarraFinal from '@/components/public/site/BarraFinal';
+import ProgramacaoPublica from '@/components/public/ProgramacaoPublica';
 import PregacoesList from '@/components/public/PregacoesList';
 import LiderancaList from '@/components/public/LiderancaList';
-import ContatoForm from '@/components/public/ContatoForm';
 import GaleriaGrid from '@/components/public/GaleriaGrid';
 import CanaisSection from '@/components/public/CanaisSection';
-import ChurchInfo from '@/components/public/ChurchInfo';
+import ContatoForm from '@/components/public/ContatoForm';
 import styles from './page.module.css';
 
 interface IgrejaConfig {
@@ -36,6 +40,7 @@ interface IgrejaConfig {
     corTextoSecundario: string;
     corBorda: string;
     tema: string;
+    paletaSite?: string;
     anoFundacao: number | null;
     rodapeDescricao: string | null;
     rodapeEndereco: string | null;
@@ -52,13 +57,31 @@ interface IgrejaConfig {
     statMinisterios: boolean;
   } | null;
   paginaPublica?: {
-    secaoHero: any;
-    secaoSobre: any;
-    secaoEventos: any;
-    secaoLideranca: any;
-    secaoGaleria: any;
-    secaoContato: any;
-    secaoPregacoes: any;
+    secaoHero?: {
+      exibir?: boolean;
+      tipo?: 'IMAGEM' | 'SLIDE' | 'VIDEO';
+      imagemUrl?: string;
+      videoUrl?: string;
+      slides?: { url: string; alt?: string }[];
+      sobretitulo?: string;
+      titulo?: string;
+      subtitulo?: string;
+      botaoTexto?: string;
+      botaoLink?: string;
+    } | null;
+    secaoSobre?: { exibir?: boolean; titulo?: string; texto?: string } | null;
+    secaoEventos?: { exibir?: boolean } | null;
+    secaoLideranca?: { exibir?: boolean } | null;
+    secaoGaleria?: { exibir?: boolean } | null;
+    secaoContato?: { exibir?: boolean } | null;
+    secaoPregacoes?: { exibir?: boolean } | null;
+    secaoPilares?: {
+      exibir?: boolean;
+      itens?: { titulo: string; descricao: string; detalhes?: string }[];
+    } | null;
+    secaoPalavraDia?: { exibir?: boolean } | null;
+    secaoMinisterios?: { exibir?: boolean } | null;
+    secaoRodapeInfo?: { exibir?: boolean; horariosCulto?: { dia: string; horario: string }[] } | null;
   } | null;
 }
 
@@ -88,179 +111,166 @@ export default function IgrejaHomePage() {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <div className={styles.loading}>Carregando...</div>
-      </div>
-    );
+    return <div className={styles.siteLoading}>Carregando...</div>;
   }
 
   if (!igreja) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <h1 style={{ color: 'var(--text-primary)' }}>Igreja não encontrada</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>A igreja com slug "<code>{slug}</code>" não existe ou está inativa.</p>
-        <Link href="/" style={{ marginTop: '2rem', display: 'inline-block' }}>
-          <button className={styles.btnPrimary}><ArrowRight size={16} /> Voltar ao início</button>
+      <div className={styles.siteErro}>
+        <h1>Igreja não encontrada</h1>
+        <p>A igreja com slug &quot;<code>{slug}</code>&quot; não existe ou está inativa.</p>
+        <Link href="/" className={styles.btnPrimary} style={{ marginTop: '2rem', display: 'inline-flex' }}>
+          Voltar ao início <ArrowRight size={16} />
         </Link>
       </div>
     );
   }
 
-  const hero = igreja.paginaPublica?.secaoHero || { titulo: 'Bem-vindos à nossa Igreja', subtitulo: 'Uma comunidade de fé, amor e esperança' };
-  const sobre = igreja.paginaPublica?.secaoSobre || { titulo: 'Sobre Nós', texto: 'Somos uma igreja comprometida com o Evangelho.' };
-  const exibirEventos = igreja.paginaPublica?.secaoEventos?.exibir ?? true;
-  const exibirLideranca = igreja.paginaPublica?.secaoLideranca?.exibir ?? true;
-  const exibirGaleria = igreja.paginaPublica?.secaoGaleria?.exibir ?? true;
-  const exibirContato = igreja.paginaPublica?.secaoContato?.exibir ?? true;
-  const exibirPregacoes = igreja.paginaPublica?.secaoPregacoes?.exibir ?? true;
+  const cfg = igreja.configuracoes;
+  const pp = igreja.paginaPublica;
+
+  const heroExibir = pp?.secaoHero?.exibir ?? true;
+  const pilaresExibir = pp?.secaoPilares?.exibir ?? true;
+  const palavraDiaExibir = pp?.secaoPalavraDia?.exibir ?? true;
+  const sobreExibir = pp?.secaoSobre?.exibir ?? true;
+  const eventosExibir = pp?.secaoEventos?.exibir ?? true;
+  const ministeriosExibir = pp?.secaoMinisterios?.exibir ?? true;
+  const rodapeInfoExibir = pp?.secaoRodapeInfo?.exibir ?? true;
+  const programacaoExibir = pp?.secaoSobre?.exibir ?? true;
+  const pregacoesExibir = pp?.secaoPregacoes?.exibir ?? true;
+  const liderancaExibir = pp?.secaoLideranca?.exibir ?? true;
+  const galeriaExibir = pp?.secaoGaleria?.exibir ?? true;
+  const contatoExibir = pp?.secaoContato?.exibir ?? true;
+
+  const nomeOrg = cfg?.nomeIgreja || igreja.nome;
 
   return (
-    <>
-      <BannerCarousel slug={slug} />
+    <div className={styles.siteWrapper} id="topo">
+      <TopBarSite
+        endereco={cfg?.rodapeEndereco}
+        telefone={cfg?.rodapeTelefone}
+        instagram={cfg?.rodapeInstagram}
+        facebook={cfg?.rodapeFacebook}
+        youtube={cfg?.rodapeYoutube}
+        nomeOrg={nomeOrg}
+      />
+      <HeaderSite
+        slug={slug}
+        logoUrl={cfg?.logoUrl}
+        nomeIgreja={nomeOrg}
+      />
 
-      <section className={styles.hero} style={{ backgroundImage: `url(${igreja.configuracoes?.logoDarkUrl || '/images/iadmp/Slide/image1.jpg'})` }}>
-        <div className={styles.heroOverlay} />
-        <div className={styles.heroContent}>
-          <h1>{hero.titulo || igreja.nome}</h1>
-          <p>{hero.subtitulo || igreja.descricao || 'Uma comunidade de fé, amor e esperança.'}</p>
-          <div className={styles.heroButtons}>
-            <Link href={`/igreja/${slug}/eventos`} className={styles.btnPrimary}>
-              Próximos Eventos <ArrowRight size={16} />
-            </Link>
-            <Link href={`/igreja/${slug}/contato`} className={styles.btnOutline}>
-              Fale Conosco
-            </Link>
+      {heroExibir && (
+        <HeroSite
+          slug={slug}
+          config={pp?.secaoHero || null}
+          nomeFallback={igreja.nome}
+          descricaoFallback={igreja.descricao}
+        />
+      )}
+
+      {pilaresExibir && (
+        <PilaresSection
+          itens={pp?.secaoPilares?.itens || null}
+          slug={slug}
+          exibirPalavraDia={palavraDiaExibir}
+        />
+      )}
+
+      {sobreExibir && (
+        <section className={styles.sobre} id="sobre">
+          <div className={styles.sobreInner}>
+            <h2>{pp?.secaoSobre?.titulo || 'Sobre Nós'}</h2>
+            <p>
+              {pp?.secaoSobre?.texto ||
+                igreja.descricao ||
+                'Somos uma igreja comprometida com o Evangelho.'}
+            </p>
           </div>
-        </div>
-      </section>
-
-      <HeroStats slug={slug} />
-
-      <section className={styles.section}>
-        <VerseOfTheDay slug={slug} />
-      </section>
-
-      {exibirEventos && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>Próximos Eventos</h2>
-            <Link href={`/igreja/${slug}/eventos`} className={styles.verTodos}>
-              Ver todos <ArrowRight size={16} />
-            </Link>
-          </div>
-          <EventosList slug={slug} limit={4} />
         </section>
       )}
 
-      {exibirPregacoes && (
-        <section className={styles.section} style={{ background: 'var(--bg-secondary)' }}>
-          <div className={styles.sectionHeader}>
-            <h2>Pregações Recentes</h2>
-            <Link href={`/igreja/${slug}/pregacoes`} className={styles.verTodos}>
-              Ver todas <ArrowRight size={16} />
-            </Link>
+      {eventosExibir && <EventosAvisosSection slug={slug} />}
+
+      {programacaoExibir && (
+        <section className={styles.secaoExtra} id="programacao">
+          <div className={styles.secaoExtraInner}>
+            <h2>Programação</h2>
+            <ProgramacaoPublica slug={slug} />
           </div>
-          <PregacoesList slug={slug} limit={3} />
         </section>
       )}
 
-      {exibirLideranca && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>Nossa Liderança</h2>
-            <Link href={`/igreja/${slug}/lideranca`} className={styles.verTodos}>
-              Ver todos <ArrowRight size={16} />
-            </Link>
+      {ministeriosExibir && <MinisteriosSection slug={slug} />}
+
+      {pregacoesExibir && (
+        <section className={styles.secaoExtra}>
+          <div className={styles.secaoExtraInner}>
+            <div className={styles.secaoExtraHeader}>
+              <h2>Pregações Recentes</h2>
+              <Link href={`/igreja/${slug}/pregacoes`} className={styles.verTodos}>
+                Ver todas <ArrowRight size={16} />
+              </Link>
+            </div>
+            <PregacoesList slug={slug} limit={3} />
           </div>
-          <LiderancaList slug={slug} limit={4} />
         </section>
       )}
 
-      {exibirGaleria && (
-        <section className={styles.section} style={{ background: 'var(--bg-secondary)' }}>
-          <div className={styles.sectionHeader}>
-            <h2>Galeria</h2>
-            <Link href={`/igreja/${slug}/galeria`} className={styles.verTodos}>
-              Ver mais <ArrowRight size={16} />
-            </Link>
+      {liderancaExibir && (
+        <section className={styles.secaoExtra}>
+          <div className={styles.secaoExtraInner}>
+            <div className={styles.secaoExtraHeader}>
+              <h2>Nossa Liderança</h2>
+              <Link href={`/igreja/${slug}/lideranca`} className={styles.verTodos}>
+                Ver todos <ArrowRight size={16} />
+              </Link>
+            </div>
+            <LiderancaList slug={slug} limit={4} />
           </div>
-          <GaleriaGrid slug={slug} limit={6} />
+        </section>
+      )}
+
+      {galeriaExibir && (
+        <section className={styles.secaoExtra}>
+          <div className={styles.secaoExtraInner}>
+            <div className={styles.secaoExtraHeader}>
+              <h2>Galeria</h2>
+              <Link href={`/igreja/${slug}/galeria`} className={styles.verTodos}>
+                Ver mais <ArrowRight size={16} />
+              </Link>
+            </div>
+            <GaleriaGrid slug={slug} limit={6} />
+          </div>
         </section>
       )}
 
       <CanaisSection slug={slug} />
 
-      {exibirContato && (
-        <section className={styles.section} style={{ background: 'var(--bg-secondary)' }}>
-          <div className={styles.sectionHeader}>
+      {contatoExibir && (
+        <section className={styles.secaoExtra} id="contato-form">
+          <div className={styles.secaoExtraInner}>
             <h2>Contato</h2>
+            <ContatoForm slug={slug} />
           </div>
-          <ContatoForm slug={slug} />
         </section>
       )}
 
-      <footer className={styles.churchFooter}>
-        <div className={styles.footerGrid}>
-          <div>
-            <h3>{igreja.configuracoes?.nomeIgreja || igreja.nome}</h3>
-            <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-              {igreja.descricao || 'Uma comunidade de fé, amor e esperança.'}
-            </p>
-          </div>
-          <div>
-            <h3>Endereço</h3>
-            {igreja.configuracoes?.rodapeEndereco && (
-              <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                <MapPin size={14} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} />
-                {igreja.configuracoes.rodapeEndereco}
-              </p>
-            )}
-            {igreja.configuracoes?.rodapeTelefone && (
-              <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                <Phone size={14} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} />
-                {igreja.configuracoes.rodapeTelefone}
-              </p>
-            )}
-            {igreja.configuracoes?.rodapeEmail && (
-              <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                <Mail size={14} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} />
-                {igreja.configuracoes.rodapeEmail}
-              </p>
-            )}
-            {igreja.configuracoes?.rodapeWhatsapp && (
-              <a href={igreja.configuracoes.rodapeWhatsapp} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', textDecoration: 'none' }}>
-                <MessageSquare size={14} /> WhatsApp
-              </a>
-            )}
-          </div>
-          <div>
-            <h3>Redes Sociais</h3>
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-              {igreja.configuracoes?.rodapeYoutube && (
-                <a href={igreja.configuracoes.rodapeYoutube} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)' }}>
-                  <Radio size={20} />
-                </a>
-              )}
-              {igreja.configuracoes?.rodapeInstagram && (
-                <a href={igreja.configuracoes.rodapeInstagram} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)' }}>
-                  <Radio size={20} />
-                </a>
-              )}
-              {igreja.configuracoes?.rodapeFacebook && (
-                <a href={igreja.configuracoes.rodapeFacebook} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)' }}>
-                  <Radio size={20} />
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className={styles.footerBottom}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            © {new Date().getFullYear()} {igreja.configuracoes?.nomeIgreja || igreja.nome}. Todos os direitos reservados.
-          </p>
-        </div>
-      </footer>
-      </>
-    );
-  }
+      {rodapeInfoExibir && (
+        <RodapeInfoSection
+          nomeOrg={nomeOrg}
+          endereco={cfg?.rodapeEndereco}
+          telefone={cfg?.rodapeTelefone}
+          whatsapp={cfg?.rodapeWhatsapp}
+          email={cfg?.rodapeEmail}
+          instagram={cfg?.rodapeInstagram}
+          facebook={cfg?.rodapeFacebook}
+          youtube={cfg?.rodapeYoutube}
+          horariosCulto={pp?.secaoRodapeInfo?.horariosCulto}
+        />
+      )}
+
+      <BarraFinal nomeOrg={nomeOrg} />
+    </div>
+  );
+}

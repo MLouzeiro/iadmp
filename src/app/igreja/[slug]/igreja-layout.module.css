@@ -63,6 +63,26 @@
   color: var(--text-primary);
 }
 
+.navCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary, #C8960C);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.navCta:hover {
+  opacity: 0.88;
+  color: #fff;
+}
+
 .mobileToggle {
   display: none;
   background: none;

@@ -17,6 +17,11 @@ export async function GET(request: NextRequest) {
     const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
 
     if (!orgId) {
+      // Slug/organizacaoId informado mas inválido, inativo ou com site desligado → 404.
+      // Sem parâmetros (portal geral) e sem nenhuma org ativa → resposta vazia.
+      if (slug || organizacaoId) {
+        return NextResponse.json({ error: 'Igreja não encontrada' }, { status: 404 });
+      }
       return NextResponse.json({ organizacaoId: null, organizacao: null });
     }
 
@@ -32,10 +37,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!organizacao) {
-      return NextResponse.json({ organizacaoId: null, organizacao: null });
+      return NextResponse.json({ error: 'Igreja não encontrada' }, { status: 404 });
     }
 
     const config = await prisma.configuracoesIgreja.findUnique({
+      where: { organizacaoId: orgId },
+    });
+
+    const paginaPublica = await prisma.paginaPublica.findUnique({
       where: { organizacaoId: orgId },
     });
 
@@ -43,6 +52,7 @@ export async function GET(request: NextRequest) {
       organizacaoId: orgId,
       organizacao,
       configuracoes: config,
+      paginaPublica,
     });
   } catch (error) {
     console.error('GET /api/public/church-info error:', error);

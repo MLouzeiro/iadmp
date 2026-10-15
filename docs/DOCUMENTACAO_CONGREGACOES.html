@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IADMPMA — Documentação Interativa: Congregações &amp; Isolamento de Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #C8960C;
+    --primary-soft: rgba(200, 150, 12, .14);
+    --bg: #0A1628;
+    --bg-2: #0E1D33;
+    --card: #12243D;
+    --card-2: #162B47;
+    --border: #22385A;
+    --text: #F0ECE2;
+    --muted: #9FB0C9;
+    --green: #38C172;
+    --red: #E4574F;
+    --blue: #4C9AFF;
+    --radius: 14px;
+    --mono: 'JetBrains Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; }
+  a { color: var(--primary); text-decoration: none; }
+  code { font-family: var(--mono); font-size: .86em; background: rgba(255,255,255,.06); padding: .1em .4em; border-radius: 5px; color: #F2C94C; }
+
+  /* ---------- Layout ---------- */
+  .shell { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: linear-gradient(180deg, #0C1A2E, #0A1628);
+    border-right: 1px solid var(--border);
+    padding: 26px 18px 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px; flex: 0 0 auto;
+    background: linear-gradient(135deg, var(--primary), #8A6508);
+    display: grid; place-items: center; font-weight: 700; color: #0A1628; font-size: 15px;
+  }
+  .brand h1 { font-size: 1.02rem; line-height: 1.2; }
+  .brand small { display: block; color: var(--muted); font-family: 'Montserrat'; font-weight: 400; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+  nav.toc { margin-top: 22px; display: flex; flex-direction: column; gap: 2px; }
+  nav.toc a {
+    display: block; padding: 8px 11px; border-radius: 8px; color: var(--muted);
+    font-size: .82rem; font-weight: 500; border-left: 2px solid transparent; transition: .18s;
+  }
+  nav.toc a:hover { background: rgba(255,255,255,.05); color: var(--text); }
+  nav.toc a.active { background: var(--primary-soft); color: var(--primary); border-left-color: var(--primary); }
+  .toc-label { font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: #5D7398; margin: 18px 0 6px 11px; }
+  .side-note { margin-top: 26px; padding: 12px; border: 1px dashed var(--border); border-radius: 10px; font-size: .72rem; color: var(--muted); }
+
+  main { padding: 42px 46px 90px; max-width: 1080px; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; padding: 34px 32px; border-radius: var(--radius); overflow: hidden;
+    background: radial-gradient(1000px 320px at 12% -30%, rgba(200,150,12,.22), transparent 60%), var(--card);
+    border: 1px solid var(--border); margin-bottom: 38px; }
+  .hero .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--primary); font-weight: 600; }
+  .hero h2 { font-size: clamp(1.5rem, 3vw, 2.15rem); margin: 8px 0 12px; line-height: 1.2; }
+  .hero p { color: var(--muted); max-width: 74ch; font-size: .93rem; }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .badge { font-size: .7rem; font-weight: 600; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); }
+  .badge.gold { border-color: rgba(200,150,12,.5); color: var(--primary); background: var(--primary-soft); }
+
+  section { margin-bottom: 54px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 1.55rem; margin-bottom: 6px; }
+  .sec-sub { color: var(--muted); font-size: .88rem; margin-bottom: 20px; max-width: 80ch; }
+  .num { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary); font-family: 'Montserrat'; font-size: .78rem; font-weight: 700; margin-right: 8px; vertical-align: 3px; }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+  .card h3 { font-size: 1.02rem; margin-bottom: 8px; font-family: 'Montserrat'; font-weight: 700; }
+  .card p, .card li { color: var(--muted); font-size: .85rem; }
+  .card ul { padding-left: 18px; margin-top: 8px; }
+  .card li { margin-bottom: 5px; }
+  .card .ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 1rem; margin-bottom: 12px; background: var(--primary-soft); }
+
+  .callout { border-left: 3px solid var(--primary); background: var(--primary-soft); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: .86rem; color: #E9DFC4; margin: 18px 0; }
+  .callout.warn { border-color: var(--red); background: rgba(228,87,79,.12); color: #F3D2D0; }
+  .callout.info { border-color: var(--blue); background: rgba(76,154,255,.1); color: #CFE1FF; }
+  .callout strong { color: #fff; }
+
+  /* ---------- Hierarquia / diagrama ---------- */
+  .hier { display: grid; gap: 12px; }
+  .hier-box { border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; background: var(--card); }
+  .hier-box.org { border-color: rgba(200,150,12,.55); background: linear-gradient(180deg, rgba(200,150,12,.1), var(--card)); }
+  .hier-box h4 { font-family: 'Montserrat'; font-size: .92rem; margin-bottom: 4px; }
+  .hier-box p { font-size: .8rem; color: var(--muted); }
+  .hier-children { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 14px; }
+  .hier-child { background: var(--card-2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; font-size: .78rem; color: var(--muted); }
+  .hier-child b { display: block; color: var(--text); font-size: .8rem; }
+  .arrow { text-align: center; color: var(--primary); font-size: 1.1rem; }
+
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 18px; flex-wrap: wrap; }
+  .tab-btn { background: none; border: none; color: var(--muted); font-family: 'Montserrat'; font-size: .84rem; font-weight: 600;
+    padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent; transition: .15s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+
+  table.cmp { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  table.cmp th, table.cmp td { text-align: left; padding: 11px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.cmp th { color: var(--primary); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+  table.cmp td { color: var(--muted); }
+  table.cmp td:first-child { color: var(--text); font-weight: 600; }
+
+  /* ---------- Camadas ---------- */
+  .layers { display: grid; gap: 10px; }
+  .layer { border: 1px solid var(--border); background: var(--card); border-radius: 12px; overflow: hidden; }
+  .layer-head { display: flex; align-items: center; gap: 14px; padding: 15px 18px; cursor: pointer; user-select: none; }
+  .layer-head:hover { background: rgba(255,255,255,.03); }
+  .layer-n { width: 30px; height: 30px; border-radius: 8px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; font-weight: 700; font-size: .8rem; flex: 0 0 auto; }
+  .layer-head h4 { font-family: 'Montserrat'; font-size: .93rem; flex: 1; }
+  .layer-head .tag { font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 9px; border-radius: 99px; }
+  .chev { color: var(--muted); transition: .2s; }
+  .layer.open .chev { transform: rotate(90deg); }
+  .layer-body { display: none; padding: 0 18px 18px 62px; font-size: .85rem; color: var(--muted); }
+  .layer.open .layer-body { display: block; animation: fade .2s ease; }
+
+  pre { background: #0B1526; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: .78rem; line-height: 1.6; color: #CDE3FF; margin: 10px 0; }
+  pre .k { color: #F2C94C; }
+  pre .s { color: #8DD7A5; }
+  pre .c { color: #6B82A8; font-style: italic; }
+
+  /* ---------- Stepper ---------- */
+  .steps { counter-reset: st; display: grid; gap: 12px; }
+  .step { display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+  .step-n { counter-increment: st; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--primary-soft); border: 1px solid rgba(200,150,12,.45); color: var(--primary); font-weight: 700; font-size: .82rem; }
+  .step-n::before { content: counter(st); }
+  .step-body { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 17px; }
+  .step-body h4 { font-family: 'Montserrat'; font-size: .9rem; margin-bottom: 4px; }
+  .step-body p { font-size: .82rem; color: var(--muted); }
+
+  /* ---------- Simulador ---------- */
+  .sim { background: linear-gradient(180deg, var(--card-2), var(--card)); border: 1px solid rgba(200,150,12,.35); border-radius: var(--radius); padding: 24px; }
+  .sim h3 { font-family: 'Playfair Display'; font-size: 1.2rem; margin-bottom: 4px; }
+  .sim .hint { font-size: .8rem; color: var(--muted); margin-bottom: 18px; }
+  .sim-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--muted); font-family: 'Montserrat';
+    font-size: .78rem; font-weight: 600; padding: 8px 14px; border-radius: 99px; cursor: pointer; transition: .15s; }
+  .chip:hover { border-color: var(--primary); color: var(--text); }
+  .chip.active { background: var(--primary); border-color: var(--primary); color: #0A1628; }
+  .sim-result { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .sim-box { background: #0B1526; border: 1px solid var(--border); border-radius: 12px; padding: 15px 17px; }
+  .sim-box h5 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; font-family: 'Montserrat'; }
+  .sim-box ul { list-style: none; font-size: .82rem; }
+  .sim-box li { padding: 5px 0; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+  .ok { color: var(--green); font-weight: 700; }
+  .no { color: var(--red); font-weight: 700; }
+  .sim-verdict { margin-top: 16px; padding: 13px 16px; border-radius: 10px; font-size: .85rem; display: flex; gap: 10px; align-items: center; }
+  .sim-verdict.allow { background: rgba(56,193,114,.12); border: 1px solid rgba(56,193,114,.4); color: #BFEED3; }
+  .sim-verdict.deny { background: rgba(228,87,79,.12); border: 1px solid rgba(228,87,79,.4); color: #F6CFCD; }
+
+  /* ---------- Tabela de endpoints ---------- */
+  .search-bar { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
+  .search-bar input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'Montserrat'; font-size: .86rem; }
+  .search-bar input::placeholder { color: #5D7398; }
+  .ep-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  .ep-table th { text-align: left; padding: 10px 12px; background: var(--card-2); color: var(--primary); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .ep-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--muted); }
+  .ep-table td:first-child { font-family: var(--mono); font-size: .76rem; color: #CDE3FF; white-space: nowrap; }
+  .pill { font-size: .66rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: .05em; }
+  .pill.scope { background: rgba(76,154,255,.15); color: #9CC5FF; }
+  .pill.public { background: rgba(56,193,114,.15); color: #7FE0AC; }
+  .pill.super { background: rgba(200,150,12,.18); color: var(--primary); }
+
+  /* ---------- FAQ ---------- */
+  details.faq { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  details.faq summary { list-style: none; cursor: pointer; padding: 15px 18px; font-weight: 600; font-size: .89rem; display: flex; justify-content: space-between; gap: 12px; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::after { content: '+'; color: var(--primary); font-size: 1.15rem; font-weight: 400; }
+  details.faq[open] summary::after { content: '–'; }
+  details.faq[open] summary { border-bottom: 1px solid var(--border); color: var(--primary); }
+  details.faq .faq-a { padding: 14px 18px; font-size: .85rem; color: var(--muted); }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .quiz-q h4 { font-family: 'Montserrat'; font-size: .9rem; margin-bottom: 12px; }
+  .quiz-opt { display: block; width: 100%; text-align: left; background: rgba(255,255,255,.03); border: 1px solid var(--border);
+    color: var(--muted); font-family: 'Montserrat'; font-size: .83rem; padding: 10px 14px; border-radius: 9px; margin-bottom: 7px; cursor: pointer; transition: .15s; }
+  .quiz-opt:hover { border-color: var(--primary); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(56,193,114,.14); color: #C6F0D8; }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(228,87,79,.13); color: #F6CFCD; }
+  .quiz-feedback { font-size: .8rem; margin-top: 8px; color: var(--muted); display: none; }
+  .quiz-score { text-align: center; padding: 18px; background: var(--primary-soft); border: 1px solid rgba(200,150,12,.4); border-radius: 12px; font-weight: 600; color: var(--primary); display: none; }
+
+  footer { border-top: 1px solid var(--border); padding-top: 20px; color: #5D7398; font-size: .75rem; }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { position: relative; height: auto; }
+    main { padding: 26px 18px 70px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside>
+  <div class="brand">
+    <div class="brand-mark">IAD</div>
+    <div>
+      <h1>IADMPMA</h1>
+      <small>Docs · Congregações</small>
+    </div>
+  </div>
+  <nav class="toc" id="toc">
+    <div class="toc-label">Fundamentos</div>
+    <a href="#visao">1. Visão geral</a>
+    <a href="#hierarquia">2. Organização × Congregação</a>
+    <a href="#isolamento">3. As 4 camadas do isolamento</a>
+    <a href="#fluxo">4. Fluxo de uma requisição</a>
+    <div class="toc-label">Na prática</div>
+    <a href="#simulador">5. Simulador de visão</a>
+    <a href="#perfis">6. Quem administra o quê</a>
+    <a href="#cadastro">7. Passo a passo da congregação</a>
+    <a href="#site">8. Site público por igreja</a>
+    <div class="toc-label">Referência</div>
+    <a href="#apis">9. APIs e escopo</a>
+    <a href="#erros">10. Erros e códigos</a>
+    <a href="#limites">11. Limites atuais</a>
+    <a href="#faq">12. Perguntas frequentes</a>
+    <a href="#quiz">13. Teste rápido</a>
+  </nav>
+  <div class="side-note">
+    Fonte do código:<br>
+    <code>src/lib/tenant.ts</code><br>
+    <code>src/lib/auth-helpers.ts</code><br>
+    <code>prisma/schema.prisma</code><br>
+    <code>src/app/admin/layout.tsx</code>
+  </div>
+</aside>
+
+<main>
+
+<div class="hero">
+  <div class="kicker">Documentação interativa · Multi-tenant</div>
+  <h2>Como as congregações veem, administram e se isolam no sistema</h2>
+  <p>
+    Este guia explica — com exemplos e simulação — o modelo de isolamento de dados do IADMPMA:
+    o que cada congregação enxerga ao entrar no painel <code>/admin</code>, como o sistema impede
+    uma igreja de ver os dados da outra, e onde a fronteira realmente está.
+  </p>
+  <div class="hero-badges">
+    <span class="badge gold">Next.js App Router</span>
+    <span class="badge">NextAuth v5 + JWT</span>
+    <span class="badge">Prisma + PostgreSQL (Neon)</span>
+    <span class="badge">RBAC granular</span>
+    <span class="badge">278 testes passando</span>
+  </div>
+</div>
+
+<!-- 1 -->
+<section id="visao">
+  <h2><span class="num">1</span>Visão geral do modelo</h2>
+  <p class="sec-sub">
+    O sistema é <strong>multi-tenant</strong>: uma única instância atende várias igrejas, mas cada igreja
+    só enxerga os próprios dados. A fronteira dura de isolamento é a <strong>Organização</strong>.
+  </p>
+
+  <div class="grid g3">
+    <div class="card">
+      <div class="ico">🏢</div>
+      <h3>Organização = tenant</h3>
+      <p>Cada igreja (matriz, filial autônoma ou rede) é uma <code>Organizacao</code>. Todo registro de negócio
+      carrega <code>organizacaoId</code>. É o que separa de verdade os dados.</p>
+    </div>
+    <div class="card">
+      <div class="ico">⛪</div>
+      <h3>Congregação = sub-unidade</h3>
+      <p>Dentro de uma organização existem várias <code>Congregacao</code> (ex.: Cohabiano, Vila Sarney).
+      Ela <em>classifica</em> registros (<code>congregacaoId</code>), mas não é um tenant isolado.</p>
+    </div>
+    <div class="card">
+      <div class="ico">👤</div>
+      <h3>Usuário com vínculo</h3>
+      <p>O acesso nasce do vínculo <code>UsuarioOrganizacao</code> (usuário ↔ organização). Sem vínculo,
+      não há dados para ver — mesmo que a role seja alta.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Resposta direta:</strong> as congregações veem o painel normalmente, mas cada uma só opera dentro
+    da sua <strong>Organização</strong>. Tentar acessar outra organização resulta em <strong>403</strong>
+    (“Sem permissão para esta organização”) e gera registro de auditoria <code>ACESSO_NEGADO</code>.
+    Já as congregações <em>internas</em> de uma mesma organização dividem o mesmo acesso — entre elas a separação
+    é por <strong>filtro/relatório</strong>, não por bloqueio (ver seção 11).
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="hierarquia">
+  <h2><span class="num">2</span>Organização × Congregação</h2>
+  <p class="sec-sub">São dois níveis diferentes. Confundir os dois é o erro mais comum ao configurar o sistema.</p>
+
+  <div class="hier">
+    <div class="hier-box org">
+      <h4>🏢 Organização — <em>o isolamento real</em></h4>
+      <p>Ex.: “IADMP Central”, “IADMP Filial Norte”. Possui <code>slug</code> próprio, site público próprio,
+      configurações próprias e usuários vinculados. Ninguém de fora entra.</p>
+      <div class="hier-children">
+        <div class="hier-child"><b>⛪ Congregação Cohabiano</b>Membros, liturgias, eventos…</div>
+        <div class="hier-child"><b>⛪ Congregação Vila Sarney</b>Membros, liturgias, eventos…</div>
+        <div class="hier-child"><b>⛪ Congregação Novo Renascer</b>Membros, liturgias, eventos…</div>
+      </div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="hier-box">
+      <h4>Registros de negócio</h4>
+      <p>Todos com <code>organizacaoId</code> (obrigatório, com índice) + <code>congregacaoId</code> (opcional):
+      Membro, Liturgia, Evento, Aviso, Lideranca, EventoFinanceiro, Galeria, Oportunidade, Agenda, Inscricao…</p>
+    </div>
+  </div>
+
+  <div class="tabs" data-tabs="cmp" style="margin-top:24px">
+    <button class="tab-btn active" data-tab="cmp-a">Comparativo</button>
+    <button class="tab-btn" data-tab="cmp-b">Por que não isolar por congregação?</button>
+    <button class="tab-btn" data-tab="cmp-c">Como o dado nasce</button>
+  </div>
+
+  <div class="tab-pane active" id="cmp-a">
+    <div class="card" style="padding:8px 4px">
+      <table class="cmp">
+        <thead><tr><th>Aspecto</th><th>Organização</th><th>Congregação</th></tr></thead>
+        <tbody>
+          <tr><td>Modelo Prisma</td><td><code>Organizacao</code> (slug único)</td><td><code>Congregacao</code> (única por org + nome)</td></tr>
+          <tr><td>Isolamento</td><td><strong>Blindado</strong> por API (403) e auditoria</td><td><strong>Filtro</strong> opcional em listas/relatórios</td></tr>
+          <tr><td>Quem cria</td><td>SUPER_ADMIN em <code>/admin/organizacoes</code></td><td>Automático: escrever “Matriz” no formulário já cria</td></tr>
+          <tr><td>Usuário</td><td>Vinculado via <code>UsuarioOrganizacao</code></td><td>Não há vínculo de usuário ↔ congregação</td></tr>
+          <tr><td>Site público</td><td><code>/igreja/[slug]</code> próprio</td><td>Compartilha o site da organização</td></tr>
+          <tr><td>Escopo no banco</td><td><code>organizacaoId: { in: [...] }</code></td><td><code>congregacaoId</code> quando filtrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="cmp-b">
+    <div class="card">
+      <h3>O design atual é intencional</h3>
+      <ul>
+        <li>O sistema foi desenhado para <strong>multi-igreja</strong>, não para multi-sede isolada: a fronteira de segurança é a organização.</li>
+        <li>Dentro de uma igreja, o pastor/admin precisa enxergar <strong>todas</strong> as congregações (relatórios consolidados, financeiro, comparativos).</li>
+        <li>A congregação é usada como <strong>dimensão de filtro</strong>: em <code>/api/membros?congregacaoId=…</code>, relatórios e no painel de indicadores.</li>
+        <li>Se no futuro for preciso que um líder de congregação só veja a própria congregação, o ponto de extensão já existe: campo <code>congregacaoId</code> + helpers de escopo em <code>src/lib/tenant.ts</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="cmp-c">
+    <div class="card">
+      <h3>Resolução por nome (find-or-create)</h3>
+      <p>O formulário pede o campo <strong>texto</strong> “Congregação”. Ao salvar, <code>resolveCongregacaoId()</code> executa:</p>
+      <pre><span class="c">// src/lib/tenant.ts — resolveCongregacaoId()</span>
+1. Se veio <span class="k">congregacaoId</span>  → valida se pertence à organização (senão ORG_FORBIDDEN)
+2. Se veio só o <span class="k">nome</span>         → procura Congregacao na organização
+3. Se não existir             → <span class="s">cria</span> a congregação dentro da organização
+4. Se não veio nada           → <span class="k">null</span> (registro sem congregação)</pre>
+      <p>Isso significa que digitar “Matriz” pela primeira vez cria a congregação automaticamente — sem passo extra de cadastro.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="isolamento">
+  <h2><span class="num">3</span>As 4 camadas do isolamento</h2>
+  <p class="sec-sub">O isolamento não depende de uma única barreira. São quatro, empilhadas. Clique em cada uma para ver o código.</p>
+
+  <div class="layers" id="layers">
+    <div class="layer open">
+      <div class="layer-head"><div class="layer-n">1</div><h4>Banco de dados — coluna obrigatória</h4><span class="tag">Prisma</span><span class="chev">›</span></div>
+      <div class="layer-body">
+        <p>Toda entidade de domínio tem <code>organizacaoId</code> com FK e índice. Um registro simplesmente não existe sem uma organização dona.</p>
+        <pre><span class="k">model</span> Membro {
+  organizacaoId  String           <span class="c">// obrigatório, com índice</span>
+  congregacaoId  String?          <span class="c">// opcional — sub-unidade</span>
+  organizacao    Organizacao      @relation(...)
+  congregacao    Congregacao?     @relation(...)
+}</pre>
+        <p>Consulta de um usuário com escopo SINGLE (1 org):</p>
+        <pre>prisma.membro.findMany({ where: { organizacaoId: { <span class="k">in</span>: [<span class="s">'org_A'</span>] } } })</pre>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-head"><div class="layer-n">2</div><h4>API — escopo resolvido no servidor</h4><span class="tag">tenant.ts</span><span class="chev">›</span></div>
+      <div class="layer-body">
+        <p>As rotas de negócio chamam <code>resolveOrgScope()</code> (ou <code>canManageOrganization()</code>) antes de consultar o banco. Hoje <strong>44 das 69 rotas</strong> importam <code>src/lib/tenant.ts</code>; as demais usam os helpers equivalentes de <code>auth-helpers</code>. O cliente nunca decide o escopo.</p>
+        <pre><span class="c">// GET /api/membros (src/app/api/membros/route.ts)</span>
+<span class="k">const</span> user   = <span class="k">await</span> requireAuth();
+<span class="k">const</span> scope  = <span class="k">await</span> resolveOrgScope(user, organizacaoId);
+<span class="k">if</span> (scope.mode !== <span class="s">'ALL'</span>) where.organizacaoId = { <span class="k">in</span>: scope.orgIds };</pre>
+        <p>Funções centrais de <code>src/lib/tenant.ts</code>:</p>
+        <ul>
+          <li><code>resolveOrgScope(user, orgId)</code> → modos <code>ALL</code> (SUPER_ADMIN), <code>SINGLE</code> e <code>MULTI</code></li>
+          <li><code>resolveTargetOrgId()</code> → decide a organização de uma escrita (POST/PATCH)</li>
+          <li><code>assertOrgAccess()</code> → confirma vínculo e audita <code>ACESSO_NEGADO</code> quando nega</li>
+          <li><code>withOrgScope()</code> / <code>orgFilter()</code> → injetam o filtro no <code>where</code> do Prisma</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-head"><div class="layer-n">3</div><h4>RBAC — sessão, role e permissões</h4><span class="tag">NextAuth v5</span><span class="chev">›</span></div>
+      <div class="layer-body">
+        <p>Autenticação por <strong>cookie JWT</strong> (<code>authjs.session-token</code>). O middleware protege <code>/admin/*</code> e as rotas chamam:</p>
+        <pre>requireAuth()                      <span class="c">// 401 sem sessão</span>
+requireSuperAdmin()                <span class="c">// 403 se não for SUPER_ADMIN</span>
+hasPermission(id, <span class="s">'membros'</span>, <span class="s">'criar'</span>) <span class="c">// 403 se o perfil não permite</span>
+canAssignRole(requester, role)     <span class="c">// impede subir de nível sozinho</span></pre>
+        <p>Hierarquia: <code>SUPER_ADMIN(100) &gt; ADMIN(90) &gt; PASTOR(85) &gt; ADMIN_IGREJA(80) &gt; LIDER/LIDER_MINISTERIO(60) &gt; SECRETARIA/FINANCEIRO/EDITOR_SITE(50) &gt; COORDENADOR(40) &gt; MUSICO(20) &gt; MEMBER(10)</code></p>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-head"><div class="layer-n">4</div><h4>Site público — separado por slug</h4><span class="tag">/igreja/[slug]</span><span class="chev">›</span></div>
+      <div class="layer-body">
+        <p>As APIs públicas não usam sessão: resolvem a organização via <code>resolvePublicOrganizacaoId()</code> — prioridade <strong>slug &gt; organizacaoId &gt; fallback</strong> (primeira organização ativa, ordenada por criação). Se o slug não existir ou a org estiver inativa, <strong>não fica vazio</strong>: o sistema cai na primeira org ativa (cuidado ao interpretar páginas vazias).</p>
+        <pre>GET /api/public/eventos?slug=iadmp-central
+<span class="c">// resolveOrgBySlug(slug) → organizacaoId → where.organizacaoId = id</span></pre>
+        <p>Rota pública da igreja: <code>/igreja/iadmp-central/eventos</code>, <code>/lideranca</code>, <code>/galeria</code>, <code>/contato</code>…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="fluxo">
+  <h2><span class="num">4</span>Fluxo de uma requisição</h2>
+  <p class="sec-sub">O que acontece quando um líder clica em “Membros” no painel.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Login em /admin/login</h4>
+      <p>NextAuth valida credenciais (bcrypt) e cria o cookie <code>authjs.session-token</code> com <code>id</code>, <code>role</code> e <code>organizacoes[]</code>. Usuário inativo (<code>ativo: false</code>) é bloqueado.</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Middleware valida o cookie</h4>
+      <p><code>src/middleware.ts</code> protege <code>/admin/:path*</code>: sem cookie, redireciona para o login. A página carrega, mas os dados ainda não.</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Seletor de organização no sidebar</h4>
+      <p>O layout busca <code>GET /api/organizacoes</code>, que devolve só as organizações do usuário (SUPER_ADMIN recebe todas as ativas). A escolha fica salva em <code>localStorage: iadmp-current-org</code> e ao trocar a página recarrega.</p>
+      <p style="margin-top:6px"><strong>Atenção:</strong> por padrão as listagens <em>não</em> enviam esse valor ao servidor — elas usam o escopo completo dos vínculos (união das orgs). Só formulários/abas que pedem <code>?organizacaoId</code> explicitamente são afetados (ver seções 7 e 11).</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Fetch da lista — escopo aplicado no servidor</h4>
+      <p><code>fetch("/api/membros")</code> (sem <code>organizacaoId</code> na maioria das telas) → <code>requireAuth()</code> → <code>resolveOrgScope()</code> → <code>where.organizacaoId = { in: orgIds }</code>. Usuário de 1 org vê só a dela; usuário MULTI vê a união das vinculadas. O registro de outra igreja nunca sai do banco.</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Escrita validada e auditada</h4>
+      <p>POST/PATCH passa por Zod (<code>src/lib/validations.ts</code>), <code>resolveTargetOrgId()</code>, <code>resolveCongregacaoId()</code> e grava <code>AuditLog</code> com ação CREATE/UPDATE/DELETE. Tentativa fora do escopo → 403 + <code>ACESSO_NEGADO</code>.</p>
+    </div></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="simulador">
+  <h2><span class="num">5</span>Simulador de visão</h2>
+  <p class="sec-sub">Escolha um perfil para ver exatamente o que ele enxerga, o filtro gerado no banco e o que acontece se tentar acessar outra igreja.</p>
+
+  <div class="sim">
+    <h3>🛡️ Quem está olhando?</h3>
+    <p class="hint">Cenário: o sistema tem 3 organizações ativas — <strong>Central</strong>, <strong>Norte</strong> e <strong>Sul</strong>.</p>
+    <div class="sim-controls" id="simControls">
+      <button class="chip active" data-sim="super">SUPER_ADMIN</button>
+      <button class="chip" data-sim="single">Admin vinculado só à Central</button>
+      <button class="chip" data-sim="multi">Usuário 2 orgs (Central + Norte)</button>
+      <button class="chip" data-sim="sem">Usuário sem vínculo</button>
+      <button class="chip" data-sim="fora">Admin da Central pedindo dados do Norte</button>
+    </div>
+
+    <div class="sim-result">
+      <div class="sim-box">
+        <h5>Organizações visíveis</h5>
+        <ul id="simOrgs"></ul>
+      </div>
+      <div class="sim-box">
+        <h5>O que pode fazer</h5>
+        <ul id="simCan"></ul>
+      </div>
+      <div class="sim-box">
+        <h5>Filtro aplicado no banco</h5>
+        <pre id="simWhere" style="margin:0;font-size:.76rem"></pre>
+      </div>
+    </div>
+
+    <div class="sim-verdict allow" id="simVerdict"></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="perfis">
+  <h2><span class="num">6</span>Quem administra o quê</h2>
+  <p class="sec-sub">Visão por perfil dentro do painel <code>/admin</code>.</p>
+  <div class="card" style="padding:8px 4px">
+    <table class="cmp">
+      <thead><tr><th>Perfil</th><th>Vê</th><th>Pode</th><th>Não pode</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>SUPER_ADMIN</td>
+          <td>Todas as organizações e congregações</td>
+          <td>Criar/editar/excluir organizações, usuários, perfis, publicações para qualquer org</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>ADMIN_IGREJA / PASTOR</td>
+          <td>Só as organizações vinculadas (no MULTI, as listagens mostram a união)</td>
+          <td>Gerenciar membros, liderança, eventos, liturgia, financeiro, avisos, galeria da própria org</td>
+          <td>Criar organizações; ver dados de outra org; atribuir roles acima do próprio nível</td>
+        </tr>
+        <tr>
+          <td>LÍDER / COORDENADOR</td>
+          <td>Da própria org, conforme permissões do perfil</td>
+          <td>Módulos liberados no perfil (ex.: <code>membros:criar</code>, <code>eventos:editar</code>)</td>
+          <td>Módulos sem permissão → 403</td>
+        </tr>
+        <tr>
+          <td>SECRETARIA / FINANCEIRO / EDITOR</td>
+          <td>Da própria org</td>
+          <td>Seus módulos específicos (financeiro, avisos, site público…)</td>
+          <td>Fora do escopo do módulo</td>
+        </tr>
+        <tr>
+          <td>MÚSICO / MEMBER</td>
+          <td>Da própria org</td>
+          <td>Leitura e tarefas básicas (liturgia, ministérios)</td>
+          <td>Escritas sensíveis (financeiro, usuários, permissões)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout info">
+    <strong>Dica:</strong> o escopo de organização e o escopo de permissão são independentes. Estar vinculado à org
+    não basta — cada escrita também exige a permissão <code>módulo:ação</code> (ex.: <code>financeiro:criar</code>).
+  </div>
+  <div class="callout info">
+    <strong>Observação:</strong> a página <code>/admin/organizacoes</code> (CRUD de tenants, SUPER_ADMIN) existe,
+    mas <strong>não tem item no menu do sidebar</strong> — o acesso hoje é pela URL direta.
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="cadastro">
+  <h2><span class="num">7</span>Passo a passo: como uma congregação administra</h2>
+  <p class="sec-sub">Rotina do dia a dia de quem entra no painel para cuidar da própria congregação.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Entrar com o usuário da congregação</h4>
+      <p>Acesso direto em <code>/admin/login</code>. O administrador da igreja cria o usuário em <code>/admin/usuarios</code> e marca a <strong>organização</strong> dele (multi-seleção possível).</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Conferir a organização ativa no topo do menu</h4>
+      <p>Se tiver 1 org, fica fixa. Se tiver várias, o seletor aparece no topo do sidebar; trocar salva em <code>localStorage</code> e recarrega a página. <strong>Hoje o seletor não refiltra as listagens</strong> — elas mostram a união das orgs vinculadas; o valor é usado nas telas/abas que enviam <code>?organizacaoId</code> (ex.: Centro de Gestão, modelos de liturgia, site público).</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Cadastrar preenchendo “Congregação”</h4>
+      <p>Em Membros, Liturgia, Eventos, Avisos, Liderança, Financeiro e Galeria existe o campo Congregação. Basta digitar o nome (ex.: “Vila Sarney”) — ele vira <code>congregacaoId</code> automaticamente dentro da organização.</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Filtrar para ver só a sua congregação</h4>
+      <p>As <strong>APIs</strong> aceitam <code>?congregacaoId=…</code> (membros, eventos, avisos, liderança, financeiro e indicadores), mas as listagens do painel ainda <strong>não expõem</strong> um seletor de congregação — hoje a filtragem por congregação aparece nos relatórios (<code>/admin/relatorios</code> exporta CSV com a coluna Congregação) e no Centro de Gestão.</p>
+    </div></div>
+    <div class="step"><div class="step-n"></div><div class="step-body">
+      <h4>Nada vaza — e tudo é registrado</h4>
+      <p>Criações/edições geram <code>AuditLog</code>. Tentativas fora do escopo geram <code>ACESSO_NEGADO</code> com o motivo em <code>/admin/gestao?aba=auditoria</code> (aba Auditoria do Centro de Gestão).</p>
+    </div></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="site">
+  <h2><span class="num">8</span>Site público por igreja</h2>
+  <p class="sec-sub">Cada organização tem vitrine própria e independente no domínio raiz.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Rotas públicas</h3>
+      <ul>
+        <li><code>/igreja/[slug]</code> — home</li>
+        <li><code>/igreja/[slug]/eventos</code> — agenda</li>
+        <li><code>/igreja/[slug]/lideranca</code> — liderança</li>
+        <li><code>/igreja/[slug]/pregacoes</code> — pregações</li>
+        <li><code>/igreja/[slug]/galeria</code> — galeria</li>
+        <li><code>/igreja/[slug]/contato</code> — contato</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>O que sai do banco</h3>
+      <ul>
+        <li>Eventos com <code>publicarNoSite = true</code></li>
+        <li>Líderes com <code>publico = true</code> e <code>ativo = true</code></li>
+        <li>Pregações com <code>status = PUBLICADA</code></li>
+        <li>Banners ativos na janela de datas</li>
+        <li>Cores/logo via <code>/api/public/church-info?slug=…</code></li>
+        <li>Contadores do hero (<code>/api/public/hero-stats</code>)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <strong>Regra de ouro:</strong> a vitrine pública resolve o filtro <code>organizacaoId</code> a partir do <code>slug</code> da URL —
+    não há campo livre vindo do cliente. <strong>Porém</strong>, slug inválido/inativo cai no fallback da primeira org ativa
+    (<code>resolvePublicOrganizacaoId()</code>), então um endereço errado mostra o site padrão, não uma página vazia.
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="apis">
+  <h2><span class="num">9</span>Referência de APIs e escopo</h2>
+  <p class="sec-sub">Busque por módulo. <span class="pill scope">escopo</span> = exige sessão e filtra por organização · <span class="pill super">SUPER_ADMIN</span> = restrito · <span class="pill public">público</span> = sem sessão (resolve por slug).</p>
+
+  <div class="search-bar">
+    <span>🔎</span>
+    <input type="text" id="epSearch" placeholder="Filtrar endpoints… ex.: membros, public, financeiro" />
+  </div>
+  <div class="card" style="padding:0; overflow-x:auto">
+    <table class="ep-table" id="epTable">
+      <thead><tr><th>Endpoint</th><th>Escopo</th><th>Comportamento</th></tr></thead>
+      <tbody>
+        <tr><td>GET /api/membros</td><td><span class="pill scope">escopo</span></td><td><code>resolveOrgScope</code> + filtro opcional <code>congregacaoId</code></td></tr>
+        <tr><td>POST /api/membros</td><td><span class="pill scope">escopo</span></td><td>Permissão <code>membros:criar</code> + <code>resolveTargetOrgId</code> + find-or-create da congregação</td></tr>
+        <tr><td>GET/PATCH /api/membros/[id]</td><td><span class="pill scope">escopo</span></td><td>Registro de outra org → 403 ORG_FORBIDDEN</td></tr>
+        <tr><td>GET /api/eventos</td><td><span class="pill scope">escopo</span></td><td>Lista eventos da organização ativa</td></tr>
+        <tr><td>GET /api/liturgia</td><td><span class="pill scope">escopo</span></td><td>Programações filtradas por org (e congregação se pedida)</td></tr>
+        <tr><td>GET /api/financeiro</td><td><span class="pill scope">escopo</span></td><td>Livro-razão por organização/congregação</td></tr>
+        <tr><td>GET /api/avisos</td><td><span class="pill scope">escopo</span></td><td>Avisos da organização</td></tr>
+        <tr><td>GET /api/galeria</td><td><span class="pill scope">escopo</span></td><td>Álbens e itens da organização</td></tr>
+        <tr><td>GET /api/lideranca</td><td><span class="pill scope">escopo</span></td><td>Lideranças da organização</td></tr>
+        <tr><td>GET /api/organizacoes</td><td><span class="pill scope">escopo</span></td><td>Devolve só as orgs do usuário (SUPER_ADMIN: todas as ativas)</td></tr>
+        <tr><td>POST /api/organizacoes</td><td><span class="pill super">SUPER_ADMIN</span></td><td><code>requireSuperAdmin()</code> + slug único automático</td></tr>
+        <tr><td>DELETE /api/organizacoes/[id]</td><td><span class="pill super">SUPER_ADMIN</span></td><td>Exclusão/gerência de tenants</td></tr>
+        <tr><td>GET /api/usuarios</td><td><span class="pill scope">escopo</span></td><td><code>assertOrgAccess</code> + <code>resolveOrgScope</code>/<code>orgFilter</code> (sem <code>assertTargetUserScope</code>, que protege <code>/api/usuarios/[id]</code>)</td></tr>
+        <tr><td>GET /api/gestao/indicadores</td><td><span class="pill scope">escopo</span></td><td>RBAC <code>dashboard:visualizar</code> + escopo; aceita <code>congregacaoId</code></td></tr>
+        <tr><td>GET /api/gestao/auditoria</td><td><span class="pill scope">escopo</span></td><td>Logs da organização, incl. <code>ACESSO_NEGADO</code></td></tr>
+        <tr><td>GET /api/public/eventos</td><td><span class="pill public">público</span></td><td><code>?slug=</code> → organização dona do site</td></tr>
+        <tr><td>GET /api/public/church-info</td><td><span class="pill public">público</span></td><td>Configurações/identidade visual da org do slug</td></tr>
+        <tr><td>GET /api/public/lideranca</td><td><span class="pill public">público</span></td><td>Líderes públicos ativos da org</td></tr>
+        <tr><td>GET /api/public/pregacoes</td><td><span class="pill public">público</span></td><td>Pregações PUBLICADAS da org</td></tr>
+        <tr><td>POST /api/public/contato</td><td><span class="pill public">público</span></td><td>Mensagem de contato salva com a organização do slug</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="erros">
+  <h2><span class="num">10</span>Erros e códigos</h2>
+  <p class="sec-sub">Padrão de resposta: <code>{ error: "mensagem em português" }</code> com o status adequado.</p>
+  <div class="card" style="padding:8px 4px">
+    <table class="cmp">
+      <thead><tr><th>Status</th><th>Quando</th><th>Resposta</th></tr></thead>
+      <tbody>
+        <tr><td>401</td><td>Sessão ausente/inválida</td><td><code>{ "error": "Não autorizado" }</code></td></tr>
+        <tr><td>403</td><td>Role/permissão insuficiente</td><td><code>{ "error": "Sem permissão" }</code></td></tr>
+        <tr><td>403</td><td>Organização fora do escopo (<code>ORG_FORBIDDEN</code>)</td><td><code>{ "error": "Sem permissão para esta organização" }</code></td></tr>
+        <tr><td>400</td><td>Escopo múltiplo sem org escolhida (<code>ORG_REQUIRED</code>)</td><td><code>{ "error": "Selecione a organização do registro" }</code></td></tr>
+        <tr><td>400</td><td>Validação Zod falhou</td><td><code>{ "error": "Dados inválidos" }</code></td></tr>
+        <tr><td>404</td><td>Registro inexistente ou fora do escopo</td><td><code>{ "error": "Não encontrado" }</code></td></tr>
+        <tr><td>500</td><td>Erro interno (genérico, sem stack)</td><td><code>{ "error": "Erro ao …" }</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <strong>Segurança:</strong> detalhes de banco nunca são expostos ao cliente (o <code>catch</code> devolve mensagem genérica),
+    <code>passwordHash</code> nunca aparece em resposta, e toda negação de escopo é auditada.
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="limites">
+  <h2><span class="num">11</span>Limites atuais (importante)</h2>
+  <p class="sec-sub">Transparência sobre o que o isolamento cobre hoje — e o que ele não cobre.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="color:var(--green)">✔ Isolado de verdade</h3>
+      <ul>
+        <li>Dados entre <strong>organizações</strong> (igrejas distintas)</li>
+        <li>Escritas: criação/editição em org alheia</li>
+        <li>Gerência de organizações, usuários e permissões</li>
+        <li>Sites públicos (cada slug vê só a sua org)</li>
+        <li>Auditoria de tentativas negadas</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:#E4A94F">⚠ Não é bloqueado hoje</h3>
+      <ul>
+        <li><strong>Congregações dentro da mesma organização</strong>: um usuário com acesso à org vê as congregações dela — a separação é por filtro (<code>congregacaoId</code>), não por perfil</li>
+        <li>Não existe vínculo “usuário ↔ congregação” no schema (<code>UsuarioOrganizacao</code> só tem <code>organizacaoId</code> + <code>perfilId</code>)</li>
+        <li>Campo de congregação é texto livre com find-or-create (variações de nome criam congregações duplicadas se não houver padrão)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Se for necessário isolamento por congregação:</strong> o caminho já está mapeado — adicionar
+    <code>congregacaoId</code> opcional em <code>UsuarioOrganizacao</code>, estender <code>resolveOrgScope()</code> para
+    devolver também o escopo de congregação e aplicá-lo em <code>withOrgScope()</code>. <strong>44 das 69 rotas</strong> de API já importam
+    <code>src/lib/tenant.ts</code> (as demais usam <code>canManageOrganization()</code> de <code>auth-helpers</code>), então a mudança seria centralizada.
+  </div>
+</section>
+
+<!-- 12 -->
+<section id="faq">
+  <h2><span class="num">12</span>Perguntas frequentes</h2>
+  <p class="sec-sub">Clique para abrir.</p>
+
+  <details class="faq">
+    <summary>Uma congregação consegue ver os dados da outra?</summary>
+    <div class="faq-a">Depende do nível. Entre <strong>organizações diferentes</strong> (igrejas distintas): nunca — o banco filtra e a API retorna 403. Entre <strong>congregações da mesma organização</strong>: sim, quem tem acesso à organização enxerga todas as congregações dela; existe filtro <code>?congregacaoId=</code> nas APIs e nos relatórios para concentrar a visão na própria (as listagens do painel ainda não exibem seletor de congregação).</div>
+  </details>
+  <details class="faq">
+    <summary>Como o sistema sabe em qual organização o usuário está?</summary>
+    <div class="faq-a">Pela tabela <code>UsuarioOrganizacao</code> (vínculo usuário ↔ organização), lida no servidor via <code>resolveOrgScope()</code>. O seletor do sidebar salva a preferência em <code>localStorage ('iadmp-current-org')</code> e recarrega a página, mas ele <strong>não muda sozinho o filtro das listagens</strong> — essas usam o escopo completo dos vínculos. Em nenhum caso o seletor amplia o escopo além do vínculo.</div>
+  </details>
+  <details class="faq">
+    <summary>O que impede eu passar ?organizacaoId=deoutrapessoa na URL?</summary>
+    <div class="faq-a"><code>resolveOrgScope()</code> compara o <code>organizacaoId</code> pedido com a lista de vínculos do usuário. Se não estiver na lista, lança <code>ORG_FORBIDDEN</code> → 403 “Sem permissão para esta organização” e registra <code>ACESSO_NEGADO</code> na auditoria.</div>
+  </details>
+  <details class="faq">
+    <summary>Criar membro exige cadastrar a congregação antes?</summary>
+    <div class="faq-a">Não. Basta digitar o nome no campo “Congregação”: <code>resolveCongregacaoId()</code> procura dentro da organização e cria se não existir. Também é possível enviar <code>congregacaoId</code> diretamente — nesse caso o sistema valida se ela pertence à organização.</div>
+  </details>
+  <details class="faq">
+    <summary> SUPER_ADMIN vê tudo sem vínculo nenhum?</summary>
+    <div class="faq-a">Sim. A role <code>SUPER_ADMIN</code> opera em modo <code>ALL</code>: não tem filtro de organização, enxerga todas as organizações ativas no seletor e pode criar/gerenciar organizações em <code>/admin/organizacoes</code>. Ele também recebe todas as permissões (<code>getUserPermissions()</code> devolve o catálogo completo).</div>
+  </details>
+  <details class="faq">
+    <summary>Um usuário pode se promovendo a SUPER_ADMIN?</summary>
+    <div class="faq-a">Não. <code>canAssignRole()</code> compara a hierarquia e só permite atribuir roles de nível <strong>inferior</strong> ao do solicitante. Alterações de role/permissão passam sempre pela sessão, nunca pelo body enviado pelo cliente.</div>
+  </details>
+  <details class="faq">
+    <summary>O que acontece com o site público se a organização for desativada?</summary>
+    <div class="faq-a"><code>resolveOrgBySlug()</code> só retorna organizações com <code>ativo: true</code>, porém <code>resolvePublicOrganizacaoId()</code> tem fallback: slug desconhecido ou org inativa faz o sistema usar a <strong>primeira organização ativa</strong> (ordenada por criação). Ou seja: o site não fica vazio — ele pode exibir o conteúdo da organização padrão. Se quiser bloqueio total, esse fallback é o ponto a ajustar.</div>
+  </details>
+</section>
+
+<!-- 13 -->
+<section id="quiz">
+  <h2><span class="num">13</span>Teste rápido</h2>
+  <p class="sec-sub">4 perguntas para validar o entendimento. Clique na alternativa certa.</p>
+
+  <div class="quiz-q" data-answer="1">
+    <h4>1. Qual é a fronteira dura de isolamento de dados no IADMPMA?</h4>
+    <button class="quiz-opt">A congregação (cada subsede fica trancada)</button>
+    <button class="quiz-opt">B organização (cada igreja/tenant)</button>
+    <button class="quiz-opt">C o usuário (cada um vê só o que cadastrou)</button>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-q" data-answer="2">
+    <h4>2. Um admin vinculado apenas à organização “Central” chama <code>GET /api/membros?organizacaoId=org_norte</code>. O que acontece?</h4>
+    <button class="quiz-opt">A Retorna 200 com a lista vazia</button>
+    <button class="quiz-opt">B Retorna 401 porque o parâmetro é inválido</button>
+    <button class="quiz-opt">C Retorna 403 “Sem permissão para esta organização” e audita ACESSO_NEGADO</button>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-q" data-answer="0">
+    <h4>3. Ao digitar “Vila Sarney” no campo Congregação ao criar um membro…</h4>
+    <button class="quiz-opt">A O sistema procura a congregação na organização e cria se não existir</button>
+    <button class="quiz-opt">B É preciso cadastrá-la antes em /admin/organizacoes</button>
+    <button class="quiz-opt">C O texto é salvo como string pura, sem validação</button>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-q" data-answer="2">
+    <h4>4. Dois usuários da MESMA organização, um da Congregação A e outro da B. O da A…</h4>
+    <button class="quiz-opt">A Não vê nenhum dado da Congregação B</button>
+    <button class="quiz-opt">B Recebe 403 ao abrir qualquer tela</button>
+    <button class="quiz-opt">C Vê os dados da B (mesmo tenant), podendo filtrar pela própria congregação</button>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-score" id="quizScore"></div>
+</section>
+
+<footer>
+  IADMPMA · Documentação interativa de congregações e isolamento de dados · gerada a partir do código-fonte real
+  (<code>src/lib/tenant.ts</code>, <code>src/lib/auth-helpers.ts</code>, <code>prisma/schema.prisma</code>) ·
+  Atualizada em outubro de 2026.
+</footer>
+
+</main>
+</div>
+
+<script>
+(function () {
+  /* ---- Scrollspy ---- */
+  const links = Array.from(document.querySelectorAll('#toc a'));
+  const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const spy = () => {
+    let idx = 0;
+    sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) idx = i; });
+    links.forEach(a => a.classList.remove('active'));
+    if (links[idx]) links[idx].classList.add('active');
+  };
+  document.addEventListener('scroll', spy, { passive: true });
+  spy();
+
+  /* ---- Tabs ---- */
+  document.querySelectorAll('[data-tabs]').forEach(group => {
+    group.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const id = btn.dataset.tab;
+        const parent = group.parentElement;
+        parent.querySelectorAll(':scope > .tab-pane').forEach(p => p.classList.remove('active'));
+        const pane = document.getElementById(id);
+        if (pane) pane.classList.add('active');
+      });
+    });
+  });
+
+  /* ---- Camadas (accordion) ---- */
+  document.querySelectorAll('#layers .layer-head').forEach(head => {
+    head.addEventListener('click', () => head.parentElement.classList.toggle('open'));
+  });
+
+  /* ---- Simulador ---- */
+  const ORGS = ['Central', 'Norte', 'Sul'];
+  const SCENARIOS = {
+    super: {
+      orgs: ['Central', 'Norte', 'Sul'],
+      can: [
+        [1, 'Ver TODAS as organizações e congregações'],
+        [1, 'Criar/editar/excluir organizações (/admin/organizacoes)'],
+        [1, 'Gerenciar usuários, perfis e permissões'],
+        [1, 'Publicar conteúdo para qualquer igreja']
+      ],
+      where: "where: { }   // modo ALL — sem filtro de organizacaoId",
+      verdict: ['allow', '✅ Acesso total: SUPER_ADMIN opera em modo ALL, sem restrição de vínculo.']
+    },
+    single: {
+      orgs: ['Central'],
+      can: [
+        [1, 'Ver membros, eventos, liturgia e financeiro da Central'],
+        [1, 'Filtra por congregação dentro da Central (API aceita ?congregacaoId)'],
+        [0, 'Ver dados da Norte ou da Sul'],
+        [0, 'Criar organizações (exige SUPER_ADMIN)']
+      ],
+      where: "where: {\n  organizacaoId: { in: ['org_central'] }\n}",
+      verdict: ['allow', '🔒 Escopo SINGLE: tudo que este usuário consulta vem apenas da organização Central.']
+    },
+    multi: {
+      orgs: ['Central', 'Norte'],
+      can: [
+        [1, 'Listas (membros, eventos…) trazem a união: Central + Norte'],
+        [1, 'Alternar entre Central e Norte no seletor do sidebar (persiste a escolha)'],
+        [0, 'Ver dados da Sul'],
+        [0, 'Registrar sem informar qual org usar (ORG_REQUIRED)']
+      ],
+      where: "where: {\n  organizacaoId: { in: ['org_central', 'org_norte'] }\n}",
+      verdict: ['allow', '🔀 Escopo MULTI: as listagens padrão mostram a união das orgs vinculadas; o seletor salva a preferência, mas só telas que enviam ?organizacaoId são filtradas por ela. Escrita sem org escolhida → 400 ORG_REQUIRED.']
+    },
+    sem: {
+      orgs: [],
+      can: [
+        [1, 'Fazer login (se a conta estiver ativa)'],
+        [0, 'Carregar qualquer lista do painel'],
+        [0, 'Criar/editar qualquer registro'],
+        [0, 'Acessar site interno sem org']
+      ],
+      where: "// escopo vazio → lança ORG_FORBIDDEN antes de consultar\n→ 403 { error: \"Sem permissão\" }",
+      verdict: ['deny', '🚫 Sem vínculo em nenhuma organização: resolveOrgScope lança ORG_FORBIDDEN → 403 + auditoria ACESSO_NEGADO.']
+    },
+    fora: {
+      orgs: ['Central'],
+      can: [
+        [1, 'Listar os próprios dados normalmente'],
+        [1, 'Informar ?organizacaoId=org_norte na URL'],
+        [0, 'Receber dados da Norte (não está no vínculo)'],
+        [0, 'Escapar do filtro manipulando o corpo da requisição']
+      ],
+      where: "// organizacaoId pedido não está em orgIds\nif (!orgIds.includes(requestedOrgId))\n  throw new Error('ORG_FORBIDDEN');\n→ 403 \"Sem permissão para esta organização\"\n+ writeAudit({ acao: 'ACESSO_NEGADO' })",
+      verdict: ['deny', '🚫 Tentativa negada: o servidor compara o pedido com o vínculo e registra ACESSO_NEGADO na auditoria.']
+    }
+  };
+
+  const elOrgs = document.getElementById('simOrgs');
+  const elCan = document.getElementById('simCan');
+  const elWhere = document.getElementById('simWhere');
+  const elVerdict = document.getElementById('simVerdict');
+
+  function renderSim(key) {
+    const s = SCENARIOS[key];
+    elOrgs.innerHTML = s.orgs.length
+      ? s.orgs.map(o => `<li><span class="ok">✓</span> 🏢 ${o}<br><span style="color:#5D7398;font-size:.75rem">todas as congregações internas</span></li>`).join('')
+      : '<li><span class="no">✗</span> Nenhuma organização visível</li>';
+    elCan.innerHTML = s.can.map(([ok, txt]) => `<li><span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span> ${txt}</li>`).join('');
+    elWhere.textContent = s.where;
+    elVerdict.className = 'sim-verdict ' + s.verdict[0];
+    elVerdict.innerHTML = s.verdict[1];
+  }
+
+  document.querySelectorAll('#simControls .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#simControls .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderSim(chip.dataset.sim);
+    });
+  });
+  renderSim('super');
+
+  /* ---- Busca de endpoints ---- */
+  const search = document.getElementById('epSearch');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    document.querySelectorAll('#epTable tbody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  /* ---- Quiz ---- */
+  let answered = 0, score = 0;
+  const fbCorrect = '✔ Correto!';
+  const texts = {
+    0: 'A fronteira dura é a Organização (tenant). Congregação é sub-unidade com filtro.',
+    1: 'resolveOrgScope compara com os vínculos: fora da lista → 403 ORG_FORBIDDEN + auditoria.',
+    2: 'resolveCongregacaoId faz find-or-create dentro da organização — nenhum passo extra.',
+    3: 'Mesma organização = mesmo escopo. O isolamento forte é entre igrejas (organizações).'
+  };
+  document.querySelectorAll('.quiz-q').forEach((q, qi) => {
+    const answer = parseInt(q.dataset.answer, 10);
+    const opts = q.querySelectorAll('.quiz-opt');
+    const fb = q.querySelector('.quiz-feedback');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        if (q.dataset.done) return;
+        q.dataset.done = '1';
+        answered++;
+        if (oi === answer) { opt.classList.add('correct'); score++; fb.textContent = fbCorrect + ' ' + texts[qi]; }
+        else { opt.classList.add('wrong'); opts[answer].classList.add('correct'); fb.textContent = 'Resposta certa: alternativa ' + 'ABC'[answer] + '. ' + texts[qi]; }
+        fb.style.display = 'block';
+        if (answered === 4) {
+          const el = document.getElementById('quizScore');
+          el.style.display = 'block';
+          el.textContent = 'Resultado: ' + score + '/4 — ' + (score === 4 ? 'Excelente! Você entendeu o isolamento.' : 'Revise as seções 1, 2 e 11.');
+        }
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

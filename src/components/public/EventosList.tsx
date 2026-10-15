@@ -26,17 +26,19 @@ function dataBR(iso: string) {
   return formatarDataCurta(iso);
 }
 
-export default function EventosList() {
+export default function EventosList({ slug, limit = 24 }: { slug?: string; limit?: number }) {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/public/eventos?limit=24')
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (slug) params.set('slug', slug);
+    fetch(`/api/public/eventos?${params}`)
       .then((r) => r.json())
       .then((d) => setEventos(d.eventos || []))
       .catch(() => setEventos([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [slug, limit]);
 
   if (loading) {
     return <EmptyState title="Carregando eventos..." message="Buscando a programação da igreja." />;

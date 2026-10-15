@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { Prisma, Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, hasPermission, canAssignRole, canManageOrganization } from '@/lib/auth-helpers';
-import { assertOrgAccess, resolveOrgScope, orgFilter, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
+import { assertOrgAccess, resolveOrgScope, ORG_FORBIDDEN, orgForbiddenResponse } from '@/lib/tenant';
 
 const criarUsuarioSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -13,12 +14,15 @@ const criarUsuarioSchema = z.object({
   confirmPassword: z.string(),
   role: z.string().min(1, 'Perfil é obrigatório'),
   perfilId: z.string().optional(),
-  organizacoes: z.array(z.string()).min(1, 'Selecione pelo menos uma organização'),
+  organizacoes: z.array(z.string()).optional().default([]),
   permissoes: z.record(z.string(), z.boolean()).optional(),
   ativo: z.boolean().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Senhas não conferem',
   path: ['confirmPassword'],
+}).refine((data) => data.role === 'SUPER_ADMIN' || data.organizacoes.length > 0, {
+  message: 'Selecione pelo menos uma organização',
+  path: ['organizacoes'],
 });
 
 export async function GET(request: Request) {
@@ -32,7 +36,7 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (search) {
       where.OR = [
@@ -40,7 +44,12 @@ export async function GET(request: Request) {
         { email: { contains: search, mode: 'insensitive' } },
       ];
     }
-    if (role) where.role = role;
+    if (role) {
+      if (!Object.values(Role).includes(role as Role)) {
+        return NextResponse.json({ error: 'Perfil inválido' }, { status: 400 });
+      }
+      where.role = role as Role;
+    }
     if (ativo !== null && ativo !== undefined && ativo !== '') {
       where.ativo = ativo === 'true';
     }
@@ -146,7 +155,7 @@ export async function POST(request: Request) {
           email: validated.email,
           telefone: validated.telefone || null,
           passwordHash,
-          role: validated.role as any,
+          role: validated.role as Role,
           perfilId: validated.perfilId || null,
           ativo: validated.ativo !== undefined ? validated.ativo : true,
         },
@@ -188,8 +197,8 @@ export async function POST(request: Request) {
     return NextResponse.json(safeUser, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
-      const issues = JSON.parse(error.message);
-      const msg = issues.map((i: any) => i.message).join('; ');
+      const issues: { message?: string }[] = JSON.parse(error.message);
+      const msg = issues.map((i) => i.message).join('; ');
       return NextResponse.json({ error: msg }, { status: 400 });
     }
     if (error instanceof Error) {

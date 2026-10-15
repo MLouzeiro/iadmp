@@ -9,6 +9,7 @@ import Modal, { ModalField } from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import SearchBar from '@/components/ui/SearchBar';
 import { useToast } from '@/components/ui/Toast';
+import UploadField from '@/components/ui/UploadField';
 import styles from '@/components/ui/form.module.css';
 import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
@@ -32,7 +33,7 @@ function paraInputDate(valor: string | null | undefined): string {
 
 export default function BannersAdminPage() {
   const { toast, confirm } = useToast();
-  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg, orgAtualId } = useOrganizacoes();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -63,7 +64,7 @@ export default function BannersAdminPage() {
   const openNovo = () => {
     setEditando(null);
     setForm({
-      organizacaoId: orgs.length === 1 ? orgs[0].id : '',
+      organizacaoId: orgAtualId || (orgs.length === 1 ? orgs[0].id : ''),
       titulo: '',
       imagemUrl: '',
       tipo: 'BANNER',
@@ -79,7 +80,7 @@ export default function BannersAdminPage() {
   const openEditar = (b: Banner) => {
     setEditando(b);
     setForm({
-      organizacaoId: b.organizacaoId || (orgs.length === 1 ? orgs[0].id : ''),
+      organizacaoId: b.organizacaoId || orgAtualId || (orgs.length === 1 ? orgs[0].id : ''),
       titulo: b.titulo || '',
       imagemUrl: b.imagemUrl,
       tipo: b.tipo,
@@ -93,8 +94,12 @@ export default function BannersAdminPage() {
   };
 
   const salvar = async () => {
+    if (multiOrg && !form.organizacaoId) {
+      toast('Selecione a organização.', 'warn');
+      return;
+    }
     if (!form.imagemUrl.trim()) {
-      toast('Informe a URL da imagem.', 'warn');
+      toast('Informe a URL da imagem ou envie um arquivo.', 'warn');
       return;
     }
     const payload = {
@@ -145,11 +150,12 @@ export default function BannersAdminPage() {
           type: 'select' as const,
           value: form.organizacaoId,
           required: true,
+          placeholder: 'Selecione a organização',
           options: orgs.map((o) => ({ value: o.id, label: o.nome })),
         }]
       : []),
     { name: 'titulo', label: 'Título', value: form.titulo, full: true },
-    { name: 'imagemUrl', label: 'URL da imagem', value: form.imagemUrl, required: true, full: true, placeholder: '/images/... ou https://...' },
+    { name: 'imagemUrl', label: 'URL da imagem (opcional)', value: form.imagemUrl, full: true, placeholder: 'https://... ou /images/... — ou envie um arquivo abaixo' },
     {
       name: 'tipo', label: 'Tipo', type: 'select', value: form.tipo,
       options: [
@@ -262,7 +268,17 @@ export default function BannersAdminPage() {
         onClose={() => setModalOpen(false)}
         onSave={salvar}
         saveLabel={editando ? 'Salvar alterações' : 'Criar banner'}
-      />
+      >
+        <UploadField
+          organizacaoId={form.organizacaoId || orgAtualId || (orgs.length === 1 ? orgs[0].id : '')}
+          value={form.imagemUrl}
+          onChange={(url) => setForm((p) => ({ ...p, imagemUrl: url }))}
+          pasta="banners"
+          entityTipo="Banner"
+          entityId={editando?.id}
+          label="Ou envie uma imagem do dispositivo"
+        />
+      </Modal>
     </div>
   );
 }

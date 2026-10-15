@@ -27,9 +27,9 @@ export const socialLinks = [
 export const programs = [
   {
     id: 1,
-    day: 'Quarta e Domingo',
-    title: 'Consagrações',
-    time: '06:00',
+    day: 'Domingo',
+    title: 'Consagração',
+    time: '07:00',
     description: 'Tempo de oração e consagração diante do Senhor.',
   },
   {

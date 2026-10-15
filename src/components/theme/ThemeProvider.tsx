@@ -2,9 +2,11 @@
 
 import { useEffect, useState, createContext, useContext, useCallback } from 'react';
 import { defaultColors, getContrastRatio, darkenColor, type ThemeColors } from '@/lib/theme-palettes';
+import { resolverPaleta, type PaletaSite } from '@/lib/site-palettes';
 
 interface ThemeContextType {
   colors: ThemeColors;
+  paletaSite: PaletaSite;
   tema: string;
   loading: boolean;
   toggleTheme: () => void;
@@ -14,6 +16,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({
   colors: defaultColors,
+  paletaSite: resolverPaleta('PADRAO'),
   tema: 'dark',
   loading: true,
   toggleTheme: () => {},
@@ -25,8 +28,9 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children, slug }: { children: React.ReactNode; slug?: string }) {
   const [colors, setColors] = useState<ThemeColors>(defaultColors);
+  const [paletaSite, setPaletaSite] = useState<PaletaSite>(resolverPaleta('PADRAO'));
   const [tema, setTema] = useState('dark');
   const [loading, setLoading] = useState(true);
 
@@ -34,22 +38,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = typeof window !== 'undefined' ? localStorage.getItem('iadmp-theme') : null;
     if (savedTheme) setTema(savedTheme);
 
-    fetch('/api/configuracoes')
+    const url = slug ? `/api/public/church-info?slug=${encodeURIComponent(slug)}` : '/api/configuracoes';
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.corPrincipal) {
+        const cfg = slug ? data?.configuracoes : data;
+        if (cfg && cfg.corPrincipal) {
           setColors({
-            corPrincipal: data.corPrincipal,
-            corSecundaria: data.corSecundaria,
-            corDestaque: data.corDestaque,
-            corFundo: data.corFundo,
-            corFundoClaro: data.corFundoClaro,
-            corSuperficie: data.corSuperficie,
-            corTexto: data.corTexto,
-            corTextoSecundario: data.corTextoSecundario,
-            corBorda: data.corBorda,
+            corPrincipal: cfg.corPrincipal,
+            corSecundaria: cfg.corSecundaria,
+            corDestaque: cfg.corDestaque,
+            corFundo: cfg.corFundo,
+            corFundoClaro: cfg.corFundoClaro,
+            corSuperficie: cfg.corSuperficie,
+            corTexto: cfg.corTexto,
+            corTextoSecundario: cfg.corTextoSecundario,
+            corBorda: cfg.corBorda,
           });
-          if (!savedTheme && data.tema) setTema(data.tema);
+          if (cfg.paletaSite) setPaletaSite(resolverPaleta(cfg.paletaSite));
+          if (!savedTheme && cfg.tema) setTema(cfg.tema);
         }
         setLoading(false);
       })
@@ -78,7 +85,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('theme-updated', handleUpdate as EventListener);
     return () => window.removeEventListener('theme-updated', handleUpdate as EventListener);
-  }, []);
+  }, [slug]);
 
   const toggleTheme = useCallback(() => {
     setTema((prev) => {
@@ -172,15 +179,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--gradient-gold-soft', `linear-gradient(135deg, ${colors.corPrincipal}26, ${colors.corPrincipal}0d)`);
     root.style.setProperty('--gradient-dark', `linear-gradient(180deg, ${colors.corFundo} 0%, ${colors.corSuperficie} 100%)`);
 
+    root.style.setProperty('--site-primary', paletaSite.primaria);
+    root.style.setProperty('--site-navy', paletaSite.navy);
+    root.style.setProperty('--site-bg-light', paletaSite.fundoClaro);
+    root.style.setProperty('--site-text', paletaSite.texto);
+    root.style.setProperty('--site-text-sec', paletaSite.textoSec);
+    root.style.setProperty('--site-green', paletaSite.verde);
+    root.style.setProperty('--site-white', paletaSite.branco);
+
     if (claro) {
       root.style.setProperty('--bg-secondary', fundoLuz);
     } else {
       root.style.setProperty('--bg-secondary', colors.corSuperficie);
     }
-  }, [colors, tema, loading]);
+  }, [colors, paletaSite, tema, loading]);
 
   return (
-    <ThemeContext.Provider value={{ colors, tema, loading, toggleTheme, setTemaManual, updateColors }}>
+    <ThemeContext.Provider value={{ colors, paletaSite, tema, loading, toggleTheme, setTemaManual, updateColors }}>
       {children}
     </ThemeContext.Provider>
   );

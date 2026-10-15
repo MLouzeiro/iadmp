@@ -93,6 +93,9 @@ export default function Modal({
                       />
                     ) : f.type === 'select' ? (
                       <select className={styles.select} value={String(val)} onChange={(e) => set(e.target.value)}>
+                        {f.placeholder && (
+                          <option value="" disabled={f.required}>{f.placeholder}</option>
+                        )}
                         {(f.options || []).map((o) => (
                           <option key={o.value} value={o.value}>{o.label}</option>
                         ))}

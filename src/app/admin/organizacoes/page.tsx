@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Building2, Eye, Check, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Pencil, Trash2, Building2, Eye, ExternalLink } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -17,6 +18,7 @@ interface Organizacao {
   slug: string;
   descricao: string | null;
   ativo: boolean;
+  sitePublico: boolean;
   dominioPersonalizado: string | null;
   createdAt: string;
   _count?: {
@@ -31,6 +33,7 @@ interface Organizacao {
 
 export default function OrganizacoesPage() {
   const { toast, confirm } = useToast();
+  const router = useRouter();
   const [organizacoes, setOrganizacoes] = useState<Organizacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -42,6 +45,7 @@ export default function OrganizacoesPage() {
     slug: '',
     dominioPersonalizado: '',
     ativo: true,
+    sitePublico: true,
   });
 
   const fetchOrganizacoes = useCallback(() => {
@@ -59,7 +63,7 @@ export default function OrganizacoesPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ nome: '', descricao: '', slug: '', dominioPersonalizado: '', ativo: true });
+    setForm({ nome: '', descricao: '', slug: '', dominioPersonalizado: '', ativo: true, sitePublico: true });
     setModalOpen(true);
   };
 
@@ -71,12 +75,13 @@ export default function OrganizacoesPage() {
       slug: org.slug,
       dominioPersonalizado: org.dominioPersonalizado || '',
       ativo: org.ativo,
+      sitePublico: org.sitePublico ?? true,
     });
     setModalOpen(true);
   };
 
   const openDetalhes = (org: Organizacao) => {
-    window.location.href = `/admin/organizacoes/${org.id}`;
+    router.push(`/admin/organizacoes/${org.id}`);
   };
 
   const salvar = async () => {
@@ -99,6 +104,7 @@ export default function OrganizacoesPage() {
       slug: form.slug,
       dominioPersonalizado: form.dominioPersonalizado || undefined,
       ativo: form.ativo,
+      sitePublico: form.sitePublico,
     };
 
     const url = editando ? `/api/organizacoes/${editando.id}` : '/api/organizacoes';
@@ -120,6 +126,21 @@ export default function OrganizacoesPage() {
     }
   };
 
+  const toggleSitePublico = async (org: Organizacao) => {
+    const novo = !org.sitePublico;
+    const res = await fetch(`/api/organizacoes/${org.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sitePublico: novo }),
+    });
+    if (res.ok) {
+      toast(novo ? `Site público de "${org.nome}" habilitado.` : `Site público de "${org.nome}" desligado.`, 'ok');
+      fetchOrganizacoes();
+    } else {
+      toast('Erro ao alterar site público.', 'err');
+    }
+  };
+
   const excluir = (org: Organizacao) => {
     confirm(`Excluir a organização "${org.nome}"? Esta ação não pode ser desfeita.`, async () => {
       const res = await fetch(`/api/organizacoes/${org.id}`, { method: 'DELETE' });
@@ -138,6 +159,7 @@ export default function OrganizacoesPage() {
     { name: 'descricao', label: 'Descrição', type: 'textarea', value: form.descricao },
     { name: 'dominioPersonalizado', label: 'Domínio personalizado (opcional)', value: form.dominioPersonalizado, placeholder: 'ex: igreja.exemplo.com' },
     { name: 'ativo', label: 'Ativa', type: 'checkbox', value: form.ativo, placeholder: 'Organização ativa e acessível' },
+    { name: 'sitePublico', label: 'Site público', type: 'checkbox', value: form.sitePublico, placeholder: 'Exibir esta congregação no portal (/igreja/{slug})' },
   ];
 
   const onChange = (name: string, value: string | number | boolean) => {
@@ -153,23 +175,23 @@ export default function OrganizacoesPage() {
   return (
     <div>
       <PageHead
-        title="Organizações"
-        subtitle="Cadastro de igrejas/congregações do sistema (SUPER_ADMIN)"
-        actions={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Nova Organização</Button>}
+        title="Congregações"
+        subtitle="Organizações com site próprio: cadastro, slug e publicação no portal"
+        actions={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Nova Congregação</Button>}
       />
 
       <div className={styles.toolbar}>
-        <SearchBar value={search} onChange={setSearch} placeholder="Buscar organização..." />
+        <SearchBar value={search} onChange={setSearch} placeholder="Buscar congregação..." />
       </div>
 
       {loading ? (
-        <div className={styles.loadingState}>Carregando organizações...</div>
+        <div className={styles.loadingState}>Carregando congregações...</div>
       ) : filtrados.length === 0 ? (
         <EmptyState
           icon={<Building2 size={30} />}
-          title="Nenhuma organização encontrada"
-          message={search ? 'Tente outro termo de busca.' : 'Cadastre a primeira organização do sistema.'}
-          action={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Nova Organização</Button>}
+          title="Nenhuma congregação encontrada"
+          message={search ? 'Tente outro termo de busca.' : 'Cadastre a primeira congregação do sistema.'}
+          action={<Button icon={<Plus size={16} />} onClick={openNovo} size="sm">Nova Congregação</Button>}
         />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -191,7 +213,29 @@ export default function OrganizacoesPage() {
                 </div>
               </div>
               <div className={styles.listItemActions}>
-                <Badge variant={org.ativo ? 'success' : 'error'}>{org.ativo ? 'ATIVA' : 'INATIVA'}</Badge>
+                <Badge variant={org.ativo ? 'ok' : 'err'}>{org.ativo ? 'ATIVA' : 'INATIVA'}</Badge>
+                <Badge variant={org.sitePublico ? 'info' : 'mut'}>
+                  {org.sitePublico ? 'SITE ON' : 'SITE OFF'}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => toggleSitePublico(org)}
+                  title={org.sitePublico ? 'Desligar site público' : 'Ligar site público'}
+                >
+                  {org.sitePublico ? 'Desligar site' : 'Ligar site'}
+                </Button>
+                {org.sitePublico && org.ativo && org.slug && (
+                  <a
+                    href={`/igreja/${org.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                  >
+                    <ExternalLink size={13} /> Ver site
+                  </a>
+                )}
                 <Button size="sm" variant="secondary" icon={<Eye size={14} />} onClick={() => openDetalhes(org)}>Detalhes</Button>
                 <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => openEditar(org)}>Editar</Button>
                 <Button size="sm" variant="danger" icon={<Trash2 size={14} />} onClick={() => excluir(org)}>Excluir</Button>
@@ -203,14 +247,14 @@ export default function OrganizacoesPage() {
 
       <Modal
         open={modalOpen}
-        title={editando ? 'Editar Organização' : 'Nova Organização'}
-        description="POST/PUT /api/organizacoes · schema Zod criarOrganizacaoSchema"
+        title={editando ? 'Editar Congregação' : 'Nova Congregação'}
+        description="POST/PUT /api/organizacoes · publicação via sitePublico"
         fields={campos}
         values={form as unknown as Record<string, string | number | boolean>}
         onChange={onChange}
         onClose={() => setModalOpen(false)}
         onSave={salvar}
-        saveLabel={editando ? 'Salvar alterações' : 'Criar organização'}
+        saveLabel={editando ? 'Salvar alterações' : 'Criar congregação'}
       />
     </div>
   );

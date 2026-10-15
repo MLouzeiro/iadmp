@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { resolveOrgScope, resolveTargetOrgId, assertOrgAccess, withOrgScope, orgFilter, ORG_FORBIDDEN, ORG_REQUIRED } from '@/lib/tenant';
+import { resolveOrgScope, resolveTargetOrgId, assertOrgAccess, withOrgScope, orgFilter, resolvePublicOrganizacaoId, ORG_FORBIDDEN, ORG_REQUIRED } from '@/lib/tenant';
 import { canManageOrganization } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 
@@ -13,6 +13,7 @@ jest.mock('@/lib/prisma', () => ({
     },
     organizacao: {
       findMany: jest.fn().mockResolvedValue([]),
+      findFirst: jest.fn().mockResolvedValue(null),
     },
     auditLog: {
       create: jest.fn().mockResolvedValue({}),
@@ -28,6 +29,7 @@ const mockFindMany = prisma.usuarioOrganizacao.findMany as jest.Mock;
 const mockAudit = prisma.auditLog.create as jest.Mock;
 const mockCan = canManageOrganization as jest.Mock;
 const mockOrgs = prisma.organizacao.findMany as jest.Mock;
+const mockOrgFindFirst = prisma.organizacao.findFirst as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -156,5 +158,46 @@ describe('withOrgScope / orgFilter', () => {
       { mode: 'MULTI', orgIds: ['a', 'b'] }
     );
     expect(where.organizacaoId).toBe('a');
+  });
+});
+
+describe('resolvePublicOrganizacaoId', () => {
+  it('slug valido e ativo com site publico retorna o id', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org-x' });
+    const id = await resolvePublicOrganizacaoId({ slug: 'sede' });
+    expect(id).toBe('org-x');
+    expect(mockOrgFindFirst).toHaveBeenCalledWith({
+      where: { slug: 'sede', ativo: true, sitePublico: true },
+      select: { id: true },
+    });
+  });
+
+  it('slug invalido retorna null SEM fallback para outra organizacao', async () => {
+    mockOrgFindFirst.mockResolvedValue(null);
+    const id = await resolvePublicOrganizacaoId({ slug: 'nao-existe' });
+    expect(id).toBeNull();
+    expect(mockOrgFindFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it('organizacaoId invalido retorna null SEM fallback', async () => {
+    mockOrgFindFirst.mockResolvedValue(null);
+    const id = await resolvePublicOrganizacaoId({ organizacaoId: 'org-fantasma' });
+    expect(id).toBeNull();
+    expect(mockOrgFindFirst).toHaveBeenCalledTimes(1);
+    expect(mockOrgFindFirst).toHaveBeenCalledWith({
+      where: { id: 'org-fantasma', ativo: true, sitePublico: true },
+      select: { id: true },
+    });
+  });
+
+  it('sem parametros usa a primeira organizacao ativa (portal geral)', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org-padrao' });
+    const id = await resolvePublicOrganizacaoId({});
+    expect(id).toBe('org-padrao');
+    expect(mockOrgFindFirst).toHaveBeenCalledWith({
+      where: { ativo: true },
+      select: { id: true },
+      orderBy: { createdAt: 'asc' },
+    });
   });
 });

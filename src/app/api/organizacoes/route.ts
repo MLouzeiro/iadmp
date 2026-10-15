@@ -32,6 +32,7 @@ const criarOrganizacaoSchema = z.object({
   slug: z.string().optional(),
   dominioPersonalizado: z.string().optional(),
   ativo: z.boolean().optional(),
+  sitePublico: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
         slug,
         dominioPersonalizado: validated.dominioPersonalizado || null,
         ativo: validated.ativo ?? true,
+        sitePublico: validated.sitePublico ?? true,
       },
     });
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 
-export default function ContatoForm() {
+export default function ContatoForm({ slug }: { slug?: string }) {
   const { toast } = useToast();
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', assunto: '', mensagem: '' });
   const [enviando, setEnviando] = useState(false);
@@ -20,7 +20,8 @@ export default function ContatoForm() {
     }
     setEnviando(true);
     try {
-      const res = await fetch('/api/public/contato', {
+      const qs = slug ? `?slug=${encodeURIComponent(slug)}` : '';
+      const res = await fetch(`/api/public/contato${qs}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

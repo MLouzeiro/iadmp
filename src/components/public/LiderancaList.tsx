@@ -12,17 +12,21 @@ interface Lider {
   congregacao?: { id: string; nome: string } | null;
 }
 
-export default function LiderancaList() {
+export default function LiderancaList({ slug, limit }: { slug?: string; limit?: number }) {
   const [lideres, setLideres] = useState<Lider[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/public/lideranca')
+    const params = new URLSearchParams();
+    if (slug) params.set('slug', slug);
+    if (limit) params.set('limit', String(limit));
+    const qs = params.toString();
+    fetch(`/api/public/lideranca${qs ? `?${qs}` : ''}`)
       .then((r) => r.json())
       .then((d) => setLideres(d.lideres || []))
       .catch(() => setLideres([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [slug, limit]);
 
   if (loading) {
     return <EmptyState title="Carregando liderança..." message="Buscando os servos da nossa comunidade." />;

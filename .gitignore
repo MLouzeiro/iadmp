@@ -43,3 +43,12 @@ next-env.d.ts
 # opencode local
 .opencode/node_modules/
 .opencode/package-lock.json
+
+# artefatos de validação no navegador (Playwright MCP)
+.playwright-mcp/
+
+# screenshots de validação na raiz do projeto
+/*.png
+
+# scripts temporários de debug
+scripts/temp-*.js

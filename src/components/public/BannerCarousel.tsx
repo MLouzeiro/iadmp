@@ -18,20 +18,23 @@ const INTERVALO_MS = 6000;
 
 /**
  * Carrossel interativo de banners/flyers no topo do site público.
- * Busca /api/public/banners; sem banners ativos, não renderiza nada.
+ * Busca /api/public/banners (organização padrão ou via slug); sem banners ativos, não renderiza nada.
  */
-export default function BannerCarousel() {
+export default function BannerCarousel({ slug }: { slug?: string }) {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [indice, setIndice] = useState(0);
   const [pausado, setPausado] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    fetch('/api/public/banners')
+    const url = slug
+      ? `/api/public/banners?slug=${encodeURIComponent(slug)}`
+      : '/api/public/banners';
+    fetch(url)
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => setBanners(Array.isArray(d) ? d : []))
       .catch(() => setBanners([]));
-  }, []);
+  }, [slug]);
 
   const total = banners.length;
 

@@ -6,8 +6,16 @@ import { GET as listaGET } from '@/app/api/public/pregacoes/route';
 import { GET as detalheGET } from '@/app/api/public/pregacoes/[slug]/route';
 import { prisma } from '@/lib/prisma';
 
+// Evita carregar next-auth (ESM) — tenant.ts só usa canManageOrganization destes helpers.
+jest.mock('@/lib/auth-helpers', () => ({
+  canManageOrganization: jest.fn().mockResolvedValue(false),
+}));
+
 jest.mock('@/lib/prisma', () => ({
   prisma: {
+    organizacao: {
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
     pregacao: {
       findMany: jest.fn().mockResolvedValue([]),
       findFirst: jest.fn().mockResolvedValue(null),
@@ -17,11 +25,13 @@ jest.mock('@/lib/prisma', () => ({
 
 const mockFindMany = prisma.pregacao.findMany as jest.Mock;
 const mockFindFirst = prisma.pregacao.findFirst as jest.Mock;
+const mockOrgFindFirst = prisma.organizacao.findFirst as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockFindMany.mockResolvedValue([]);
   mockFindFirst.mockResolvedValue(null);
+  mockOrgFindFirst.mockResolvedValue(null);
 });
 
 function slugParams(slug = 'mensagem-da-semana') {
@@ -29,13 +39,32 @@ function slugParams(slug = 'mensagem-da-semana') {
 }
 
 describe('GET /api/public/pregacoes (lista)', () => {
-  it('retorna 400 sem organizacaoId', async () => {
+  it('sem parametro usa a organizacao padrao (portal geral)', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org1' });
+    mockFindMany.mockResolvedValue([{ id: 'p1', titulo: 'Mensagem', slug: 'mensagem' }]);
     const res = await listaGET(new NextRequest('http://localhost/api/public/pregacoes'));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(200);
+    expect(mockOrgFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { ativo: true } })
+    );
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ organizacaoId: 'org1' }) })
+    );
+  });
+
+  it('organizacaoId invalido retorna lista vazia sem cair no fallback', async () => {
+    mockOrgFindFirst.mockResolvedValue(null);
+    const res = await listaGET(
+      new NextRequest('http://localhost/api/public/pregacoes?organizacaoId=org-fantasma')
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ pregacoes: [] });
+    expect(mockOrgFindFirst).toHaveBeenCalledTimes(1);
     expect(mockFindMany).not.toHaveBeenCalled();
   });
 
   it('retorna 200 apenas com pregacoes PUBLICADAS da organizacao', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org1' });
     mockFindMany.mockResolvedValue([{ id: 'p1', titulo: 'Mensagem', slug: 'mensagem' }]);
     const res = await listaGET(
       new NextRequest('http://localhost/api/public/pregacoes?organizacaoId=org1&limit=4')
@@ -50,6 +79,7 @@ describe('GET /api/public/pregacoes (lista)', () => {
   });
 
   it('nao expoe campos internos (observacoes, createdById, status)', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org1' });
     mockFindMany.mockResolvedValue([{ id: 'p1' }]);
     const res = await listaGET(
       new NextRequest('http://localhost/api/public/pregacoes?organizacaoId=org1')
@@ -61,6 +91,7 @@ describe('GET /api/public/pregacoes (lista)', () => {
   });
 
   it('erro de banco retorna 500 sem vazar mensagem interna', async () => {
+    mockOrgFindFirst.mockResolvedValue({ id: 'org1' });
     mockFindMany.mockRejectedValue(new Error('FATAL: password=segura123'));
     const res = await listaGET(
       new NextRequest('http://localhost/api/public/pregacoes?organizacaoId=org1')

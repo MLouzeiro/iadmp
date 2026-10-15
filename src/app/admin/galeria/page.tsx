@@ -10,6 +10,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import SearchBar from '@/components/ui/SearchBar';
 import Lightbox from '@/components/ui/Lightbox';
 import { useToast } from '@/components/ui/Toast';
+import UploadField from '@/components/ui/UploadField';
 import styles from '@/components/ui/form.module.css';
 import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 
@@ -230,7 +231,17 @@ export default function GaleriaAdminPage() {
         onClose={() => setModalOpen(false)}
         onSave={salvar}
         saveLabel={editando ? 'Salvar alterações' : 'Adicionar item'}
-      />
+      >
+        <UploadField
+          organizacaoId={form.organizacaoId || (orgs.length === 1 ? orgs[0].id : '')}
+          value={form.url}
+          onChange={(url) => setForm((p) => ({ ...p, url }))}
+          pasta="galeria"
+          entityTipo="GaleriaItem"
+          entityId={editando?.id}
+          label="Ou envie uma imagem do dispositivo"
+        />
+      </Modal>
     </div>
   );
 }

@@ -211,12 +211,13 @@ export async function resolveCongregacaoId(
 
 /**
  * Resolve organização por slug (para APIs públicas).
- * Retorna null se não encontrar ou se a organização não estiver ativa.
+ * Retorna null se não encontrar, se a organização não estiver ativa
+ * ou se o site público estiver desabilitado (sitePublico = false).
  */
 export async function resolveOrgBySlug(slug: string | null): Promise<string | null> {
   if (!slug) return null;
   const org = await prisma.organizacao.findFirst({
-    where: { slug, ativo: true },
+    where: { slug, ativo: true, sitePublico: true },
     select: { id: true },
   });
   return org?.id || null;
@@ -224,19 +225,19 @@ export async function resolveOrgBySlug(slug: string | null): Promise<string | nu
 
 /**
  * Resolve organização para APIs públicas.
- * Prioridade: slug > organizacaoId > fallback (primeira ativa).
+ * - slug ou organizacaoId informado: se não existir/ativo/site desligado → null (sem fallback).
+ * - sem parâmetros (portal geral): primeira organização ativa (ordenada por criação).
  */
 export async function resolvePublicOrganizacaoId(params: { slug?: string | null; organizacaoId?: string | null }): Promise<string | null> {
   if (params.slug) {
-    const bySlug = await resolveOrgBySlug(params.slug);
-    if (bySlug) return bySlug;
+    return resolveOrgBySlug(params.slug);
   }
   if (params.organizacaoId) {
     const byId = await prisma.organizacao.findFirst({
-      where: { id: params.organizacaoId, ativo: true },
+      where: { id: params.organizacaoId, ativo: true, sitePublico: true },
       select: { id: true },
     });
-    if (byId) return byId.id;
+    return byId?.id || null;
   }
   const padrao = await prisma.organizacao.findFirst({
     where: { ativo: true },

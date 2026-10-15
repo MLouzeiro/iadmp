@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images,
   Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate,
-  Radio, Mic, BarChart3, Menu, X, ClipboardList, Image, Building2, Send, FileText,
+  Radio, Mic, BarChart3, Menu, X, ClipboardList, Image, Building2, Send, FileText, HardDrive,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
@@ -61,6 +61,8 @@ const grupos: { label: string; itens: NavItem[] }[] = [
       { name: 'Galeria', path: '/admin/galeria', icon: Images },
       { name: 'Banners', path: '/admin/banners', icon: Image },
       { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
+      { name: 'Congregações', path: '/admin/organizacoes', icon: Building2 },
+      { name: 'Armazenamento', path: '/admin/armazenamento', icon: HardDrive },
     ],
   },
 {
@@ -116,7 +118,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setOrgs(list);
         if (list.length > 0) {
           const stored = localStorage.getItem('iadmp-current-org');
-          const initialOrg = stored && list.some(o => o.id === stored) ? stored : list[0].id;
+          const initialOrg = stored && list.some((o: Organizacao) => o.id === stored) ? stored : list[0].id;
           setCurrentOrgId(initialOrg);
           localStorage.setItem('iadmp-current-org', initialOrg);
         }
@@ -245,6 +247,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <LogOut size={19} />
             Sair
           </button>
+          <div className={styles.sidebarContacto}>
+            <p>IADMP — Assembleia de Deus</p>
+            <p>Maranhão, Brasil</p>
+            <p>+55 98 98803-5646</p>
+          </div>
         </nav>
       </aside>
       <main className={styles.main}>{children}</main>

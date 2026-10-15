@@ -48,12 +48,15 @@ const STAT_ORDER: StatKey[] = ['congregacoes', 'lideres', 'anosHistoria', 'minis
  * Estatísticas do hero da home — dados de /api/public/hero-stats.
  * Sem conexão/config, reproduz os valores fixos hoje em produção (5/11/12/3).
  */
-export default function HeroStats() {
+export default function HeroStats({ slug }: { slug?: string }) {
   const [stats, setStats] = useState<HeroStatsData>(FALLBACK);
 
   useEffect(() => {
     let cancelado = false;
-    fetch('/api/public/hero-stats')
+    const url = slug
+      ? `/api/public/hero-stats?slug=${encodeURIComponent(slug)}`
+      : '/api/public/hero-stats';
+    fetch(url)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: HeroStatsData | null) => {
         if (cancelado || !d || typeof d.congregacoes !== 'number') return;
@@ -76,7 +79,7 @@ export default function HeroStats() {
     return () => {
       cancelado = true;
     };
-  }, []);
+  }, [slug]);
 
   const exibir = stats.exibir ?? FALLBACK.exibir;
   const visiveis = STAT_ORDER.filter((key) => exibir[key]);
@@ -84,11 +87,11 @@ export default function HeroStats() {
   if (visiveis.length === 0) return null;
 
   return (
-    <div className="hero-stats">
+    <div className="heroStats">
       {visiveis.map((key) => (
-        <div key={key} className="hero-stat">
-          <span className="hero-stat-value">{stats[key] ?? 0}</span>
-          <span className="hero-stat-label">{STAT_LABELS[key]}</span>
+        <div key={key} className="heroStat">
+          <span className="heroStatValue">{stats[key] ?? 0}</span>
+          <span className="heroStatLabel">{STAT_LABELS[key]}</span>
         </div>
       ))}
     </div>

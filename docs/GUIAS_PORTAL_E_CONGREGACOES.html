@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IADMPMA — Guias: Portal Geral &amp; Site da Congregação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #C8960C;
+    --primary-soft: rgba(200, 150, 12, .14);
+    --bg: #0A1628;
+    --bg-2: #0E1D33;
+    --card: #12243D;
+    --card-2: #162B47;
+    --border: #22385A;
+    --text: #F0ECE2;
+    --muted: #9FB0C9;
+    --green: #38C172;
+    --red: #E4574F;
+    --blue: #4C9AFF;
+    --radius: 14px;
+    --mono: 'JetBrains Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; }
+  a { color: var(--primary); text-decoration: none; }
+  code { font-family: var(--mono); font-size: .86em; background: rgba(255,255,255,.06); padding: .1em .4em; border-radius: 5px; color: #F2C94C; }
+
+  .shell { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: linear-gradient(180deg, #0C1A2E, #0A1628);
+    border-right: 1px solid var(--border);
+    padding: 26px 18px 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px; flex: 0 0 auto;
+    background: linear-gradient(135deg, var(--primary), #8A6508);
+    display: grid; place-items: center; font-weight: 700; color: #0A1628; font-size: 15px;
+  }
+  .brand h1 { font-size: 1.02rem; line-height: 1.2; }
+  .brand small { display: block; color: var(--muted); font-family: 'Montserrat'; font-weight: 400; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+  nav.toc { margin-top: 22px; display: flex; flex-direction: column; gap: 2px; }
+  nav.toc a {
+    display: block; padding: 8px 11px; border-radius: 8px; color: var(--muted);
+    font-size: .82rem; font-weight: 500; border-left: 2px solid transparent; transition: .18s;
+  }
+  nav.toc a:hover { background: rgba(255,255,255,.05); color: var(--text); }
+  .toc-label { font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: #5D7398; margin: 18px 0 6px 11px; }
+
+  main { padding: 42px 46px 90px; max-width: 1080px; }
+
+  .hero { position: relative; padding: 34px 32px; border-radius: var(--radius); overflow: hidden;
+    background: radial-gradient(1000px 320px at 12% -30%, rgba(200,150,12,.22), transparent 60%), var(--card);
+    border: 1px solid var(--border); margin-bottom: 38px; }
+  .hero .kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--primary); font-weight: 600; }
+  .hero h2 { font-size: clamp(1.5rem, 3vw, 2.15rem); margin: 8px 0 12px; line-height: 1.2; }
+  .hero p { color: var(--muted); max-width: 74ch; font-size: .93rem; }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .badge { font-size: .7rem; font-weight: 600; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); }
+  .badge.gold { border-color: rgba(200,150,12,.5); color: var(--primary); background: var(--primary-soft); }
+
+  section { margin-bottom: 54px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 1.55rem; margin-bottom: 6px; }
+  .sec-sub { color: var(--muted); font-size: .88rem; margin-bottom: 20px; max-width: 80ch; }
+  .num { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary); font-family: 'Montserrat'; font-size: .78rem; font-weight: 700; margin-right: 8px; vertical-align: 3px; }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+  .card h3 { font-size: 1.02rem; margin-bottom: 8px; font-family: 'Montserrat'; font-weight: 700; }
+  .card p, .card li { color: var(--muted); font-size: .85rem; }
+  .card ul { padding-left: 18px; margin-top: 8px; }
+  .card li { margin-bottom: 5px; }
+
+  .callout { border-left: 3px solid var(--primary); background: var(--primary-soft); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: .86rem; color: #E9DFC4; margin: 18px 0; }
+  .callout.warn { border-color: var(--red); background: rgba(228,87,79,.12); color: #F3D2D0; }
+  .callout.info { border-color: var(--blue); background: rgba(76,154,255,.1); color: #CFE1FF; }
+  .callout strong { color: #fff; }
+
+  table.cmp { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  table.cmp th, table.cmp td { text-align: left; padding: 11px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.cmp th { color: var(--primary); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+  table.cmp td { color: var(--muted); }
+  table.cmp td:first-child { color: var(--text); font-weight: 600; }
+
+  .steps { counter-reset: st; display: grid; gap: 12px; }
+  .step { display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+  .step-n { counter-increment: st; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--primary-soft); border: 1px solid rgba(200,150,12,.45); color: var(--primary); font-weight: 700; font-size: .82rem; }
+  .step-n::before { content: counter(st); }
+  .step-body { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 17px; }
+  .step-body h4 { font-family: 'Montserrat'; font-size: .9rem; margin-bottom: 4px; }
+  .step-body p { font-size: .82rem; color: var(--muted); }
+
+  pre { background: #0B1526; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: .78rem; line-height: 1.6; color: #CDE3FF; margin: 10px 0; }
+  pre .k { color: #F2C94C; }
+  pre .s { color: #8DD7A5; }
+
+  footer { border-top: 1px solid var(--border); padding: 26px 0 0; margin-top: 40px; color: var(--muted); font-size: .78rem; }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { position: relative; height: auto; }
+    main { padding: 28px 20px 70px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <div class="brand-mark">IA</div>
+      <div>
+        <h1>IADMPMA</h1>
+        <small>Guias de uso</small>
+      </div>
+    </div>
+    <nav class="toc">
+      <div class="toc-label">Visão geral</div>
+      <a href="#inicio">Introdução</a>
+      <div class="toc-label">Guia 1 — Portal</div>
+      <a href="#g1-acesso">Acesso ao portal</a>
+      <a href="#g1-congregacoes">Congregações</a>
+      <a href="#g1-site-publico">Ligar/desligar site</a>
+      <a href="#g1-slug">Slug e URL</a>
+      <a href="#g1-gerenciar">Gerenciar conteúdo</a>
+      <div class="toc-label">Guia 2 — Congregação</div>
+      <a href="#g2-estrutura">Estrutura do site</a>
+      <a href="#g2-publicar">O que publicar</a>
+      <a href="#g2-isolamento">Isolamento de dados</a>
+      <a href="#g2-visitante">Visita do público</a>
+      <div class="toc-label">Referência</div>
+      <a href="#ref-endpoints">Endpoints públicos</a>
+      <a href="#ref-perfis">Perfis e permissões</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero" id="inicio">
+      <span class="kicker">Documentação operacional · pt-BR</span>
+      <h2>Portal Geral &amp; Site da Congregação</h2>
+      <p>Dois guias práticos: o administrador do portal gerencia todas as congregações; cada congregação ativa tem um site público em <code>/igreja/{slug}</code> com dados isolados por organização.</p>
+      <div class="hero-badges">
+        <span class="badge gold">Guia 1 · Portal (SUPER_ADMIN)</span>
+        <span class="badge gold">Guia 2 · Congregação (líder local)</span>
+        <span class="badge">Multi-organização</span>
+        <span class="badge">Isolamento de dados</span>
+      </div>
+    </div>
+
+    <!-- ============ GUIA 1 ============ -->
+    <section id="g1-acesso">
+      <h2><span class="num">1</span>Guia 1 — Acesso ao portal</h2>
+      <p class="sec-sub">O portal administrativo fica em <code>/admin</code> e exige login com credenciais do sistema. O papel <strong>SUPER_ADMIN</strong> enxerga todas as congregações; outros papéis operam apenas nas organizações vinculadas.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n"></div>
+          <div class="step-body">
+            <h4>Abra <code>/admin/login</code></h4>
+            <p>Entre com e-mail e senha cadastrados. A sessão usa cookie do NextAuth (<code>authjs.session-token</code>).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-n"></div>
+          <div class="step-body">
+            <h4>Selecione a organização (se houver mais de uma)</h4>
+            <p>O seletor no topo do painel troca o contexto ativo. SUPER_ADMIN vê todas; demais papéis veem apenas as vinculadas via <code>UsuarioOrganizacao</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-n"></div>
+          <div class="step-body">
+            <h4>Abra <strong>Congregações</strong> no menu lateral</h4>
+            <p>Grupo <em>Operação</em> → <em>Congregações</em> (<code>/admin/organizacoes</code>). Lá você cria, edita, liga/desliga o site público e acessa os detalhes de cada congregação.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="g1-congregacoes">
+      <h2><span class="num">2</span>Gerenciar congregações</h2>
+      <p class="sec-sub">Cada congregação do portal é uma <strong>Organização</strong> no banco (tenant). O campo <code>slug</code> define a URL pública e o campo <code>sitePublico</code> controla se ela aparece no portal.</p>
+      <div class="grid g2">
+        <div class="card">
+          <h3>Criar congregação</h3>
+          <ul>
+            <li><strong>Nome</strong> — nome visível (obrigatório)</li>
+            <li><strong>Slug</strong> — só minúsculas, números e hífens (obrigatório); vira a URL</li>
+            <li><strong>Descrição</strong> — texto opcional</li>
+            <li><strong>Domínio personalizado</strong> — opcional (futuro apontamento)</li>
+            <li><strong>Ativa</strong> — organização funcional no sistema</li>
+            <li><strong>Site público</strong> — marca se o site <code>/igreja/{slug}</code> fica no ar</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Editar / excluir</h3>
+          <ul>
+            <li><strong>Editar</strong> — abre o modal com os mesmos campos</li>
+            <li><strong>Detalhes</strong> — página com contadores, identidade visual e ações rápidas</li>
+            <li><strong>Excluir</strong> — confirmação em tela; use apenas sem dados dependentes</li>
+            <li>Preferir <strong>Desativar</strong> a excluir quando houver membros/eventos</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout warn"><strong>Atenção:</strong> slug é a URL pública. Alterar o slug depois quebra links antigos (<code>/igreja/slug-antigo</code> passa a retornar 404). Comunique a comunicação antes de renomear.</div>
+    </section>
+
+    <section id="g1-site-publico">
+      <h2><span class="num">3</span>Ligar e desligar o site da congregação</h2>
+      <p class="sec-sub">O site público de cada congregação é um interruptor (<code>sitePublico</code>) que pode ser operado de dois lugares.</p>
+      <table class="cmp">
+        <thead>
+          <tr><th>Onde</th><th>Como</th><th>Efeito</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lista (Congregações)</td>
+            <td>Badge <em>SITE ON/OFF</em> + botão <em>Ligar site</em> / <em>Desligar site</em></td>
+            <td>Alterna <code>sitePublico</code> e recarrega a lista</td>
+          </tr>
+          <tr>
+            <td>Detalhes da congregação</td>
+            <td>Card <em>Site Público</em> com o mesmo interruptor</td>
+            <td>Mesma alteração, com confirmação por toast</td>
+          </tr>
+          <tr>
+            <td>Botão <em>Ver site</em></td>
+            <td>Abre <code>/igreja/{slug}</code> em nova aba</td>
+            <td>Só aparece quando ativa + site ligado + slug preenchido</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout info"><strong>Regra do portal:</strong> a home do portal (<code>/</code>) lista automaticamente apenas organizações com <code>ativo</code>, <code>sitePublico</code> e <code>slug</code> preenchidos. Desligar o site remove a congregação da lista sem apagar dados.</div>
+    </section>
+
+    <section id="g1-slug">
+      <h2><span class="num">4</span>Slug e URL pública</h2>
+      <pre><span class="c">// Padrão</span>
+https://SEU-DOMINIO/igreja/<span class="s">meu-portal</span>
+
+<span class="c">// Exemplo com slug "assembleia-centro"</span>
+https://SEU-DOMINIO/igreja/<span class="s">assembleia-centro</span></pre>
+      <ul class="card" style="list-style:none;padding:16px 20px;">
+        <li>✅ Válido: <code>assembleia-centro</code>, <code>ip2</code>, <code>igreja-norte-1</code></li>
+        <li>❌ Inválido: <code>Assembleia Centro</code> (espaço), <code>IGREJA</code> (maiúscula), <code>igreja_centro</code> (underscore)</li>
+      </ul>
+    </section>
+
+    <section id="g1-gerenciar">
+      <h2><span class="num">5</span>Gerenciar conteúdo da congregação</h2>
+      <p class="sec-sub">Depois de criar a congregação e ligar o site, o conteúdo (eventos, avisos, liturgia, ministérios, pregações, canais, versículos, galeria, banners) é gerenciado nos módulos normais do painel, sempre <strong>no contexto da organização correta</strong> (seletor no topo ou parâmetro <code>organizacaoId</code> nas rotas).</p>
+      <div class="steps">
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Selecione a congregação no seletor do topo</h4><p>Ou use os botões <em>Gerenciar Membros / Liderança / Eventos</em> na página de detalhes, que já levam com <code>?organizacaoId=</code>.</p></div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Cadastre eventos, avisos e liturgia</h4><p>Para o site público, avisos precisam de <code>publicarSite=true</code>, situação ATIVA e janela de datas válida; liturgia não pode estar em RASCUNHO/CANCELADA.</p></div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Confira o site em <code>/igreja/{slug}</code></h4><p>Use o botão <em>Ver site</em>. As seções do site puxam dados das APIs públicas já filtrados pela congregação.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ GUIA 2 ============ -->
+    <section id="g2-estrutura">
+      <h2><span class="num">6</span>Guia 2 — Estrutura do site da congregação</h2>
+      <p class="sec-sub">O site de cada congregação é público (sem login) e segue o layout aprovado: topbar azul-marinho, header branco sticky, hero, faixa de valores, eventos + avisos, ministérios, contato/WhatsApp e rodapé.</p>
+      <div class="grid g2">
+        <div class="card">
+          <h3>Seções do site</h3>
+          <ul>
+            <li><strong>Hero</strong> — imagem de fundo + chamada + stats</li>
+            <li><strong>Programação</strong> — cultos fixos da semana</li>
+            <li><strong>Eventos + Avisos</strong> — lado a lado (grid)</li>
+            <li><strong>Ministérios</strong> — cards de ministérios ativos</li>
+            <li><strong>Pregações</strong> — últimas mensagens</li>
+            <li><strong>Liderança</strong> — equipe pastoral</li>
+            <li><strong>Contato</strong> — formulário + WhatsApp flutuante</li>
+            <li><strong>Rodapé</strong> — endereço, redes e créditos</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Comportamento</h3>
+          <ul>
+            <li>Navbar e rodapé do site da congregação usam o layout próprio (<code>/igreja/*</code> esconde o navbar/rodapé global)</li>
+            <li>Botão flutuante de WhatsApp abre conversa com o número da congregação</li>
+            <li>Slug inválido ou organização desligada → página 404 amigável</li>
+            <li>Todas as imagens e cores respeitam o tema configurado da organização</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="g2-publicar">
+      <h2><span class="num">7</span>O que publicar (checklist do líder)</h2>
+      <p class="sec-sub">Para o site da congregação ficar completo, o líder/local deve manter estes dados atualizados no painel (contexto da congregação):</p>
+      <table class="cmp">
+        <thead><tr><th>Conteúdo</th><th>Módulo no painel</th><th>Aparece no site em</th></tr></thead>
+        <tbody>
+          <tr><td>Eventos</td><td>Eventos</td><td>Seção Eventos</td></tr>
+          <tr><td>Avisos</td><td>Avisos (com publicarSite)</td><td>Seção Avisos</td></tr>
+          <tr><td>Programação semanal</td><td>Liturgia → Programações</td><td>Seção Programação</td></tr>
+          <tr><td>Ministérios</td><td>Ministérios</td><td>Seção Ministérios</td></tr>
+          <tr><td>Pregações</td><td>Comunicação → Pregações</td><td>Seção Pregações</td></tr>
+          <tr><td>Liderança</td><td>Liderança</td><td>Seção Liderança</td></tr>
+          <tr><td>Canais (YouTube, etc.)</td><td>Comunicação → Canais</td><td>Topbar / seções</td></tr>
+          <tr><td>Versículo do dia</td><td>Comunicação → Versículos</td><td>Bloco Versículo</td></tr>
+          <tr><td>Identidade (logo, cores, contatos)</td><td>Configurações</td><td>Tema + rodapé</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="g2-isolamento">
+      <h2><span class="num">8</span>Isolamento de dados</h2>
+      <p class="sec-sub">Cada congregação só enxerga (e publica) os próprios dados. O isolamento é aplicado no backend, nunca só no frontend.</p>
+      <div class="grid g2">
+        <div class="card">
+          <h3>Regras do backend</h3>
+          <ul>
+            <li>Rotas públicas aceitam <code>?slug=</code> ou <code>?organizacaoId=</code></li>
+            <li>Sem parâmetros → organização padrão do sistema</li>
+            <li>Parâmetro informado mas inválido → <strong>404</strong> (church-info) ou lista vazia (demais rotas), nunca fallback silencioso</li>
+            <li>Usuário não-SUPER_ADMIN só vê dados das organizações vinculadas</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Exemplo prático</h3>
+          <p style="margin-bottom:10px;">Congregação <code>ip2</code> tem um evento; a congregação <code>assembleia-centro</code> não pode vê-lo:</p>
+          <pre style="margin:0;"><span class="c">// Site do ip2</span>
+GET /api/public/eventos?slug=<span class="s">ip2</span>
+<span class="c">// → apenas eventos do ip2</span>
+
+GET /api/public/eventos?slug=<span class="s">assembleia-centro</span>
+<span class="c">// → apenas eventos da assembleia-centro</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="g2-visitante">
+      <h2><span class="num">9</span>Visita do público</h2>
+      <p class="sec-sub">O visitante não precisa de conta. Ele acessa direto a URL, navega pelas seções e pode usar o formulário de contato ou o WhatsApp flutuante.</p>
+      <div class="steps">
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Portal → escolhe a congregação</h4><p>Na home do portal (<code>/</code>), a seção <em>Nossas Congregações</em> lista as igrejas ativas com site ligado.</p></div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Acessa <code>/igreja/{slug}</code></h4><p>Site completo daquela congregação, com conteúdo isolado.</p></div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><h4>Interage</h4><p>Formulário de contato, WhatsApp, inscrição em eventos públicos — tudo sem login.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ REFERÊNCIA ============ -->
+    <section id="ref-endpoints">
+      <h2><span class="num">10</span>Endpoints públicos (referência)</h2>
+      <p class="sec-sub">Todas as rotas públicas ficam em <code>/api/public/*</code> e não exigem sessão. Aceitam <code>?slug=</code> ou <code>?organizacaoId=</code>.</p>
+      <table class="cmp">
+        <thead><tr><th>Rota</th><th>Método</th><th>Retorna</th></tr></thead>
+        <tbody>
+          <tr><td><code>/api/public/church-info</code></td><td>GET</td><td>Identidade, contatos e configurações da igreja (404 se slug inválido)</td></tr>
+          <tr><td><code>/api/public/congregacoes</code></td><td>GET</td><td>Lista de congregações ativas com site público (para o portal)</td></tr>
+          <tr><td><code>/api/public/eventos</code></td><td>GET</td><td>Eventos públicos da organização</td></tr>
+          <tr><td><code>/api/public/avisos</code></td><td>GET</td><td>Avisos com publicarSite + situação ATIVA + janela de datas</td></tr>
+          <tr><td><code>/api/public/programacao</code></td><td>GET</td><td>Programações/liturgias publicadas</td></tr>
+          <tr><td><code>/api/public/ministerios</code></td><td>GET</td><td>Ministérios ativos</td></tr>
+          <tr><td><code>/api/public/lideranca</code></td><td>GET</td><td>Liderança (suporta <code>?limit=</code>)</td></tr>
+          <tr><td><code>/api/public/pregacoes</code></td><td>GET</td><td>Pregações publicadas</td></tr>
+          <tr><td><code>/api/public/canais</code></td><td>GET</td><td>Canais oficiais (YouTube, etc.)</td></tr>
+          <tr><td><code>/api/public/versiculo</code></td><td>GET</td><td>Versículo do dia</td></tr>
+          <tr><td><code>/api/public/contato</code></td><td>POST</td><td>Envio de mensagem de contato (slug na query string)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="ref-perfis">
+      <h2><span class="num">11</span>Perfis e permissões (resumo)</h2>
+      <table class="cmp">
+        <thead><tr><th>Papel</th><th>Nível</th><th>Alcance</th></tr></thead>
+        <tbody>
+          <tr><td>SUPER_ADMIN</td><td>100</td><td>Todas as congregações; gerencia organizações e site público</td></tr>
+          <tr><td>ADMIN</td><td>90</td><td>Organizações vinculadas</td></tr>
+          <tr><td>PASTOR</td><td>85</td><td>Organização própria; conteúdo pastoral</td></tr>
+          <tr><td>ADMIN_IGREJA</td><td>80</td><td>Administração da congregação</td></tr>
+          <tr><td>LIDER / COORDENADOR</td><td>60</td><td>Módulos do seu ministério</td></tr>
+          <tr><td>SECRETARIA / FINANCEIRO / EDITOR_SITE</td><td>50</td><td>Módulos operacionais</td></tr>
+          <tr><td>MUSICO</td><td>20</td><td>Liturgia / música</td></tr>
+          <tr><td>MEMBER</td><td>10</td><td>Sem acesso administrativo</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><strong>Boa prática:</strong> para cada congregação nova, crie o usuário local com papel ADMIN_IGREJA ou PASTOR e vincule apenas àquela organização. Assim o líder gerencia o próprio site sem enxergar as demais congregações.</div>
+    </section>
+
+    <footer>
+      IADMPMA · Guias operacionais (pt-BR) · Atualizado em outubro de 2026 · Documentação complementar: <a href="./DOCUMENTACAO_CONGREGACOES.html">Documentação Interativa de Congregações</a>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

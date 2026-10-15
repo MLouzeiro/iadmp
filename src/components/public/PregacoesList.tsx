@@ -36,16 +36,19 @@ function getReference(p: Pregacao): string | null {
   return ref;
 }
 
-export default function PregacoesList() {
+export default function PregacoesList({ slug, limit = 50 }: { slug?: string; limit?: number }) {
   const { organizacaoId } = useChurchInfo();
   const [pregacoes, setPregacoes] = useState<Pregacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!organizacaoId) return;
+    if (!slug && !organizacaoId) return;
     async function fetchPregacoes() {
       try {
-        const res = await fetch(`/api/public/pregacoes?organizacaoId=${organizacaoId}&limit=50`);
+        const params = new URLSearchParams({ limit: String(limit) });
+        if (slug) params.set('slug', slug);
+        else if (organizacaoId) params.set('organizacaoId', organizacaoId);
+        const res = await fetch(`/api/public/pregacoes?${params}`);
         if (res.ok) {
           const data = await res.json();
           setPregacoes(data.pregacoes);
@@ -57,7 +60,7 @@ export default function PregacoesList() {
       }
     }
     fetchPregacoes();
-  }, [organizacaoId]);
+  }, [organizacaoId, slug, limit]);
 
   return (
     <>

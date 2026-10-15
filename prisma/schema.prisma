@@ -34,6 +34,7 @@ model User {
   publicacoesPublicadas       Publicacao[]        @relation("PublicacaoPublicadoPor")
   liderancaHistoricoAutor     LiderancaHistorico[] @relation("LiderancaHistoricoAutor")
   eventoOrganizadorUser       EventoOrganizador[] @relation("EventoOrganizadorUser")
+  storedFilesUploaded         StoredFile[]        @relation("StoredFileUploader")
 }
 
 enum Role {
@@ -57,6 +58,7 @@ model Organizacao {
   slug               String?               @unique
   descricao          String?
   ativo              Boolean               @default(true)
+  sitePublico        Boolean               @default(true)
   dominioPersonalizado String?
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
@@ -90,6 +92,10 @@ model Organizacao {
   banners            Banner[]
   paginaPublica      PaginaPublica?
   publicacoesDestino PublicacaoOrganizacao[]
+  storedFiles        StoredFile[]
+  storageConfig      StorageConfig[]
+  storageMeasurements StorageMeasurement[]
+  storageAlerts      StorageAlert[]
 
   @@index([ativo])
   @@index([slug])
@@ -762,6 +768,7 @@ model ConfiguracoesIgreja {
   statLideres      Boolean  @default(true)
   statAnosHistoria Boolean  @default(true)
   statMinisterios  Boolean  @default(true)
+  paletaSite       String   @default("PADRAO")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   organizacao      Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
@@ -1017,18 +1024,21 @@ model ContatoMensagem {
 }
 
 model PaginaPublica {
-  id             String    @id @default(cuid())
-  organizacaoId  String    @unique
-  conteudo       Json      @default("{}")
-  secaoHero      Json?
-  secaoSobre     Json?
-  secaoEventos   Json?
-  secaoLideranca Json?
-  secaoGaleria   Json?
-  secaoContato   Json?
-  secaoPregacoes Json?
-  updatedAt      DateTime  @updatedAt
-  organizacao    Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  id                String    @id @default(cuid())
+  organizacaoId     String    @unique
+  conteudo          Json      @default("{}")
+  secaoHero         Json?
+  secaoSobre        Json?
+  secaoEventos      Json?
+  secaoLideranca    Json?
+  secaoGaleria      Json?
+  secaoContato      Json?
+  secaoPregacoes    Json?
+  secaoPilares      Json?
+  secaoMinisterios  Json?
+  secaoRodapeInfo   Json?
+  updatedAt         DateTime  @updatedAt
+  organizacao       Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
 
   @@index([organizacaoId])
 }
@@ -1106,4 +1116,76 @@ model EventoOrganizador {
   @@index([liderancaId])
   @@index([membroId])
   @@index([userId])
+}
+
+model StoredFile {
+  id            String    @id @default(cuid())
+  organizacaoId String
+  bucket        String    @default("imagens")
+  path          String
+  fileName      String
+  sizeBytes     Int
+  contentType   String?
+  etag          String?
+  entityTipo    String?
+  entityId      String?
+  uploadedById  String?
+  ativo         Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+  uploadedBy    User?     @relation("StoredFileUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@unique([bucket, path])
+  @@index([organizacaoId])
+  @@index([createdAt])
+  @@index([ativo])
+}
+
+model StorageConfig {
+  id              String    @id @default(cuid())
+  organizacaoId   String?
+  limiteBytes     BigInt
+  alertaAtencao   Int       @default(70)
+  alertaCritico   Int       @default(85)
+  alertaUrgente   Int       @default(95)
+  ativo           Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  organizacao     Organizacao? @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId])
+}
+
+model StorageMeasurement {
+  id              String    @id @default(cuid())
+  organizacaoId   String?
+  totalBytes      BigInt
+  fileCount       Int
+  buckets         Json?
+  fonte           String    @default("INVENTARIO")
+  observacao      String?
+  medidoEm        DateTime  @default(now())
+  organizacao     Organizacao? @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([medidoEm])
+  @@index([organizacaoId])
+}
+
+model StorageAlert {
+  id              String    @id @default(cuid())
+  organizacaoId   String?
+  nivel           Int
+  titulo          String
+  mensagem        String
+  sugestoes       Json?
+  fonte           String    @default("INVENTARIO")
+  status          String    @default("ATIVO")
+  emitidoEm       DateTime  @default(now())
+  lidoEm          DateTime?
+  resolvidoEm     DateTime?
+  organizacao     Organizacao? @relation(fields: [organizacaoId], references: [id], onDelete: Cascade)
+
+  @@index([organizacaoId, status])
+  @@index([emitidoEm])
 }

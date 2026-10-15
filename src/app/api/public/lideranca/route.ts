@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
     const organizacaoId = searchParams.get('organizacaoId');
+    const limit = parseInt(searchParams.get('limit') || '0', 10);
 
     const orgId = await resolvePublicOrganizacaoId({ slug, organizacaoId });
 
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
         congregacao: { select: { id: true, nome: true } },
       },
       orderBy: { ordemExibicao: 'asc' },
+      ...(limit > 0 ? { take: limit } : {}),
     });
 
     return NextResponse.json({ lideres });

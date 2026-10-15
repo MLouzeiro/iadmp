@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { galleryImages } from '@/data/site-data';
 import Lightbox from '@/components/ui/Lightbox';
 
-export default function GaleriaGrid() {
+// slug/limit aceitos para compatibilidade com /igreja/[slug]; imagens ainda são estáticas.
+export default function GaleriaGrid(_props: { slug?: string; limit?: number }) {
   const [aberta, setAberta] = useState<{ src: string; alt: string } | null>(null);
 
   return (

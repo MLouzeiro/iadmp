@@ -7,6 +7,11 @@ import { GET as bannersGET } from '@/app/api/public/banners/route';
 import { GET as footerInfoGET } from '@/app/api/public/footer-info/route';
 import { prisma } from '@/lib/prisma';
 
+// Evita carregar next-auth (ESM) — tenant.ts só usa canManageOrganization destes helpers.
+jest.mock('@/lib/auth-helpers', () => ({
+  canManageOrganization: jest.fn().mockResolvedValue(false),
+}));
+
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     organizacao: {

@@ -21,14 +21,18 @@ const TIPOS_ICONE: Record<string, string> = {
   telegram: '✈',
 };
 
-export default function CanaisSection({ organizacaoId }: { organizacaoId: string }) {
+export default function CanaisSection({ organizacaoId, slug }: { organizacaoId?: string; slug?: string }) {
   const [canais, setCanais] = useState<Canal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCanais() {
       try {
-        const res = await fetch(`/api/public/canais?organizacaoId=${organizacaoId}`);
+        const params = new URLSearchParams();
+        if (slug) params.set('slug', slug);
+        else if (organizacaoId) params.set('organizacaoId', organizacaoId);
+        const qs = params.toString();
+        const res = await fetch(`/api/public/canais${qs ? `?${qs}` : ''}`);
         if (res.ok) {
           const data = await res.json();
           setCanais(data.canais);
@@ -40,7 +44,7 @@ export default function CanaisSection({ organizacaoId }: { organizacaoId: string
       }
     }
     fetchCanais();
-  }, [organizacaoId]);
+  }, [organizacaoId, slug]);
 
   if (loading || canais.length === 0) return null;
 

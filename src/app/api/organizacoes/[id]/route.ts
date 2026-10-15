@@ -4,21 +4,13 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth, requireSuperAdmin, canManageOrganization } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
 
-function slugify(str: string): string {
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
 const atualizarOrganizacaoSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório').optional(),
   descricao: z.string().nullable().optional(),
   slug: z.string().optional(),
   dominioPersonalizado: z.string().nullable().optional(),
   ativo: z.boolean().optional(),
+  sitePublico: z.boolean().optional(),
 });
 
 export async function GET(
@@ -96,6 +88,7 @@ export async function PUT(
     if (slug !== undefined) data.slug = slug;
     if (validated.dominioPersonalizado !== undefined) data.dominioPersonalizado = validated.dominioPersonalizado;
     if (validated.ativo !== undefined) data.ativo = validated.ativo;
+    if (validated.sitePublico !== undefined) data.sitePublico = validated.sitePublico;
 
     const organizacao = await prisma.organizacao.update({
       where: { id },
@@ -108,8 +101,8 @@ export async function PUT(
       acao: 'ATUALIZAR_ORGANIZACAO',
       entidade: 'Organizacao',
       entidadeId: id,
-      antes: { nome: existing.nome, slug: existing.slug, ativo: existing.ativo },
-      depois: { nome: organizacao.nome, slug: organizacao.slug, ativo: organizacao.ativo },
+      antes: { nome: existing.nome, slug: existing.slug, ativo: existing.ativo, sitePublico: existing.sitePublico },
+      depois: { nome: organizacao.nome, slug: organizacao.slug, ativo: organizacao.ativo, sitePublico: organizacao.sitePublico },
       req: request,
     });
 

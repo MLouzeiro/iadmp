@@ -11,7 +11,8 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'IADMP - Igreja Assembleia de Deus Missão da Promessa',
   description: 'Site oficial da Igreja Assembleia de Deus Missão da Promessa - IADMP. Uma comunidade de fé, amor e esperança.',
-  keywords: ['igreja', 'assembleia de deus', 'ministério da promessa', 'IADMP', 'culto', 'worship', 'fé', 'comunhão'],
+  keywords: ['igreja', 'assembleia de deus', 'missão da promessa', 'IADMP', 'culto', 'worship', 'fé', 'comunhão'],
+  icons: { icon: '/images/logo.png' },
   openGraph: {
     title: 'IADMP - Igreja Assembleia de Deus Missão da Promessa',
     description: 'Site oficial da Igreja Assembleia de Deus Missão da Promessa',
@@ -26,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" data-theme="dark" className={montserrat.variable}>
-      <body className={montserrat.className}>
+    <html lang="pt-BR" data-theme="dark" className={montserrat.variable} suppressHydrationWarning>
+      <body className={montserrat.className} suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

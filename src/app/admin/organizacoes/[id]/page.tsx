@@ -16,6 +16,7 @@ interface OrganizacaoDetalhe {
   slug: string;
   descricao: string | null;
   ativo: boolean;
+  sitePublico: boolean;
   dominioPersonalizado: string | null;
   createdAt: string;
   updatedAt: string;
@@ -32,13 +33,13 @@ interface OrganizacaoDetalhe {
     rodapeFacebook: string | null;
   } | null;
   paginaPublica?: {
-    secaoHero: any;
-    secaoSobre: any;
-    secaoEventos: any;
-    secaoLideranca: any;
-    secaoGaleria: any;
-    secaoContato: any;
-    secaoPregacoes: any;
+    secaoHero?: { titulo?: string; subtitulo?: string } | null;
+    secaoSobre?: { titulo?: string; texto?: string } | null;
+    secaoEventos?: { exibir?: boolean } | null;
+    secaoLideranca?: { exibir?: boolean } | null;
+    secaoGaleria?: { exibir?: boolean } | null;
+    secaoContato?: { exibir?: boolean } | null;
+    secaoPregacoes?: { exibir?: boolean } | null;
   } | null;
   _count: {
     usuarios: number;
@@ -78,6 +79,22 @@ export default function OrganizacaoDetalhePage() {
     }
   };
 
+  const handleToggleSitePublico = async () => {
+    if (!org) return;
+    const novo = !org.sitePublico;
+    const res = await fetch(`/api/organizacoes/${org.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sitePublico: novo }),
+    });
+    if (res.ok) {
+      toast(novo ? 'Site público habilitado.' : 'Site público desligado.', 'ok');
+      setOrg({ ...org, sitePublico: novo });
+    } else {
+      toast('Erro ao alterar site público.', 'err');
+    }
+  };
+
   if (loading) {
     return <div className={styles.loadingState}>Carregando organização...</div>;
   }
@@ -100,12 +117,11 @@ export default function OrganizacaoDetalhePage() {
         subtitle={`Slug: ${org.slug} · ${org.ativo ? 'Ativa' : 'Inativa'}`}
         actions={
           <>
-            {urlPublica && (
+            {urlPublica && org.sitePublico && org.ativo && (
               <Button variant="secondary" icon={<ExternalLink size={16} />} onClick={() => window.open(urlPublica, '_blank')}>
                 Ver Site Público
               </Button>
             )}
-            <Button icon={<Edit size={16} />} onClick={() => {}}>Editar</Button>
             <Link href="/admin/organizacoes"><Button variant="secondary" icon={<ArrowLeft size={16} />}>Voltar</Button></Link>
           </>
         }
@@ -114,11 +130,21 @@ export default function OrganizacaoDetalhePage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ padding: '1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
           <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</p>
-          <Badge variant={org.ativo ? 'success' : 'error'} style={{ fontSize: '0.9rem' }}>
+          <Badge variant={org.ativo ? 'ok' : 'err'}>
             {org.ativo ? 'ATIVA' : 'INATIVA'}
           </Badge>
           <Button size="sm" variant="secondary" onClick={handleToggleAtivo} style={{ marginTop: '0.5rem', width: '100%' }}>
             {org.ativo ? 'Desativar' : 'Ativar'}
+          </Button>
+        </div>
+
+        <div style={{ padding: '1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Site Público</p>
+          <Badge variant={org.sitePublico ? 'info' : 'mut'}>
+            {org.sitePublico ? 'SITE ON' : 'SITE OFF'}
+          </Badge>
+          <Button size="sm" variant="secondary" onClick={handleToggleSitePublico} style={{ marginTop: '0.5rem', width: '100%' }}>
+            {org.sitePublico ? 'Desligar site' : 'Ligar site'}
           </Button>
         </div>
 
