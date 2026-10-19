@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Users, UserCheck, Calendar, DollarSign, BookOpen, Bell, Images,
   Lightbulb, Settings, LogOut, Palette, ChevronDown, Shield, Music, LayoutTemplate,
   Radio, Mic, BarChart3, Menu, X, ClipboardList, Image, Building2, Send, FileText, HardDrive,
+  HeartHandshake,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
@@ -61,6 +62,7 @@ const grupos: { label: string; itens: NavItem[] }[] = [
       { name: 'Galeria', path: '/admin/galeria', icon: Images },
       { name: 'Banners', path: '/admin/banners', icon: Image },
       { name: 'Oportunidades', path: '/admin/oportunidades', icon: Lightbulb },
+      { name: 'Ministérios', path: '/admin/ministerios', icon: HeartHandshake },
       { name: 'Congregações', path: '/admin/organizacoes', icon: Building2 },
       { name: 'Armazenamento', path: '/admin/armazenamento', icon: HardDrive },
     ],

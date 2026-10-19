@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { inscricaoPublicaSchema } from '@/lib/validations';
 import { gerarBrCode } from '@/lib/pix';
 import { gerarQRSvg } from '@/lib/qrcode';
+import { formatarDataBR } from '@/lib/datas';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,8 +32,7 @@ function extrairIp(request: NextRequest): string {
 }
 
 function dataBR(iso: string | Date) {
-  const d = iso instanceof Date ? iso : new Date(iso);
-  return d.toLocaleDateString('pt-BR');
+  return formatarDataBR(iso);
 }
 
 export async function GET(
@@ -57,6 +57,7 @@ export async function GET(
         aceitaInscricoes: true,
         limiteInscricoes: true,
         taxaInscricao: true,
+        imagemUrl: true,
       },
     });
 

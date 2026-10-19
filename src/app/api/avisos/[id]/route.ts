@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { avisoSchema } from '@/lib/validations';
 import { requireAuth, hasPermission } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
 import { parseDataDateOnly } from '@/lib/datas';
@@ -51,19 +52,20 @@ export async function PUT(
     await assertOrgAccess(user.id, existing.organizacaoId, request);
 
     const body = await request.json();
+    const validated = avisoSchema.partial().parse(body);
     const data: Record<string, unknown> = {};
-    if (body.titulo !== undefined) data.titulo = body.titulo;
-    if (body.descricao !== undefined) data.descricao = body.descricao;
-    if (body.imagem !== undefined) data.imagem = body.imagem || null;
-    if (body.categoria !== undefined) data.categoria = body.categoria || null;
-    if (body.publicoAlvo !== undefined) data.publicoAlvo = body.publicoAlvo || null;
-    if (body.urgencia !== undefined) data.urgencia = body.urgencia;
-    if (body.situacaoAviso !== undefined) data.situacaoAviso = body.situacaoAviso;
-    if (body.publicarSite !== undefined) data.publicarSite = Boolean(body.publicarSite);
-    if (body.mostrarPainel !== undefined) data.mostrarPainel = Boolean(body.mostrarPainel);
-    if (body.destaque !== undefined) data.destaque = Boolean(body.destaque);
-    if (body.comecaEm !== undefined) data.comecaEm = body.comecaEm ? parseDataDateOnly(body.comecaEm) : new Date();
-    if (body.terminaEm !== undefined) data.terminaEm = body.terminaEm ? parseDataDateOnly(body.terminaEm) : null;
+    if (validated.titulo !== undefined) data.titulo = validated.titulo;
+    if (validated.descricao !== undefined) data.descricao = validated.descricao;
+    if (validated.imagem !== undefined) data.imagem = validated.imagem || null;
+    if (validated.categoria !== undefined) data.categoria = validated.categoria || null;
+    if (validated.publicoAlvo !== undefined) data.publicoAlvo = validated.publicoAlvo || null;
+    if (validated.urgencia !== undefined) data.urgencia = validated.urgencia;
+    if (validated.situacaoAviso !== undefined) data.situacaoAviso = validated.situacaoAviso;
+    if (validated.publicarSite !== undefined) data.publicarSite = Boolean(validated.publicarSite);
+    if (validated.mostrarPainel !== undefined) data.mostrarPainel = Boolean(validated.mostrarPainel);
+    if (validated.destaque !== undefined) data.destaque = Boolean(validated.destaque);
+    if (validated.dataInicio !== undefined) data.comecaEm = validated.dataInicio ? parseDataDateOnly(validated.dataInicio) : new Date();
+    if (validated.dataFim !== undefined) data.terminaEm = validated.dataFim ? parseDataDateOnly(validated.dataFim) : null;
     if (body.congregacaoId !== undefined || body.congregacao !== undefined) {
       data.congregacaoId = await resolveCongregacaoId(existing.organizacaoId, {
         congregacaoId: body.congregacaoId,
@@ -93,6 +95,9 @@ export async function PUT(
     if (error?.message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     if (error?.message === 'FORBIDDEN') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     if (error?.message === ORG_FORBIDDEN) return orgForbiddenResponse();
+    if (error instanceof Error && error.name === 'ZodError') {
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+    }
     return NextResponse.json({ error: 'Erro ao atualizar aviso' }, { status: 500 });
   }
 }

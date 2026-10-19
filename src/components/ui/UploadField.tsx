@@ -59,9 +59,9 @@ export default function UploadField({
       return;
     }
 
-    const mimeOk = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    const mimeOk = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon'];
     if (!mimeOk.includes(file.type)) {
-      const msg = 'Tipo de arquivo não permitido. Use JPEG, PNG, WebP, GIF ou SVG.';
+      const msg = 'Tipo de arquivo não permitido. Use JPEG, PNG, WebP, GIF, SVG ou ICO.';
       setErro(msg);
       onStatusChange?.('erro');
       return;
@@ -113,7 +113,7 @@ export default function UploadField({
           {uploading ? 'Enviando...' : 'Escolher arquivo'}
         </button>
         <span className={styles.hint}>
-          JPEG, PNG, WebP, GIF ou SVG · máx. 5 MB
+          JPEG, PNG, WebP, GIF, SVG ou ICO · máx. 5 MB
         </span>
       </div>
 

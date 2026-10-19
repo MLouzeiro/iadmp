@@ -35,6 +35,8 @@ const MIME_PERMITIDOS = [
   'image/webp',
   'image/gif',
   'image/svg+xml',
+  'image/x-icon',
+  'image/vnd.microsoft.icon',
 ];
 const TAMANHO_MAX_BYTES = 5 * 1024 * 1024; // 5 MB por arquivo
 

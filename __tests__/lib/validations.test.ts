@@ -112,9 +112,20 @@ describe('validations — schemas Zod', () => {
       const result = avisoSchema.safeParse({
         titulo: 'Reunião de líderes',
         descricao: 'Sexta às 19h',
-        prioridade: 'ALTA',
+        urgencia: 'ALTA',
       });
-            expect(result.success).toBe(true);
+      expect(result.success).toBe(true);
+    });
+
+    it('aceita campos opcionais nulos (categoria, dataFim, publicoAlvo)', () => {
+      const result = avisoSchema.safeParse({
+        titulo: 'Aviso importante',
+        descricao: 'Programação semanal',
+        categoria: null,
+        dataFim: null,
+        publicoAlvo: null,
+      });
+      expect(result.success).toBe(true);
     });
 
     it('rejeita dataFim anterior \u00e0 data do evento', () => {

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Download, Filter, FileText, Users, Calendar, BarChart3, ChevronDown, ChevronUp, Eye, Printer, Search, AlertTriangle, Shield, RefreshCw } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import { formatarDataBR } from '@/lib/datas';
 import styles from '@/components/ui/form.module.css';
 
 interface IndicadorLiderDetalhado {
@@ -131,8 +132,8 @@ export default function RelatoriosClient() {
     const rows = sortedLideres.map(l => [
       l.nome, l.cargo, l.ministerio || '', l.congregacao || '',
       l.ativo ? 'Ativo' : 'Encerrado',
-      l.dataInicio ? new Date(l.dataInicio).toLocaleDateString('pt-BR') : '',
-      l.dataFim ? new Date(l.dataFim).toLocaleDateString('pt-BR') : '',
+      l.dataInicio ? formatarDataBR(l.dataInicio) : '',
+      l.dataFim ? formatarDataBR(l.dataFim) : '',
       l.tempoDias, l.tempoLabel,
       l.desempenho.eventosOrganizador, l.desempenho.eventosParticipante,
       l.desempenho.liturgias, l.desempenho.pregacoes, l.desempenho.total,
@@ -145,16 +146,16 @@ export default function RelatoriosClient() {
     const rows: (string | number)[][] = [];
 
     lider.eventosOrganizados.forEach((e: any) => {
-      rows.push(['Evento Organizado', e.nome, new Date(e.dataEvento).toLocaleDateString('pt-BR'), `${e.funcao}${e.principal ? ' (Principal)' : ''}`]);
+      rows.push(['Evento Organizado', e.nome, formatarDataBR(e.dataEvento), `${e.funcao}${e.principal ? ' (Principal)' : ''}`]);
     });
     lider.liturgiasParticipadas.forEach((lit: any) => {
-      rows.push(['Liturgia', lit.papel, new Date(lit.data).toLocaleDateString('pt-BR'), '']);
+      rows.push(['Liturgia', lit.papel, formatarDataBR(lit.data), '']);
     });
     lider.pregacoes.forEach((p: any) => {
-      rows.push(['Pregação', p.titulo, new Date(p.data).toLocaleDateString('pt-BR'), '']);
+      rows.push(['Pregação', p.titulo, formatarDataBR(p.data), '']);
     });
     lider.historico.forEach((h: any) => {
-      rows.push(['Histórico Cargo', `${h.cargoAnterior || '—'} → ${h.cargoNovo}`, h.dataInicio ? new Date(h.dataInicio).toLocaleDateString('pt-BR') : '', h.motivo || '']);
+      rows.push(['Histórico Cargo', `${h.cargoAnterior || '—'} → ${h.cargoNovo}`, h.dataInicio ? formatarDataBR(h.dataInicio) : '', h.motivo || '']);
     });
 
     exportarCSV(`detalhes-${lider.nome.replace(/\s+/g, '-')}`, headers, rows);
@@ -263,8 +264,8 @@ export default function RelatoriosClient() {
                             {l.ativo ? 'Ativo' : 'Encerrado'}
                           </span>
                         </td>
-                        <td style={{ padding: '0.75rem' }}>{l.dataInicio ? new Date(l.dataInicio).toLocaleDateString('pt-BR') : '—'}</td>
-                        <td style={{ padding: '0.75rem' }}>{l.dataFim ? new Date(l.dataFim).toLocaleDateString('pt-BR') : '—'}</td>
+                        <td style={{ padding: '0.75rem' }}>{l.dataInicio ? formatarDataBR(l.dataInicio) : '—'}</td>
+                        <td style={{ padding: '0.75rem' }}>{l.dataFim ? formatarDataBR(l.dataFim) : '—'}</td>
                         <td style={{ padding: '0.75rem', fontWeight: 500 }}>{l.tempoDias} ({l.tempoLabel})</td>
                         <td style={{ padding: '0.75rem', textAlign: 'center', fontWeight: 600 }}>{l.desempenho.eventosOrganizador}</td>
                         <td style={{ padding: '0.75rem', textAlign: 'center' }}>{l.desempenho.eventosParticipante}</td>

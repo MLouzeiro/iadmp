@@ -5,6 +5,7 @@ import { churchData, socialLinks } from '@/data/site-data';
 import TopBarSite from '@/components/public/site/TopBarSite';
 import HeaderSite from '@/components/public/site/HeaderSite';
 import HeroSite from '@/components/public/site/HeroSite';
+import BannerCarousel from '@/components/public/BannerCarousel';
 import PilaresSection from '@/components/public/site/PilaresSection';
 import EventosAvisosSection from '@/components/public/site/EventosAvisosSection';
 import MinisteriosSection from '@/components/public/site/MinisteriosSection';
@@ -13,7 +14,7 @@ import BarraFinal from '@/components/public/site/BarraFinal';
 import CongregacoesPublicas from '@/components/public/CongregacoesPublicas';
 import ProgramacaoPublica from '@/components/public/ProgramacaoPublica';
 
-const slugPortal = 'iadmp-igreja-assembleia-de-deus-ministerio-da-promessa';
+const slugPortal = 'iadmp-sede';
 
 interface ChurchConfig {
   nomeIgreja?: string;
@@ -80,7 +81,7 @@ export default function Home() {
         youtube={youtube}
         nomeOrg={nomeOrg}
       />
-      <HeaderSite slug={slugPortal} logoUrl={cfg?.logoUrl} nomeIgreja={nomeOrg} />
+      <HeaderSite slug={slugPortal} basePath="" logoUrl={cfg?.logoUrl} nomeIgreja={nomeOrg} />
 
       <HeroSite
         slug={slugPortal}
@@ -88,6 +89,8 @@ export default function Home() {
         nomeFallback="IADMP — Missão da Promessa"
         descricaoFallback="Igreja de fé, amor e esperança, onde cada pessoa é acolhida e transformada pelo poder de Deus."
       />
+
+      <BannerCarousel slug={slugPortal} />
 
       {pilaresExibir && (
         <PilaresSection

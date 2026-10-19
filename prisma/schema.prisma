@@ -332,6 +332,7 @@ model Evento {
   observacoes       String?
   local             String?
   responsavelGeral  String?
+  imagemUrl         String?
   publicarNoSite    Boolean        @default(false)
   orcamentoPrevisto Decimal?       @db.Decimal(10, 2)
   aceitaInscricoes  Boolean        @default(false)

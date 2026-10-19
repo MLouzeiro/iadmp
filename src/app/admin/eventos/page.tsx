@@ -23,6 +23,7 @@ interface Evento {
   status: string;
   tema: string | null;
   local: string | null;
+  imagemUrl: string | null;
   orcamentoPrevisto: string | number | null;
   publicarNoSite: boolean;
   aceitaInscricoes?: boolean;
@@ -57,6 +58,7 @@ export default function EventosAdminPage() {
     diasDuracao: '',
     tema: '',
     local: '',
+    imagemUrl: '',
     status: 'PLANEJADO',
     orcamentoPrevisto: '',
     publicarNoSite: true,
@@ -88,7 +90,7 @@ export default function EventosAdminPage() {
 
   const openNovo = () => {
     setEditando(null);
-    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', dataEvento: '', dataInicio: '', dataFim: '', inscricoesAbremEm: '', inscricoesFechamEm: '', diasDuracao: '', tema: '', local: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
+    setForm({ organizacaoId: orgs.length === 1 ? orgs[0].id : '', nome: '', dataEvento: '', dataInicio: '', dataFim: '', inscricoesAbremEm: '', inscricoesFechamEm: '', diasDuracao: '', tema: '', local: '', imagemUrl: '', status: 'PLANEJADO', orcamentoPrevisto: '', publicarNoSite: true, aceitaInscricoes: false, limiteInscricoes: '', taxaInscricao: '', chavePix: '', tipoChavePix: 'CPF', nomeRecebedor: '', cidadeRecebedor: '' });
     setModalOpen(true);
   };
 
@@ -105,6 +107,7 @@ export default function EventosAdminPage() {
       diasDuracao: (e as unknown as { diasDuracao?: number }).diasDuracao != null ? String((e as unknown as { diasDuracao: number }).diasDuracao) : '',
       tema: e.tema || '',
       local: e.local || '',
+      imagemUrl: e.imagemUrl || '',
       status: e.status,
       orcamentoPrevisto: e.orcamentoPrevisto !== null ? String(e.orcamentoPrevisto) : '',
       publicarNoSite: e.publicarNoSite,
@@ -152,6 +155,7 @@ export default function EventosAdminPage() {
       diasDuracao,
       tema: form.tema || undefined,
       local: form.local || undefined,
+      imagemUrl: form.imagemUrl || undefined,
       status: form.status,
       orcamentoPrevisto: form.orcamentoPrevisto ? parseFloat(form.orcamentoPrevisto) : undefined,
       aceitaInscricoes: form.aceitaInscricoes,
@@ -210,6 +214,10 @@ export default function EventosAdminPage() {
     { name: 'diasDuracao', label: 'Dura\u00e7\u00e3o (dias)', type: 'number', value: form.diasDuracao, min: 1, placeholder: 'Auto se data fim preenchida' },
     { name: 'tema', label: 'Tema', value: form.tema },
     { name: 'local', label: 'Local', value: form.local },
+    {
+      name: 'imagemUrl', label: 'Imagem do evento', type: 'upload', full: true,
+      value: form.imagemUrl, pasta: 'eventos', entityTipo: 'Evento', uploadLabel: 'Enviar imagem',
+    },
     {
       name: 'status', label: 'Status', type: 'select', value: form.status,
       options: [
@@ -328,6 +336,7 @@ export default function EventosAdminPage() {
         onClose={() => setModalOpen(false)}
         onSave={salvar}
         saveLabel={editando ? 'Salvar alterações' : 'Criar evento'}
+        uploadOrganizacaoId={form.organizacaoId}
       />
     </div>
   );

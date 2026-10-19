@@ -11,6 +11,7 @@ interface Evento {
   dataEvento: string;
   local?: string | null;
   descricao?: string | null;
+  imagemUrl?: string | null;
 }
 
 interface Aviso {
@@ -25,12 +26,12 @@ const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'O
 
 function seloData(iso: string) {
   const d = new Date(iso);
-  return { dow: DIAS[d.getDay()], day: d.getDate(), mon: MESES[d.getMonth()] };
+  return { dow: DIAS[d.getUTCDay()], day: d.getUTCDate(), mon: MESES[d.getUTCMonth()] };
 }
 
 function horaBR(iso: string) {
   const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, '0')}h${String(d.getMinutes()).padStart(2, '0')}`;
+  return `${String(d.getUTCHours()).padStart(2, '0')}h${String(d.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 export default function EventosAvisosSection({ slug }: { slug: string }) {
@@ -71,6 +72,7 @@ export default function EventosAvisosSection({ slug }: { slug: string }) {
               return (
                 <Link key={e.id} href={`/igreja/${slug}/eventos`} className="eventoCard">
                   <div className="eventoImg">
+                    {e.imagemUrl && <img src={e.imagemUrl} alt="" loading="lazy" />}
                     <div className="eventoDate">
                       <div className="eventoDateDow">{selo.dow}</div>
                       <div className="eventoDateDay">{selo.day}</div>

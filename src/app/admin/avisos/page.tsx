@@ -40,7 +40,7 @@ function dataBR(iso?: string | null) {
 
 export default function AvisosPage() {
   const { toast, confirm } = useToast();
-  const { orgs, loading: orgsLoading, multiOrg } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg, orgAtualId } = useOrganizacoes();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -73,7 +73,7 @@ export default function AvisosPage() {
   const openNovo = () => {
     setEditando(null);
     setForm({
-      organizacaoId: orgs.length === 1 ? orgs[0].id : '', titulo: '', descricao: '', categoria: '', urgencia: 'NORMAL', situacaoAviso: 'ATIVO',
+      organizacaoId: orgs.length === 1 ? orgs[0].id : orgAtualId || '', titulo: '', descricao: '', categoria: '', urgencia: 'NORMAL', situacaoAviso: 'ATIVO',
       publicarSite: false, mostrarPainel: true, destaque: false, terminaEm: '', publicoAlvo: '',
     });
     setModalOpen(true);

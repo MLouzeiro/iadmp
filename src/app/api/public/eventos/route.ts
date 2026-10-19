@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
         local: true,
         status: true,
         preletores: true,
+        imagemUrl: true,
       },
       orderBy: { dataEvento: 'asc' },
       take: limit,

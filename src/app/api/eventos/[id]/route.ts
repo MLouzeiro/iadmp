@@ -84,6 +84,7 @@ export async function PUT(
     if (body.observacoes !== undefined) data.observacoes = body.observacoes;
     if (body.local !== undefined) data.local = body.local;
     if (body.responsavelGeral !== undefined) data.responsavelGeral = body.responsavelGeral;
+    if (body.imagemUrl !== undefined) data.imagemUrl = body.imagemUrl || null;
     if (body.publicarNoSite !== undefined) data.publicarNoSite = body.publicarNoSite;
     if (body.orcamentoPrevisto !== undefined) data.orcamentoPrevisto = body.orcamentoPrevisto;
     if (body.aceitaInscricoes !== undefined) data.aceitaInscricoes = Boolean(body.aceitaInscricoes);

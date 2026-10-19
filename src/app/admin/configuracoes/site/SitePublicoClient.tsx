@@ -6,6 +6,7 @@ import { Save, Eye, ArrowLeft, Layout, Type, Image, Users, Calendar, BookOpen, M
 import Link from 'next/link';
 import PageHead from '@/components/ui/PageHead';
 import Button from '@/components/ui/Button';
+import UploadField from '@/components/ui/UploadField';
 import { useToast } from '@/components/ui/Toast';
 import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 import { LISTA_PALETAS } from '@/lib/site-palettes';
@@ -52,7 +53,7 @@ const inputStyle: React.CSSProperties = {
   fontSize: '0.85rem',
 };
 
-function HeroEditor({ valor, onChange }: { valor: any; onChange: (v: any) => void }) {
+function HeroEditor({ valor, onChange, organizacaoId }: { valor: any; onChange: (v: any) => void; organizacaoId: string }) {
   const current = valor || {};
   const tipo = current.tipo || 'IMAGEM';
 
@@ -96,6 +97,16 @@ function HeroEditor({ valor, onChange }: { valor: any; onChange: (v: any) => voi
         <div>
           <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>URL da imagem de fundo</label>
           <input type="text" value={current.imagemUrl || ''} onChange={(e) => onChange({ ...current, imagemUrl: e.target.value })} style={inputStyle} placeholder="/images/iadmp/Slide/image1.jpg" />
+          <div style={{ marginTop: '0.5rem' }}>
+            <UploadField
+              organizacaoId={organizacaoId}
+              value={current.imagemUrl || ''}
+              onChange={(url) => onChange({ ...current, imagemUrl: url })}
+              pasta="site"
+              entityTipo="PaginaPublica"
+              label="Enviar imagem de fundo"
+            />
+          </div>
         </div>
       )}
 
@@ -112,6 +123,19 @@ function HeroEditor({ valor, onChange }: { valor: any; onChange: (v: any) => voi
             style={{ ...inputStyle, resize: 'vertical', fontFamily: 'monospace' }}
             placeholder="/images/slide1.jpg&#10;/images/slide2.jpg"
           />
+          <div style={{ marginTop: '0.5rem' }}>
+            <UploadField
+              organizacaoId={organizacaoId}
+              value=""
+              onChange={(url) => {
+                const atual: { url: string }[] = (current.slides || []).map((s: any) => (typeof s === 'string' ? { url: s } : s));
+                onChange({ ...current, slides: [...atual, { url }] });
+              }}
+              pasta="site"
+              entityTipo="PaginaPublica"
+              label="Adicionar slide (enviar imagem)"
+            />
+          </div>
         </div>
       )}
 
@@ -317,7 +341,7 @@ function RodapeInfoEditor({ valor, onChange }: { valor: any; onChange: (v: any) 
   );
 }
 
-function SecaoEditor({ secao, valor, onChange }: { secao: (typeof secoesConfig)[number]; valor: any; onChange: (v: any) => void }) {
+function SecaoEditor({ secao, valor, onChange, organizacaoId }: { secao: (typeof secoesConfig)[number]; valor: any; onChange: (v: any) => void; organizacaoId: string }) {
   const [expanded, setExpanded] = useState(secao.key === 'secaoHero');
 
   const defaultValues: Record<string, any> = {
@@ -358,7 +382,7 @@ function SecaoEditor({ secao, valor, onChange }: { secao: (typeof secoesConfig)[
       {expanded && (
         <div className={styles.sectionContent} style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-color)', marginTop: '0.5rem' }}>
           {secao.key === 'secaoHero' ? (
-            <HeroEditor valor={current} onChange={onChange} />
+            <HeroEditor valor={current} onChange={onChange} organizacaoId={organizacaoId} />
           ) : secao.key === 'secaoPilares' ? (
             <PilaresEditor valor={current} onChange={onChange} />
           ) : secao.key === 'secaoRodapeInfo' ? (
@@ -630,6 +654,7 @@ export default function SitePublicoClient({ slug: slugProp, organizacaoId: orgId
             secao={secao}
             valor={pagina?.[secao.key as keyof PaginaPublica]}
             onChange={(v) => handleSecaoChange(secao.key, v)}
+            organizacaoId={organizacaoId}
           />
         ))}
 

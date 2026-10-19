@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
           observacoes: validated.observacoes || null,
           local: validated.local || null,
           responsavelGeral: validated.responsavelGeral || null,
+          imagemUrl: validated.imagemUrl || null,
           publicarNoSite: validated.publicarNoSite ?? false,
           orcamentoPrevisto: validated.orcamentoPrevisto || null,
           aceitaInscricoes: validated.aceitaInscricoes ?? false,

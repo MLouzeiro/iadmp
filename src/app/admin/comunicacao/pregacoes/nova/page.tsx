@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
+import UploadField from '@/components/ui/UploadField';
 import { Mic, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 import styles from '../pregacoes.module.css';
 import formStyles from '@/components/ui/form.module.css';
 
@@ -23,6 +25,7 @@ const TIPOS_PREGACAO = ['Pregação', 'Estudo bíblico', 'Devocional', 'Palavra'
 export default function NovaPregacaoPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { orgAtualId } = useOrganizacoes();
   const [saving, setSaving] = useState(false);
   const [liturgias, setLiturgias] = useState<Liturgia[]>([]);
   const [form, setForm] = useState({
@@ -42,6 +45,7 @@ export default function NovaPregacaoPage() {
     try {
       const body = {
         ...form,
+        organizacaoId: orgAtualId,
         referenciaCapitulo: form.referenciaCapitulo ? parseInt(form.referenciaCapitulo) : null,
         referenciaVersIni: form.referenciaVersIni ? parseInt(form.referenciaVersIni) : null,
         referenciaVersFim: form.referenciaVersFim ? parseInt(form.referenciaVersFim) : null,
@@ -150,6 +154,14 @@ export default function NovaPregacaoPage() {
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
             <label className={formStyles.fieldLabel}>URL da Capa</label>
             <input className={formStyles.input} type="url" value={form.capaUrl} onChange={e => setForm({ ...form, capaUrl: e.target.value })} placeholder="https://..." />
+            <UploadField
+              organizacaoId={orgAtualId}
+              value={form.capaUrl}
+              onChange={(url) => setForm({ ...form, capaUrl: url })}
+              pasta="pregacoes"
+              entityTipo="Pregacao"
+              label="Enviar imagem de capa"
+            />
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>

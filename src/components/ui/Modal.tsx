@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import UploadField from './UploadField';
 import styles from './modal.module.css';
 
 export interface ModalField {
   name: string;
   label: string;
-  type?: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'checkbox' | 'multiselect' | 'time' | 'url' | 'tel';
+  type?: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'checkbox' | 'multiselect' | 'time' | 'url' | 'tel' | 'upload';
   value?: string | number | boolean | string[];
   options?: { value: string; label: string }[];
   placeholder?: string;
@@ -15,6 +16,9 @@ export interface ModalField {
   min?: number;
   max?: number;
   step?: number;
+  pasta?: string;
+  entityTipo?: string;
+  uploadLabel?: string;
 }
 
 interface ModalProps {
@@ -29,6 +33,7 @@ interface ModalProps {
   saveLabel?: string;
   saveDisabled?: boolean;
   danger?: boolean;
+  uploadOrganizacaoId?: string;
   children?: React.ReactNode;
 }
 
@@ -44,6 +49,7 @@ export default function Modal({
   saveLabel = 'Salvar',
   saveDisabled,
   danger,
+  uploadOrganizacaoId,
   children,
 }: ModalProps) {
   useEffect(() => {
@@ -128,6 +134,15 @@ export default function Modal({
                           Segure Ctrl/Cmd para selecionar múltiplos
                         </small>
                       </div>
+                    ) : f.type === 'upload' ? (
+                      <UploadField
+                        organizacaoId={uploadOrganizacaoId || ''}
+                        value={typeof val === 'string' ? val : ''}
+                        onChange={(url) => set(url)}
+                        pasta={f.pasta || 'uploads'}
+                        entityTipo={f.entityTipo}
+                        label={f.uploadLabel || 'Enviar imagem'}
+                      />
                     ) : (
                       <input
                         className={styles.input}

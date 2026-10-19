@@ -22,14 +22,17 @@ interface Config {
 
 export default function ConfiguracoesPage() {
   const { toast } = useToast();
-  const { orgs } = useOrganizacoes();
+  const { orgs, loading: orgsLoading, multiOrg, orgAtualId } = useOrganizacoes();
   const [config, setConfig] = useState<Config>({ nomeIgreja: '', logoUrl: '', logoDarkUrl: '', faviconUrl: '', tema: 'dark' });
+  const [orgEscolhidaId, setOrgEscolhidaId] = useState('');
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
-  const orgId = orgs.length === 1 ? orgs[0].id : orgs[0]?.id || '';
+  const organizacaoId = orgEscolhidaId || orgAtualId || orgs[0]?.id || '';
 
   useEffect(() => {
-    fetch('/api/configuracoes')
+    if (orgsLoading) return;
+    const params = organizacaoId ? `?organizacaoId=${encodeURIComponent(organizacaoId)}` : '';
+    fetch(`/api/configuracoes${params}`)
       .then((r) => r.json())
       .then((d) => {
         setConfig({
@@ -42,7 +45,7 @@ export default function ConfiguracoesPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [organizacaoId, orgsLoading]);
 
   const salvar = async () => {
     setSalvando(true);
@@ -50,7 +53,7 @@ export default function ConfiguracoesPage() {
       const res = await fetch('/api/configuracoes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, organizacaoId }),
       });
       if (res.ok) {
         toast('Configurações salvas.', 'ok');
@@ -76,7 +79,7 @@ export default function ConfiguracoesPage() {
     toast('Valores padrão restaurados (não salvos).', 'info');
   };
 
-  if (loading) {
+  if (loading || orgsLoading) {
     return <div className={styles.loadingState}>Carregando configurações...</div>;
   }
 
@@ -88,7 +91,7 @@ export default function ConfiguracoesPage() {
         actions={
           <>
             <Button variant="secondary" icon={<RotateCcw size={15} />} onClick={restaurar} size="sm">Restaurar padrão</Button>
-            <Button icon={<Save size={15} />} onClick={salvar} size="sm" disabled={salvando}>
+            <Button icon={<Save size={15} />} onClick={salvar} size="sm" disabled={salvando || !organizacaoId}>
               {salvando ? 'Salvando...' : 'Salvar alterações'}
             </Button>
           </>
@@ -107,6 +110,16 @@ export default function ConfiguracoesPage() {
         </div>
 
         <div className={styles.formGrid}>
+          {multiOrg && (
+            <div className={styles.formGridFull}>
+              <Select
+                label="Organização"
+                value={organizacaoId}
+                onChange={(e) => setOrgEscolhidaId(e.target.value)}
+                options={orgs.map((o) => ({ value: o.id, label: o.nome }))}
+              />
+            </div>
+          )}
           <div className={styles.formGridFull}>
             <Input
               label="Nome da igreja"
@@ -144,7 +157,7 @@ export default function ConfiguracoesPage() {
           />
           <div className={styles.formGridFull}>
             <UploadField
-              organizacaoId={orgId}
+              organizacaoId={organizacaoId}
               value={config.logoUrl}
               onChange={(url) => setConfig((p) => ({ ...p, logoUrl: url }))}
               pasta="config"
@@ -154,12 +167,23 @@ export default function ConfiguracoesPage() {
           </div>
           <div className={styles.formGridFull}>
             <UploadField
-              organizacaoId={orgId}
+              organizacaoId={organizacaoId}
               value={config.logoDarkUrl}
               onChange={(url) => setConfig((p) => ({ ...p, logoDarkUrl: url }))}
               pasta="config"
               entityTipo="ConfiguracoesIgreja"
               label="Enviar logo (tema escuro)"
+            />
+          </div>
+          <div className={styles.formGridFull}>
+            <UploadField
+              organizacaoId={organizacaoId}
+              value={config.faviconUrl}
+              onChange={(url) => setConfig((p) => ({ ...p, faviconUrl: url }))}
+              pasta="config"
+              entityTipo="ConfiguracoesIgreja"
+              label="Enviar favicon"
+              accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml"
             />
           </div>
         </div>

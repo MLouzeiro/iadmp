@@ -20,6 +20,7 @@ interface Evento {
   local?: string | null;
   status: string;
   preletores?: string | null;
+  imagemUrl?: string | null;
 }
 
 function dataBR(iso: string) {
@@ -59,6 +60,14 @@ export default function EventosList({ slug, limit = 24 }: { slug?: string; limit
       {eventos.map((e) => (
         <Link key={e.id} href={`/eventos/${e.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <article className="card event-card" style={{ height: '100%', cursor: 'pointer' }}>
+          {e.imagemUrl && (
+            <img
+              src={e.imagemUrl}
+              alt=""
+              loading="lazy"
+              style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: '8px', marginBottom: '0.75rem' }}
+            />
+          )}
           <div className="event-card-top">
             <Badge variant={statusBadgeVariant(e.status)}>{e.status.replace(/_/g, ' ')}</Badge>
             <span className="event-date">{dataBR(e.dataEvento)}</span>

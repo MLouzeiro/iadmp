@@ -115,6 +115,7 @@ export function ThemeProvider({ children, slug }: { children: React.ReactNode; s
       : tema;
 
     document.documentElement.setAttribute('data-theme', effectiveTheme);
+    document.documentElement.style.colorScheme = effectiveTheme === 'light' ? 'light' : 'dark';
 
     const claro = effectiveTheme === 'light';
     const fundoLuz = colors.corFundoClaro || '#f5e6c8';

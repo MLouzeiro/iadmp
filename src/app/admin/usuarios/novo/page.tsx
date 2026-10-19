@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Save, ArrowLeft } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
 import Input from '@/components/ui/Input';
@@ -66,6 +67,9 @@ const acaoLabels: Record<string, string> = {
 
 export default function NovoUsuarioPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const podeGerarSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
+  const roleOptionsVisiveis = roleOptions.filter((o) => podeGerarSuperAdmin || o.value !== 'SUPER_ADMIN');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -152,6 +156,11 @@ export default function NovoUsuarioPage() {
       return;
     }
 
+    if (form.role === 'SUPER_ADMIN' && !podeGerarSuperAdmin) {
+      setError('Apenas um Super Admin pode criar usuários com esse perfil');
+      return;
+    }
+
     if (form.role !== 'SUPER_ADMIN' && selectedOrgs.length === 0) {
       setError('Selecione pelo menos uma organização para este usuário');
       return;
@@ -222,7 +231,7 @@ export default function NovoUsuarioPage() {
             <Select
               label="Perfil/Função"
               required
-              options={roleOptions}
+              options={roleOptionsVisiveis}
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value, perfilId: '' })}
             />

@@ -6,6 +6,8 @@ import { palettes, defaultColors, type ThemeColors } from '@/lib/theme-palettes'
 import Button from '@/components/ui/Button';
 import FormCard from '@/components/ui/FormCard';
 import Input from '@/components/ui/Input';
+import UploadField from '@/components/ui/UploadField';
+import { useOrganizacoes } from '@/hooks/useOrganizacoes';
 import styles from '@/components/ui/form.module.css';
 
 interface Config {
@@ -134,14 +136,19 @@ function Preview({ colors, tema }: { colors: ThemeColors; tema: string }) {
 }
 
 export default function AparenciaPage() {
+  const { orgs, loading: orgsLoading, multiOrg, orgAtualId } = useOrganizacoes();
+  const [orgEscolhidaId, setOrgEscolhidaId] = useState('');
   const [config, setConfig] = useState<Config | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activePalette, setActivePalette] = useState<string | null>(null);
+  const organizacaoId = orgEscolhidaId || orgAtualId || orgs[0]?.id || '';
 
   useEffect(() => {
-    fetch('/api/configuracoes')
+    if (orgsLoading) return;
+    const params = organizacaoId ? `?organizacaoId=${encodeURIComponent(organizacaoId)}` : '';
+    fetch(`/api/configuracoes${params}`)
       .then((res) => res.json())
       .then((data) => {
         setConfig(data);
@@ -158,7 +165,7 @@ export default function AparenciaPage() {
         });
         setLoading(false);
       });
-  }, []);
+  }, [organizacaoId, orgsLoading]);
 
   const updateColor = useCallback((key: keyof ThemeColors, value: string) => {
     setConfig((prev) => prev ? { ...prev, [key]: value } : prev);
@@ -182,7 +189,7 @@ export default function AparenciaPage() {
       const res = await fetch('/api/configuracoes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, organizacaoId }),
       });
       if (res.ok) {
         setSaved(true);
@@ -194,7 +201,7 @@ export default function AparenciaPage() {
     }
   };
 
-  if (loading || !config) {
+  if (loading || orgsLoading || !config) {
     return <p style={{ color: 'var(--text-muted)' }}>Carregando configurações...</p>;
   }
 
@@ -222,8 +229,28 @@ export default function AparenciaPage() {
           <div className={styles.formCard}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Identidade</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {multiOrg && (
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.35rem' }}>Organização</label>
+                  <select
+                    value={organizacaoId}
+                    onChange={(e) => setOrgEscolhidaId(e.target.value)}
+                    style={{ width: '100%', padding: '0.5rem 0.75rem', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)' }}
+                  >
+                    {orgs.map((o) => <option key={o.id} value={o.id}>{o.nome}</option>)}
+                  </select>
+                </div>
+              )}
               <Input label="Nome da Igreja" value={config.nomeIgreja} onChange={(e) => setConfig({ ...config, nomeIgreja: e.target.value })} />
               <Input label="Logo URL" value={config.logoUrl || ''} placeholder="/images/logo.png" onChange={(e) => setConfig({ ...config, logoUrl: e.target.value || null })} />
+              <UploadField
+                organizacaoId={organizacaoId}
+                value={config.logoUrl || ''}
+                onChange={(url) => setConfig((prev) => (prev ? { ...prev, logoUrl: url } : prev))}
+                pasta="config"
+                entityTipo="ConfiguracoesIgreja"
+                label="Enviar logo"
+              />
             </div>
           </div>
 

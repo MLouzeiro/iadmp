@@ -20,6 +20,7 @@ interface Evento {
   local: string | null;
   status: string;
   preletores: string[];
+  imagemUrl?: string | null;
 }
 
 export default function IgrejaEventosPage() {
@@ -42,7 +43,7 @@ export default function IgrejaEventosPage() {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return d.toLocaleDateString('pt-BR', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   const getStatusLabel = (status: string) => {
@@ -99,6 +100,15 @@ export default function IgrejaEventosPage() {
                   {getStatusLabel(evento.status)}
                 </span>
               </div>
+
+              {evento.imagemUrl && (
+                <img
+                  src={evento.imagemUrl}
+                  alt=""
+                  loading="lazy"
+                  style={{ width: '100%', maxHeight: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)', margin: '0.75rem 0' }}
+                />
+              )}
 
               <div className={styles.eventoCardMeta}>
                 <div className={styles.metaItem}>

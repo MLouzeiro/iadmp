@@ -43,6 +43,7 @@ export const eventoSchema = z
     observacoes: z.string().optional(),
     local: z.string().optional(),
     responsavelGeral: z.string().optional(),
+    imagemUrl: z.string().optional(),
     publicarNoSite: z.boolean().optional(),
     orcamentoPrevisto: z.number().optional(),
     aceitaInscricoes: z.boolean().optional(),
@@ -77,16 +78,16 @@ export const eventoSchema = z
 export const avisoSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),
   descricao: z.string().min(1, 'Descrição é obrigatória'),
-  imagem: z.string().optional(),
-  categoria: z.string().optional(),
-  dataInicio: z.string().optional(),
-  dataFim: z.string().optional(),
-  prioridade: z.enum(['BAIXA', 'NORMAL', 'ALTA', 'URGENTE']).optional(),
-  status: z.enum(['ATIVO', 'INATIVO', 'EXPIRADO']).optional(),
-  publicoAlvo: z.string().optional(),
-  publicarNoSite: z.boolean().optional(),
-  exibirNoPainel: z.boolean().optional(),
-  destaque: z.boolean().optional(),
+  imagem: z.string().nullish(),
+  categoria: z.string().nullish(),
+  dataInicio: z.string().nullish(),
+  dataFim: z.string().nullish(),
+  urgencia: z.enum(['BAIXA', 'NORMAL', 'ALTA', 'URGENTE']).nullish(),
+  situacaoAviso: z.enum(['ATIVO', 'INATIVO', 'EXPIRADO']).nullish(),
+  publicoAlvo: z.string().nullish(),
+  publicarSite: z.boolean().nullish(),
+  mostrarPainel: z.boolean().nullish(),
+  destaque: z.boolean().nullish(),
 });
 
 export const liturgiaSchema = z.object({
@@ -140,4 +141,11 @@ export const inscricaoAdminSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+});
+
+export const ministerioSchema = z.object({
+  nome: z.string().min(1, 'Nome é obrigatório'),
+  descricao: z.string().optional(),
+  responsavel: z.string().optional(),
+  ativo: z.boolean().optional(),
 });

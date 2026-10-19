@@ -19,15 +19,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const organizacaoId = searchParams.get('organizacaoId');
     const congregacaoId = searchParams.get('congregacaoId');
-    const now = new Date();
 
     const scope = await resolveOrgScope(user, organizacaoId);
 
-    const where: Record<string, unknown> = {
-      publicarSite: true,
-      situacaoAviso: 'ATIVO',
-      OR: [{ terminaEm: null }, { terminaEm: { gte: now } }],
-    };
+    const where: Record<string, unknown> = {};
     if (scope.requestedOrgId) {
       where.organizacaoId = scope.requestedOrgId;
     } else if (scope.mode !== 'ALL') {
@@ -73,15 +68,15 @@ export async function POST(request: NextRequest) {
         congregacaoId,
         titulo: validated.titulo,
         descricao: validated.descricao,
-        imagem: body.imagem || null,
-        categoria: body.categoria || null,
+        imagem: validated.imagem || null,
+        categoria: validated.categoria || null,
         comecaEm: validated.dataInicio ? parseDataDateOnly(validated.dataInicio) : new Date(),
         terminaEm: validated.dataFim ? parseDataDateOnly(validated.dataFim) : null,
-        urgencia: body.urgencia || 'NORMAL',
-        situacaoAviso: validated.status || 'ATIVO',
+        urgencia: validated.urgencia || 'NORMAL',
+        situacaoAviso: validated.situacaoAviso || 'ATIVO',
         publicoAlvo: validated.publicoAlvo || null,
-        publicarSite: validated.publicarNoSite ?? false,
-        mostrarPainel: validated.exibirNoPainel ?? true,
+        publicarSite: validated.publicarSite ?? false,
+        mostrarPainel: validated.mostrarPainel ?? true,
         destaque: validated.destaque ?? false,
       },
       include: { congregacao: { select: { id: true, nome: true } } },
@@ -106,7 +101,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Selecione a organiza\u00e7\u00e3o do registro' }, { status: 400 });
     }
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+      const issues = (error as unknown as { issues?: { path?: unknown[]; message: string }[] }).issues || [];
+      const detalhes = issues
+        .slice(0, 3)
+        .map((i) => `${(i.path || []).map(String).join('.') || 'dados'}: ${i.message}`)
+        .join(' | ');
+      return NextResponse.json(
+        { error: detalhes ? `Dados inválidos — ${detalhes}` : 'Dados inválidos' },
+        { status: 400 }
+      );
     }
     return NextResponse.json({ error: 'Erro ao criar aviso' }, { status: 500 });
   }

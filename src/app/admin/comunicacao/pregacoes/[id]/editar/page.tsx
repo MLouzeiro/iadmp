@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
+import UploadField from '@/components/ui/UploadField';
 import { Mic, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import styles from '../../pregacoes.module.css';
@@ -19,6 +20,7 @@ interface Liturgia {
 
 interface PregacaoData {
   id: string;
+  organizacaoId?: string;
   titulo: string;
   descricao?: string;
   tema?: string;
@@ -45,6 +47,7 @@ export default function EditarPregacaoPage() {
   const id = params.id as string;
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [orgId, setOrgId] = useState('');
   const [liturgias, setLiturgias] = useState<Liturgia[]>([]);
   const [form, setForm] = useState({
     titulo: '', descricao: '', tema: '', tipo: 'Pregação', pregadorNome: '',
@@ -59,6 +62,7 @@ export default function EditarPregacaoPage() {
       fetch('/api/liturgia?limit=100').then(r => r.json()),
     ]).then(([pregData, litData]) => {
       const p: PregacaoData = pregData.pregacao;
+      setOrgId(p.organizacaoId || '');
       setForm({
         titulo: p.titulo, descricao: p.descricao || '', tema: p.tema || '', tipo: p.tipo,
         pregadorNome: p.pregadorNome || '', data: p.data.split('T')[0], liturgiaId: p.liturgiaId || '',
@@ -189,6 +193,14 @@ export default function EditarPregacaoPage() {
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>
             <label className={formStyles.fieldLabel}>URL da Capa</label>
             <input className={formStyles.input} type="url" value={form.capaUrl} onChange={e => setForm({ ...form, capaUrl: e.target.value })} />
+            <UploadField
+              organizacaoId={orgId}
+              value={form.capaUrl}
+              onChange={(url) => setForm({ ...form, capaUrl: url })}
+              pasta="pregacoes"
+              entityTipo="Pregacao"
+              label="Enviar imagem de capa"
+            />
           </div>
 
           <div className={`${formStyles.field} ${formStyles.formGridFull}`}>

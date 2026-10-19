@@ -12,6 +12,7 @@
 
 :root,
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-primary: #c9a84c;
   --color-primary-variant: #e0c068;
   --color-secondary: #d4a843;
@@ -36,6 +37,7 @@
 }
 
 [data-theme="light"] {
+  color-scheme: light;
   --color-primary: #8b6914;
   --color-primary-variant: #a67c1a;
   --color-secondary: #c9a84c;
@@ -1791,3 +1793,8 @@ section:nth-child(even) {
     height: 90px;
   }
 }
+
+/* Popups nativos (select, date input) seguem o tema via `color-scheme`
+   injetado pelo ThemeProvider — não estilizar `select option` diretamente,
+   pois no Windows o `color` aplica mas o `background-color` é ignorado,
+   gerando texto claro sobre fundo branco. */

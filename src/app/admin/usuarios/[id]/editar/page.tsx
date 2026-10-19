@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Save, ArrowLeft } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
 import Input from '@/components/ui/Input';
@@ -80,6 +81,9 @@ const acaoLabels: Record<string, string> = {
 export default function EditarUsuarioPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { data: session } = useSession();
+  const podeGerarSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
+  const roleOptionsVisiveis = roleOptions.filter((o) => podeGerarSuperAdmin || o.value !== 'SUPER_ADMIN');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -189,6 +193,11 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
       return;
     }
 
+    if (form.role === 'SUPER_ADMIN' && !podeGerarSuperAdmin) {
+      setError('Apenas um Super Admin pode atribuir esse perfil');
+      return;
+    }
+
     setSaving(true);
     try {
       const body: any = {
@@ -271,7 +280,7 @@ export default function EditarUsuarioPage({ params }: { params: Promise<{ id: st
             <Select
               label="Perfil/Função"
               required
-              options={roleOptions}
+              options={roleOptionsVisiveis}
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value, perfilId: '' })}
             />

@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import SectionHead from '@/components/ui/SectionHead';
+import { formatarDataBR } from '@/lib/datas';
 
 type Aba = 'visao' | 'indicadores' | 'pendências' | 'decisao' | 'auditoria' | 'relatórios';
 
@@ -198,8 +199,8 @@ function InfoKpi({ ind }: { ind: Indicador }) {
             <strong>Período:</strong> {String(ind.filtrosAplicados.periodo)}
           </p>
           <p>
-            <strong>De:</strong> {new Date(String(ind.filtrosAplicados.inicio)).toLocaleDateString('pt-BR')}
-            {' '}<strong>até:</strong> {new Date(String(ind.filtrosAplicados.fim)).toLocaleDateString('pt-BR')}
+            <strong>De:</strong> {formatarDataBR(String(ind.filtrosAplicados.inicio))}
+            {' '}<strong>até:</strong> {formatarDataBR(String(ind.filtrosAplicados.fim))}
           </p>
           {Array.isArray(ind.filtrosAplicados.organizacaoIds) &&
             (ind.filtrosAplicados.organizacaoIds as string[]).length > 0 && (
@@ -353,8 +354,8 @@ export default function GestaoPage() {
 
         {dados && (
           <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
-            {dados.periodo.label} · {new Date(dados.periodo.atual.inicio).toLocaleDateString('pt-BR')} a{' '}
-            {new Date(dados.periodo.atual.fim).toLocaleDateString('pt-BR')}
+            {dados.periodo.label} · {formatarDataBR(dados.periodo.atual.inicio)} a{' '}
+            {formatarDataBR(dados.periodo.atual.fim)}
           </p>
         )}
       </div>
