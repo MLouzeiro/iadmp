@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, requireSuperAdmin } from '@/lib/auth-helpers';
-import { writeAudit } from '@/lib/audit';
+import { writeAudit, extractRequestMeta } from '@/lib/audit';
 
 const atualizarPublicacaoSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório').optional(),
@@ -33,7 +33,6 @@ export async function GET(
         destinos: {
           include: {
             organizacao: { select: { id: true, nome: true, slug: true } },
-            publicadoPor: { select: { id: true, name: true, email: true } },
           },
         },
       },
@@ -101,10 +100,11 @@ export async function PUT(
       },
     });
 
-    if (validated.organizacoesIds) {
+    const organizacoesIds = validated.organizacoesIds;
+    if (organizacoesIds) {
       const currentOrgIds = existing.destinos.map(d => d.organizacaoId);
-      const toAdd = validated.organizacoesIds.filter(o => !currentOrgIds.includes(o));
-      const toRemove = currentOrgIds.filter(o => !validated.organizacoesIds.includes(o));
+      const toAdd = organizacoesIds.filter(o => !currentOrgIds.includes(o));
+      const toRemove = currentOrgIds.filter(o => !organizacoesIds.includes(o));
 
       await prisma.$transaction(async (tx) => {
         for (const orgId of toAdd) {
@@ -203,6 +203,7 @@ export async function PATCH(
     let novoStatusDestino: string;
     let novaStatusPublicacao = publicacao.status;
     const agora = new Date();
+    const meta = extractRequestMeta(request);
     const userId = (await requireAuth()).id;
 
     if (validated.acao === 'publicar') {
@@ -256,7 +257,8 @@ export async function PATCH(
           entidadeId: destino.id,
           antes: { status: destino.status },
           depois: { status: novoStatusDestino },
-          req: request,
+          ip: meta.ip ?? null,
+          userAgent: meta.userAgent ?? null,
         },
       });
     });

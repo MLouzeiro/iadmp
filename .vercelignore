@@ -1,0 +1,13 @@
+.env
+.env.*
+node_modules
+.next
+.git
+.vercel
+.claude
+docs
+opencode.json*
+public/mockup.html
+test-seed.js
+coverage
+*.log

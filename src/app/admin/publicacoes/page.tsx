@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Eye, Send, Archive, RotateCcw, Search, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, Send, Archive, RotateCcw, Search, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
 import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
+import Badge, { type BadgeVariant } from '@/components/ui/Badge';
 import Modal, { ModalField } from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import SearchBar from '@/components/ui/SearchBar';
@@ -53,13 +53,13 @@ const STATUS_LABELS: Record<string, string> = {
   DESPUBLICADO: 'Despublicado',
 };
 
-const STATUS_VARIANTS: Record<string, 'default' | 'info' | 'success' | 'warning' | 'error'> = {
-  RASCUNHO: 'default',
-  PUBLICADA: 'success',
-  ARQUIVADA: 'default',
-  PENDENTE: 'warning',
-  PUBLICADO: 'success',
-  DESPUBLICADO: 'error',
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  RASCUNHO: 'mut',
+  PUBLICADA: 'ok',
+  ARQUIVADA: 'mut',
+  PENDENTE: 'warn',
+  PUBLICADO: 'ok',
+  DESPUBLICADO: 'err',
 };
 
 const TIPO_LABELS: Record<string, string> = {
@@ -261,7 +261,7 @@ export default function PublicacoesPage() {
       />
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        <SearchBar value={search} onChange={setSearch} placeholder="Buscar publicações..." style={{ minWidth: 280 }} />
+        <SearchBar value={search} onChange={setSearch} placeholder="Buscar publicações..." />
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-primary)' }}>
             <option value="">Todos os status</option>
@@ -311,7 +311,7 @@ export default function PublicacoesPage() {
                     </div>
                   </div>
                   <div className={styles.listItemActions}>
-                    <Badge variant={STATUS_VARIANTS[statusGeral] || 'default'}>
+                    <Badge variant={STATUS_VARIANTS[statusGeral] || 'mut'}>
                       {STATUS_LABELS[statusGeral] || statusGeral}
                     </Badge>
                     <Button size="sm" variant="secondary" icon={<Eye size={14} />} onClick={() => openDetalhes(p)}>Detalhes</Button>
@@ -359,7 +359,7 @@ export default function PublicacoesPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
               <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Título</p><p style={{ fontWeight: 600 }}>{detalhe.titulo}</p></div>
               <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Tipo</p><p style={{ fontWeight: 600 }}>{TIPO_LABELS[detalhe.tipo] || detalhe.tipo}</p></div>
-              <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Status Geral</p><Badge variant={STATUS_VARIANTS[getStatusGeral(detalhe)] || 'default'}>{STATUS_LABELS[getStatusGeral(detalhe)] || getStatusGeral(detalhe)}</Badge></div>
+              <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Status Geral</p><Badge variant={STATUS_VARIANTS[getStatusGeral(detalhe)] || 'mut'}>{STATUS_LABELS[getStatusGeral(detalhe)] || getStatusGeral(detalhe)}</Badge></div>
               <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Autor</p><p style={{ fontWeight: 600 }}>{detalhe.autor?.name || '—'}</p></div>
               <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Criada em</p><p style={{ fontWeight: 600 }}>{new Date(detalhe.createdAt).toLocaleString('pt-BR')}</p></div>
               <div><p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Publicada em</p><p style={{ fontWeight: 600 }}>{detalhe.publicadoEm ? new Date(detalhe.publicadoEm).toLocaleString('pt-BR') : '—'}</p></div>
@@ -372,7 +372,7 @@ export default function PublicacoesPage() {
                   <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <span style={{ fontWeight: 500 }}>{d.organizacao.nome}</span>
-                      <Badge variant={STATUS_VARIANTS[d.status] || 'default'}>{STATUS_LABELS[d.status] || d.status}</Badge>
+                      <Badge variant={STATUS_VARIANTS[d.status] || 'mut'}>{STATUS_LABELS[d.status] || d.status}</Badge>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       {d.status === 'PENDENTE' && (

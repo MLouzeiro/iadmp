@@ -13,6 +13,7 @@ export interface ModalField {
   placeholder?: string;
   required?: boolean;
   full?: boolean;
+  rows?: number;
   min?: number;
   max?: number;
   step?: number;
@@ -26,13 +27,14 @@ interface ModalProps {
   title: string;
   description?: string;
   fields?: ModalField[];
-  values?: Record<string, string | number | boolean>;
+  values?: Record<string, string | number | boolean | string[]>;
   onChange?: (name: string, value: string | number | boolean) => void;
   onClose: () => void;
   onSave?: () => void;
   saveLabel?: string;
   saveDisabled?: boolean;
   danger?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   uploadOrganizacaoId?: string;
   children?: React.ReactNode;
 }
@@ -82,7 +84,8 @@ export default function Modal({
             <div className={styles.grid}>
               {fields.map((f) => {
                 const val = values[f.name] ?? f.value ?? '';
-                const set = (v: string | number | boolean) => onChange?.(f.name, v);
+                const set = (v: string | number | boolean | string[]) =>
+                  onChange?.(f.name, v as string | number | boolean);
                 const fieldClass = f.full ? `${styles.field} ${styles.fieldFull}` : styles.field;
                 return (
                   <div key={f.name} className={fieldClass}>
@@ -95,6 +98,7 @@ export default function Modal({
                         className={styles.textarea}
                         value={String(val)}
                         placeholder={f.placeholder}
+                        rows={f.rows}
                         onChange={(e) => set(e.target.value)}
                       />
                     ) : f.type === 'select' ? (

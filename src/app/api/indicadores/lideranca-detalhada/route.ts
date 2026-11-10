@@ -11,6 +11,10 @@ export async function GET(request: NextRequest) {
     const cargo = searchParams.get('cargo');
     const ministerioId = searchParams.get('ministerioId');
     const situacao = searchParams.get('situacao');
+    const situacaoValida: 'ativos' | 'encerrados' | 'todos' | undefined =
+      situacao === 'ativos' || situacao === 'encerrados' || situacao === 'todos'
+        ? (situacao as 'ativos' | 'encerrados' | 'todos')
+        : undefined;
     const dataInicio = searchParams.get('dataInicio');
     const dataFim = searchParams.get('dataFim');
 
@@ -25,7 +29,7 @@ export async function GET(request: NextRequest) {
       organizacaoIds,
       cargo: cargo || undefined,
       ministerioId: ministerioId || undefined,
-      situacao: situacao || undefined,
+      situacao: situacaoValida,
       dataInicio: dataInicio || undefined,
       dataFim: dataFim || undefined,
     };

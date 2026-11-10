@@ -169,7 +169,7 @@ export default function RelatoriosClient() {
         {ABAS.map(a => (
           <Button
             key={a.id}
-            variant={aba === a.id ? 'default' : 'secondary'}
+            variant={aba === a.id ? 'primary' : 'secondary'}
             icon={<a.icon size={16} />}
             onClick={() => setAba(a.id)}
           >
