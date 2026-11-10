@@ -168,7 +168,7 @@ NEXT_PUBLIC_SUPABASE_BUCKET=imagens
 
 ---
 
-## 13. Progresso das Fases 2 e 3
+## 13. Progresso das Fases 2 a 4
 
 | Passo | Status | Detalhe |
 |---|---|---|
@@ -177,11 +177,12 @@ NEXT_PUBLIC_SUPABASE_BUCKET=imagens
 | Credencial da v2 | ✅ Local | `DATABASE_URL` do branch `v2-dev` gravada em `.env.local` (não versionado); `.env` de produção permanece separado. |
 | Branch de trabalho | ✅ Criada | `feat/portal-v2` (base `feat/novo-layout-home` / `916a1fd`). `master`/produção intactos. |
 | Env de Preview | ✅ Criadas | `DATABASE_URL` (Secret, v2-dev), `NEXTAUTH_SECRET` (Secret, novo) e 3 `NEXT_PUBLIC_SUPABASE_*` (Config), todas escopo **Preview** no projeto `iadmp-ma`. Produção não alterada. |
-| Stack alinhada | ✅ Concluído | Removidos `@prisma/adapter-neon`/`@neondatabase/serverless` (não usados) e `previewFeatures = ["driverAdapters"]`; `typescript.ignoreBuildErrors: false`; removido bloco `images` do `next.config.js`; `.vercelignore` para não subir segredos. |
-| Verificação local | ✅ | `npx tsc --noEmit` sem erros; Jest **28 suítes / 387 testes** passando; `npm run build` OK (Next 16.3.3 Turbopack, 74 páginas). |
-| Preview Vercel | ✅ Publicado e validado | https://iadmp-j10fk0h9c-louzeiro.vercel.app — `/api/health` conectado, `/api/public/congregacoes` retorna 3 orgs, home/login renderizam, leitura confirmada em `v2-dev`. |
-| Proteção do preview | ⏳ Pendente | Deployment Protection (SSO) ativa; acesso no browser exige bypass/share link (ou desativar proteção de Preview). |
+| Fase 3 — Stack alinhada | ✅ Concluído | Removidos `@prisma/adapter-neon`/`@neondatabase/serverless` (não usados) e `previewFeatures = ["driverAdapters"]`; `typescript.ignoreBuildErrors: false`; removido bloco `images` do `next.config.js`; `.vercelignore` para não subir segredos. |
+| Fase 3 — Verificação local | ✅ | `npx tsc --noEmit` sem erros; Jest **28 suítes / 387 testes** passando; `npm run build` OK (Next 16.3.3 Turbopack, 74 páginas). |
+| Fase 3 — Preview Vercel | ✅ Publicado e validado | https://iadmp-j10fk0h9c-louzeiro.vercel.app — `/api/health` conectado, `/api/public/congregacoes` retorna 3 orgs, home/login renderizam, leitura confirmada em `v2-dev`. |
+| Fase 3 — Proteção do preview | ✅ Desativada (decisão do usuário) | `ssoProtection` removido do projeto (era `all_except_custom_domains`); preview abre anonimamente. Produção `iadmp-ma.vercel.app` segue pública. Reativar = PATCH com o valor anterior. |
+| Fase 3 — Commit/push | ✅ `45d1cb0` | 16 arquivos (código + `.vercelignore` + docs) em `origin/feat/portal-v2`; backups/`mockup.html` ficaram fora. |
+| Fase 4 — Multi-tenant/RBAC | ✅ Concluída (local) | Vínculos ativos obrigatórios, perfil por organização suportado, sessão revalidada a cada acesso, hierarquia centralizada em `src/lib/roles.ts`. `tsc` limpo, build OK, **30 suítes / 414 testes** passando. |
 | Storage v2 | ⏳ Pendente | Reutilizar bucket com prefixo isolado. |
-| Commit/push da fase | ⏳ Pendente | Working tree não commitado; aguardando autorização explícita. |
 
-> **Status:** Fase 1 concluída. Fase 2 concluída (banco, branch, env de Preview). Fase 3 concluída e validada em preview: tipos, testes e build OK, deploy de Preview no ar lendo o banco isolado. `/api/public/eventos` vazio é esperado (nenhum evento publicado e futuro). Próximo: liberar acesso ao preview e iniciar a fase seguinte.
+> **Status:** Fases 1–4 concluídas localmente. Fase 3 validada em preview (deploy no ar lendo `v2-dev`, `/api/public/eventos` vazio é esperado). Fase 4 endureceu o multi-tenant/RBAC: vínculos ativos obrigatórios, perfil por organização, sessão revalidada e hierarquia única de roles. Gate atual: `tsc` limpo, build OK, 30 suítes / 414 testes. Próximo: fase seguinte do plano (UI de atribuição de perfil por organização e storage ficam como pendências registradas).

@@ -39,7 +39,7 @@ export async function resolveOrgScope(
   }
 
   const vinculos = await prisma.usuarioOrganizacao.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, ativo: true, organizacao: { ativo: true } },
     select: { organizacaoId: true },
   });
   const orgIds = vinculos.map(v => v.organizacaoId);
@@ -136,12 +136,17 @@ export async function assertTargetUserScope(
 
   const target = await prisma.user.findUnique({
     where: { id: targetUserId },
-    select: { organizacoes: { select: { organizacaoId: true } } },
+    select: {
+      organizacoes: {
+        where: { ativo: true, organizacao: { ativo: true } },
+        select: { organizacaoId: true },
+      },
+    },
   });
   if (!target) throw new Error('NOT_FOUND');
 
   const mine = await prisma.usuarioOrganizacao.findMany({
-    where: { userId: requester.id },
+    where: { userId: requester.id, ativo: true, organizacao: { ativo: true } },
     select: { organizacaoId: true },
   });
   const myIds = new Set(mine.map(m => m.organizacaoId));

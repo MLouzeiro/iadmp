@@ -1,12 +1,15 @@
 /**
  * @jest-environment node
  */
-import { resolveOrgScope, resolveTargetOrgId, assertOrgAccess, withOrgScope, orgFilter, resolvePublicOrganizacaoId, ORG_FORBIDDEN, ORG_REQUIRED } from '@/lib/tenant';
+import { resolveOrgScope, resolveTargetOrgId, assertOrgAccess, assertTargetUserScope, withOrgScope, orgFilter, resolvePublicOrganizacaoId, ORG_FORBIDDEN, ORG_REQUIRED } from '@/lib/tenant';
 import { canManageOrganization } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 
 jest.mock('@/lib/prisma', () => ({
   prisma: {
+    user: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
     usuarioOrganizacao: {
       findMany: jest.fn().mockResolvedValue([]),
       findUnique: jest.fn().mockResolvedValue(null),
@@ -30,6 +33,7 @@ const mockAudit = prisma.auditLog.create as jest.Mock;
 const mockCan = canManageOrganization as jest.Mock;
 const mockOrgs = prisma.organizacao.findMany as jest.Mock;
 const mockOrgFindFirst = prisma.organizacao.findFirst as jest.Mock;
+const mockUserFindUnique = prisma.user.findUnique as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -49,7 +53,7 @@ describe('resolveOrgScope', () => {
     expect(scope.mode).toBe('MULTI');
     expect(scope.orgIds).toEqual(['org-a', 'org-b']);
     expect(mockFindMany).toHaveBeenCalledWith({
-      where: { userId: 'u1' },
+      where: { userId: 'u1', ativo: true, organizacao: { ativo: true } },
       select: { organizacaoId: true },
     });
   });
@@ -134,6 +138,57 @@ describe('assertOrgAccess', () => {
           acao: 'ACESSO_NEGADO',
           entidade: 'Organizacao',
           entidadeId: 'org-outra',
+          resultado: 'NEGADO',
+        }),
+      })
+    );
+  });
+});
+
+describe('assertTargetUserScope', () => {
+  it('SUPER_ADMIN nao e restringido', async () => {
+    await expect(assertTargetUserScope({ id: 'u1', role: 'SUPER_ADMIN' }, 'alvo')).resolves.toBeUndefined();
+    expect(mockUserFindUnique).not.toHaveBeenCalled();
+  });
+
+  it('lanca NOT_FOUND quando o alvo nao existe', async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+    await expect(assertTargetUserScope({ id: 'u1', role: 'LIDER' }, 'alvo')).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('considera apenas vinculos ativos de organizacoes ativas', async () => {
+    mockUserFindUnique.mockResolvedValue({ organizacoes: [{ organizacaoId: 'org-a' }] });
+    mockFindMany.mockResolvedValue([{ organizacaoId: 'org-a' }]);
+
+    await expect(assertTargetUserScope({ id: 'u1', role: 'LIDER' }, 'alvo')).resolves.toBeUndefined();
+
+    expect(mockUserFindUnique).toHaveBeenCalledWith({
+      where: { id: 'alvo' },
+      select: {
+        organizacoes: {
+          where: { ativo: true, organizacao: { ativo: true } },
+          select: { organizacaoId: true },
+        },
+      },
+    });
+    expect(mockFindMany).toHaveBeenCalledWith({
+      where: { userId: 'u1', ativo: true, organizacao: { ativo: true } },
+      select: { organizacaoId: true },
+    });
+  });
+
+  it('lanca ORG_FORBIDDEN e audita quando nao ha organizacao em comum', async () => {
+    mockUserFindUnique.mockResolvedValue({ organizacoes: [{ organizacaoId: 'org-b' }] });
+    mockFindMany.mockResolvedValue([{ organizacaoId: 'org-a' }]);
+
+    await expect(assertTargetUserScope({ id: 'u1', role: 'LIDER' }, 'alvo')).rejects.toThrow(ORG_FORBIDDEN);
+    expect(mockAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: 'u1',
+          acao: 'ACESSO_NEGADO',
+          entidade: 'User',
+          entidadeId: 'alvo',
           resultado: 'NEGADO',
         }),
       })

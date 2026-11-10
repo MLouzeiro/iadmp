@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       where.organizacaoId = organizacaoId;
     } else if (user.role !== 'SUPER_ADMIN') {
       const vinculos = await prisma.usuarioOrganizacao.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, ativo: true, organizacao: { ativo: true } },
         select: { organizacaoId: true },
       });
       where.organizacaoId = { in: vinculos.map(v => v.organizacaoId) };

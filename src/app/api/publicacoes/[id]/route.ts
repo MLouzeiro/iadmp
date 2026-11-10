@@ -44,7 +44,7 @@ export async function GET(
 
     if (user.role !== 'SUPER_ADMIN') {
       const userOrgs = await prisma.usuarioOrganizacao.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, ativo: true, organizacao: { ativo: true } },
         select: { organizacaoId: true },
       });
       const orgIds = userOrgs.map(u => u.organizacaoId);

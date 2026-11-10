@@ -8,8 +8,11 @@
 
 - **Sessão:** `requireAuth()` (lança `UNAUTHORIZED`) ou `getSessionUser()`.
 - **SUPER_ADMIN:** `requireSuperAdmin()` (lança `FORBIDDEN` para outros).
-- **Permissão fina:** `hasPermission(userId, modulo, acao)`.
+- **Permissão fina:** `hasPermission(userId, modulo, acao, organizacaoId?)`.
   - Internamente faz `perms.includes(`${modulo.toLowerCase()}:${acao}`)` → **o módulo é case-insensitive**; a ação deve estar em minúsculas.
+- **Perfil efetivo (Fase 4):** união de `User.perfilId` com `UsuarioOrganizacao.perfilId` dos vínculos ativos. Quando `organizacaoId` é informado, considera apenas o perfil daquele vínculo. `UsuarioPermissao` concede/revoga por cima.
+- **Vínculos válidos:** somente `UsuarioOrganizacao.ativo = true` **e** `Organizacao.ativo = true` contam para escopo e permissões.
+- **Sessão revalidada (Fase 4):** o callback `jwt` recarrega role e vínculos do banco; usuário inativo ou removido tem a sessão invalidada.
 - **Escopo multi-tenant:**
   - `resolveOrgScope(user, organizacaoId)` → `SINGLE` / `MULTI` / `ALL`.
   - `resolveTargetOrgId(user, organizacaoId)` → valida organização-alvo.
@@ -176,3 +179,10 @@ requireAuth() → hasPermission(modulo, acao) → resolveOrgScope/resolveTargetO
 2. **Ações especiais** existem além de CRUD: `iniciar_culto`, `finalizar_culto`, `gerenciar_musicas`, `gerenciar_modelos`, `gerenciar_canais`, `ver_auditoria`, `publicar`, `destacar`, `ver`.
 3. **`requireSuperAdmin`** aparece em organizações, publicações, página pública, seed e comparativo de orgs.
 4. **Rotas públicas** nunca exigem sessão, mas sempre resolvem organização ativa/site público.
+
+### 11.1 Modelo revisado — Fase 4
+
+5. **Vínculos ativos:** `resolveOrgScope`, `canManageOrganization`, `getUserOrganizations`, `assertTargetUserScope` e as rotas com consulta manual (`liturgia`, `comunicacao`, `versiculos`, `publicacoes`) exigem `UsuarioOrganizacao.ativo = true` e `Organizacao.ativo = true`.
+6. **Perfil por organização:** `hasPermission(userId, modulo, acao, organizacaoId?)` aceita o escopo organizacional; sem ele, usa a união dos perfis dos vínculos ativos. O campo `UsuarioOrganizacao.perfilId` passa a ser considerado (a UI de atribuição fica para fase posterior).
+7. **Sessão:** `src/lib/auth.ts` recarrega role/vínculos via `loadSessionUserState` no callback `jwt`; retorna `null` quando o usuário foi removido ou está inativo. Tipos em `src/types/next-auth.d.ts` incluem `ativo` e `organizacoes`.
+8. **Hierarquia única:** níveis centralizados em `src/lib/roles.ts` e alinhados ao AGENTS.md — `SUPER_ADMIN` 100, `ADMIN_IGREJA` 90, `PASTOR` 85, `LIDER`/`LIDER_MINISTERIO`/`COORDENADOR` 60, `SECRETARIA`/`FINANCEIRO`/`EDITOR_SITE` 50, `MUSICO` 20, `MEMBER` 10. `canAssignRole` só permite nível estritamente inferior.

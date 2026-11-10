@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { requireAuth, requireSuperAdmin, hasPermission } from '@/lib/auth-helpers';
+import { requireAuth, requireSuperAdmin, hasPermission, canManageOrganization } from '@/lib/auth-helpers';
 import { writeAudit } from '@/lib/audit';
 
 const criarPublicacaoSchema = z.object({
@@ -49,15 +49,13 @@ export async function GET(request: NextRequest) {
 
     if (organizacaoId) {
       if (user.role !== 'SUPER_ADMIN') {
-        const allowed = await prisma.usuarioOrganizacao.findUnique({
-          where: { userId_organizacaoId: { userId: user.id, organizacaoId } },
-        });
+        const allowed = await canManageOrganization(user.id, organizacaoId);
         if (!allowed) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       where.destinos = { some: { organizacaoId } };
     } else if (user.role !== 'SUPER_ADMIN') {
       const userOrgs = await prisma.usuarioOrganizacao.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, ativo: true, organizacao: { ativo: true } },
         select: { organizacaoId: true },
       });
       const orgIds = userOrgs.map(u => u.organizacaoId);

@@ -112,7 +112,7 @@ describe('GET listas com organizacaoId (query) exigem membership', () => {
     expect(res.status).toBe(200);
     expect(mockCan).not.toHaveBeenCalled();
     expect(prisma.usuarioOrganizacao.findMany).toHaveBeenCalledWith({
-      where: { userId: 'u1' },
+      where: { userId: 'u1', ativo: true, organizacao: { ativo: true } },
       select: { organizacaoId: true },
     });
     expect(prisma.liturgia.findMany).toHaveBeenCalledWith(

@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { loadSessionUserState } from '@/lib/session';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -54,7 +55,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = (user as any).role;
         token.id = (user as any).id;
         token.organizacoes = (user as any).organizacoes || [];
+        token.ativo = true;
+        return token;
       }
+
+      const userId = (token.id as string | undefined) || (token.sub as string | undefined);
+      if (!userId) return null;
+
+      const state = await loadSessionUserState(userId);
+      if (!state || !state.ativo) return null;
+
+      token.id = state.id;
+      token.role = state.role;
+      token.organizacoes = state.organizacoes;
+      token.ativo = state.ativo;
       return token;
     },
     async session({ session, token }) {
@@ -62,6 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
         (session.user as any).organizacoes = token.organizacoes || [];
+        (session.user as any).ativo = token.ativo !== false;
       }
       return session;
     },
